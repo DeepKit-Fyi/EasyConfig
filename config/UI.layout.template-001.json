@@ -1,0 +1,41 @@
+{
+  "MainWindow": {
+    "Width": 1024,
+    "Height": 768,
+    "Maximized": false
+  },
+  "Layout": {
+    "TreeWidth": 250,
+    "PreviewHeight": 200,
+    "ShowPreview": true,
+    "ShowStatusBar": true,
+    "ShowToolbar": true,
+    "ToolbarPosition": "top"
+  },
+  "SavedLayouts": [
+    {
+      "Name": "Default",
+      "MainWidth": 1024,
+      "MainHeight": 768,
+      "MainMaximized": false,
+      "TreeWidth": 250,
+      "PreviewHeight": 200,
+      "ShowPreview": true,
+      "ShowStatusBar": true,
+      "ShowToolbar": true,
+      "ToolbarPosition": "top"
+    },
+    {
+      "Name": "Compact",
+      "MainWidth": 800,
+      "MainHeight": 600,
+      "MainMaximized": false,
+      "TreeWidth": 200,
+      "PreviewHeight": 150,
+      "ShowPreview": false,
+      "ShowStatusBar": false,
+      "ShowToolbar": true,
+      "ToolbarPosition": "top"
+    }
+  ]
+} 

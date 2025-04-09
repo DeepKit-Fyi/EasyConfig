@@ -1,0 +1,22 @@
+{
+  "DefaultFont": {
+    "Name": "Segoe UI",
+    "Size": 9
+  },
+  "TitleFont": {
+    "Name": "Segoe UI",
+    "Size": 12
+  },
+  "MenuFont": {
+    "Name": "Segoe UI",
+    "Size": 9
+  },
+  "ButtonFont": {
+    "Name": "Segoe UI",
+    "Size": 9
+  },
+  "MonospaceFont": {
+    "Name": "Consolas",
+    "Size": 10
+  }
+} 

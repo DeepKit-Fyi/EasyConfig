@@ -1,0 +1,72 @@
+{
+  "Length": 10.0,
+  "AudioPath": "resources/audio/background.mp3",
+  "AudioVolume": 0.8,
+  "AudioStartTime": 0.0,
+  "Background": {
+    "ImagePath": "resources/images/video_bg.jpg",
+    "Opacity": 1.0,
+    "FitMode": "cover",
+    "OffsetX": 0,
+    "OffsetY": 0,
+    "Rotation": 0,
+    "BlurRadius": 0
+  },
+  "Images": [
+    {
+      "ImagePath": "resources/images/logo.png",
+      "X": 50,
+      "Y": 50,
+      "Width": 200,
+      "Height": 100,
+      "Opacity": 1.0,
+      "Rotation": 0
+    },
+    {
+      "ImagePath": "resources/images/icon.png",
+      "X": 400,
+      "Y": 200,
+      "Width": 128,
+      "Height": 128,
+      "Opacity": 0.9,
+      "Rotation": 15
+    }
+  ],
+  "Texts": [
+    {
+      "Text": "配置管理器演示",
+      "X": 300,
+      "Y": 100,
+      "FontName": "Microsoft YaHei",
+      "FontSize": 24,
+      "FontColor": "#ffffff",
+      "Bold": true,
+      "Italic": false,
+      "Alignment": 1
+    },
+    {
+      "Text": "强大、灵活的配置管理解决方案",
+      "X": 300,
+      "Y": 140,
+      "FontName": "Microsoft YaHei",
+      "FontSize": 16,
+      "FontColor": "#f0f0f0",
+      "Bold": false,
+      "Italic": false,
+      "Alignment": 1
+    }
+  ],
+  "Transitions": [
+    {
+      "Type": "fade",
+      "Duration": 1.0,
+      "StartTime": 0.0
+    },
+    {
+      "Type": "fade",
+      "Duration": 1.0,
+      "StartTime": 9.0,
+      "Direction": "out"
+    }
+  ]
+} 

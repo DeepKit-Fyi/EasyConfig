@@ -1,0 +1,686 @@
+object ViewBuildConfig: TViewBuildConfig
+  Left = 0
+  Top = 0
+  Width = 979
+  Height = 599
+  TabOrder = 0
+  object Splitter1: TSplitter
+    Left = 0
+    Top = 555
+    Width = 979
+    Height = 3
+    Cursor = crVSplit
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alBottom
+    MinSize = 45
+    ExplicitLeft = 257
+    ExplicitTop = 85
+    ExplicitWidth = 354
+  end
+  object Splitter2: TSplitter
+    Left = 933
+    Top = 85
+    Width = 5
+    Height = 470
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alRight
+    MinSize = 45
+    ExplicitLeft = 400
+    ExplicitTop = 160
+    ExplicitHeight = 100
+  end
+  object Splitter3: TSplitter
+    Left = 300
+    Top = 85
+    Width = 5
+    Height = 470
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    MinSize = 45
+    ExplicitLeft = 392
+    ExplicitTop = 152
+    ExplicitHeight = 100
+  end
+  object Splitter4: TSplitter
+    Left = 0
+    Top = 82
+    Width = 979
+    Height = 3
+    Cursor = crVSplit
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alTop
+    MinSize = 45
+    ExplicitLeft = 266
+    ExplicitWidth = 357
+  end
+  object pnlIni: TPanel
+    Left = 0
+    Top = 0
+    Width = 979
+    Height = 41
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alTop
+    TabOrder = 0
+    ExplicitWidth = 640
+    object btnAddText: TButton
+      Left = 9
+      Top = 7
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#25991#26412
+      TabOrder = 0
+    end
+    object btnAddNumber: TButton
+      Left = 90
+      Top = 7
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#25968#23383
+      TabOrder = 1
+    end
+    object btnAddPath: TButton
+      Left = 171
+      Top = 7
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#36335#24452
+      TabOrder = 2
+    end
+    object btnAddBoolean: TButton
+      Left = 252
+      Top = 7
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#24067#23572
+      TabOrder = 3
+    end
+    object btnAddDate: TButton
+      Left = 333
+      Top = 7
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#26085#26399
+      TabOrder = 4
+    end
+    object btnAddColor: TButton
+      Left = 414
+      Top = 7
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#39068#33394
+      TabOrder = 5
+    end
+  end
+  object pnlJson: TPanel
+    Left = 0
+    Top = 41
+    Width = 979
+    Height = 41
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alTop
+    TabOrder = 1
+    ExplicitWidth = 640
+    object btnAddFont: TButton
+      Left = 9
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#23383#20307
+      TabOrder = 0
+    end
+    object btnAddColorComplex: TButton
+      Left = 90
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#39068#33394
+      TabOrder = 1
+    end
+    object btnAddDatabase: TButton
+      Left = 171
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#25968#25454#24211
+      TabOrder = 2
+    end
+    object btnAddList: TButton
+      Left = 252
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#21015#34920
+      TabOrder = 3
+    end
+    object btnAddObject: TButton
+      Left = 333
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#23545#35937
+      TabOrder = 4
+    end
+    object btnAddArray: TButton
+      Left = 414
+      Top = 8
+      Width = 75
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = #28155#21152#25968#32452
+      TabOrder = 5
+    end
+  end
+  object pnlLeft: TPanel
+    Left = 0
+    Top = 85
+    Width = 300
+    Height = 470
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alLeft
+    TabOrder = 2
+    ExplicitHeight = 351
+    object Panel1: TPanel
+      Left = 1
+      Top = 1
+      Width = 300
+      Height = 468
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Align = alLeft
+      TabOrder = 0
+      ExplicitHeight = 349
+      object sgINI: TStringGrid
+        Left = 1
+        Top = 1
+        Width = 298
+        Height = 112
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Align = alTop
+        ColCount = 2
+        DefaultColWidth = 96
+        DefaultRowHeight = 36
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goRowSelect]
+        TabOrder = 0
+        OnDblClick = sgINIDblClick
+        ColWidths = (
+          105
+          186)
+      end
+      object Panel2: TPanel
+        Left = 1
+        Top = 113
+        Width = 300
+        Height = 354
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Align = alLeft
+        TabOrder = 1
+        ExplicitHeight = 235
+        object Panel3: TPanel
+          Left = 1
+          Top = 1
+          Width = 300
+          Height = 352
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Align = alLeft
+          TabOrder = 0
+          ExplicitHeight = 233
+          object Splitter5: TSplitter
+            Left = 1
+            Top = 1
+            Width = 298
+            Height = 3
+            Cursor = crVSplit
+            Margins.Left = 5
+            Margins.Top = 5
+            Margins.Right = 5
+            Margins.Bottom = 5
+            Align = alTop
+            MinSize = 45
+          end
+          object tvJSON: TTreeView
+            Left = 1
+            Top = 45
+            Width = 298
+            Height = 306
+            Margins.Left = 5
+            Margins.Top = 5
+            Margins.Right = 5
+            Margins.Bottom = 5
+            Align = alClient
+            DragMode = dmAutomatic
+            Indent = 19
+            TabOrder = 0
+            OnDblClick = tvJSONDblClick
+            ExplicitHeight = 187
+          end
+          object pnlEditing: TPanel
+            Left = 1
+            Top = 4
+            Width = 298
+            Height = 41
+            Margins.Left = 5
+            Margins.Top = 5
+            Margins.Right = 5
+            Margins.Bottom = 5
+            Align = alTop
+            TabOrder = 1
+            object edtEditing: TEdit
+              AlignWithMargins = True
+              Left = 11
+              Top = 11
+              Width = 222
+              Height = 19
+              Margins.Left = 10
+              Margins.Top = 10
+              Margins.Right = 10
+              Margins.Bottom = 10
+              Align = alLeft
+              TabOrder = 0
+              Text = 'edtEditing'
+              ExplicitHeight = 23
+            end
+            object btnUpdate: TButton
+              AlignWithMargins = True
+              Left = 224
+              Top = 11
+              Width = 63
+              Height = 19
+              Margins.Left = 10
+              Margins.Top = 10
+              Margins.Right = 10
+              Margins.Bottom = 10
+              Align = alRight
+              Caption = #20445#23384#20462#25913
+              TabOrder = 1
+              OnClick = btnUpdateClick
+            end
+          end
+        end
+      end
+    end
+  end
+  object pnlRigth: TPanel
+    Left = 938
+    Top = 85
+    Width = 41
+    Height = 470
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alRight
+    TabOrder = 3
+    ExplicitLeft = 599
+    ExplicitHeight = 351
+  end
+  object pnlContent: TPanel
+    Left = 305
+    Top = 85
+    Width = 628
+    Height = 470
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alClient
+    TabOrder = 4
+    ExplicitWidth = 289
+    ExplicitHeight = 351
+    object PageControl1: TPageControl
+      Left = 1
+      Top = 1
+      Width = 626
+      Height = 468
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      ActivePage = tsEditor
+      Align = alClient
+      TabOrder = 0
+      ExplicitWidth = 287
+      ExplicitHeight = 349
+      object tsINI: TTabSheet
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Caption = 'INI'#20869#23481
+        object Memo1: TMemo
+          Left = 0
+          Top = 0
+          Width = 618
+          Height = 438
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Align = alClient
+          Lines.Strings = (
+            'Memo1')
+          ScrollBars = ssBoth
+          TabOrder = 0
+          ExplicitWidth = 279
+          ExplicitHeight = 319
+        end
+      end
+      object tsJSON: TTabSheet
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Caption = 'JSON'#20869#23481
+        ImageIndex = 1
+        object Memo2: TMemo
+          Left = 0
+          Top = 0
+          Width = 618
+          Height = 438
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Align = alClient
+          Lines.Strings = (
+            'Memo1')
+          ScrollBars = ssBoth
+          TabOrder = 0
+          ExplicitWidth = 279
+          ExplicitHeight = 319
+        end
+      end
+      object tsEditor: TTabSheet
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
+        Caption = #22797#26434#23646#24615#32534#36753#22120
+        ImageIndex = 2
+        object Panel4: TPanel
+          Left = 0
+          Top = 397
+          Width = 618
+          Height = 41
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Align = alBottom
+          TabOrder = 0
+          ExplicitTop = 278
+          ExplicitWidth = 279
+          object btnSave: TButton
+            AlignWithMargins = True
+            Left = 184
+            Top = 14
+            Width = 91
+            Height = 19
+            Margins.Left = 10
+            Margins.Top = 10
+            Margins.Right = 10
+            Margins.Bottom = 10
+            Caption = #20445#23384#21040#25991#20214
+            TabOrder = 0
+            OnClick = btnSaveClick
+          end
+        end
+        object pnlEditorContent: TPanel
+          Left = 0
+          Top = 0
+          Width = 618
+          Height = 397
+          Margins.Left = 5
+          Margins.Top = 5
+          Margins.Right = 5
+          Margins.Bottom = 5
+          Align = alClient
+          TabOrder = 1
+          ExplicitWidth = 279
+          ExplicitHeight = 278
+        end
+      end
+    end
+  end
+  object pnlBottom: TPanel
+    Left = 0
+    Top = 558
+    Width = 979
+    Height = 41
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alBottom
+    TabOrder = 5
+    ExplicitTop = 439
+    ExplicitWidth = 640
+    object edtFileName: TEdit
+      AlignWithMargins = True
+      Left = 11
+      Top = 11
+      Width = 406
+      Height = 19
+      Margins.Left = 10
+      Margins.Top = 10
+      Margins.Right = 10
+      Margins.Bottom = 10
+      Align = alLeft
+      TabOrder = 0
+      Text = 'edtFileName'
+      ExplicitHeight = 23
+    end
+    object btnClose: TButton
+      AlignWithMargins = True
+      Left = 915
+      Top = 11
+      Width = 53
+      Height = 19
+      Margins.Left = 10
+      Margins.Top = 10
+      Margins.Right = 10
+      Margins.Bottom = 10
+      Align = alRight
+      Caption = #36864#20986
+      TabOrder = 1
+      OnClick = btnCloseClick
+      ExplicitLeft = 576
+    end
+    object btnOpenConfig: TButton
+      AlignWithMargins = True
+      Left = 802
+      Top = 11
+      Width = 93
+      Height = 19
+      Margins.Left = 10
+      Margins.Top = 10
+      Margins.Right = 10
+      Margins.Bottom = 10
+      Align = alRight
+      Caption = #25171#24320#37197#32622#25991#20214
+      TabOrder = 2
+      OnClick = btnOpenConfigClick
+      ExplicitLeft = 463
+    end
+  end
+  object dlgOpenFile: TOpenDialog
+    DefaultExt = '*.ini'
+    Filter = 'INI '#25991#20214'(*.ini)|*.ini|JSON '#25991#20214'(*.json)|*.json|'#25152#26377#25991#20214'(*.*)|*.*'
+    Left = 496
+    Top = 8
+  end
+  object dlgBrowseDir: TFileOpenDialog
+    FavoriteLinks = <>
+    FileTypes = <>
+    Options = [fdoPickFolders]
+    Left = 552
+    Top = 9
+  end
+  object dlgSelectColor: TColorDialog
+    Left = 608
+    Top = 8
+  end
+  object popupINI: TPopupMenu
+    Left = 104
+    Top = 152
+    object N1: TMenuItem
+      Caption = #26032#24314#23646#24615
+      object N5: TMenuItem
+        Caption = #25991#26412#23646#24615
+        OnClick = btnAddTextClick
+      end
+      object N6: TMenuItem
+        Caption = #25968#23383#23646#24615
+        OnClick = btnAddNumberClick
+      end
+      object N7: TMenuItem
+        Caption = #36335#24452#23646#24615
+        OnClick = btnAddPathClick
+      end
+      object N8: TMenuItem
+        Caption = #24067#23572#23646#24615
+        OnClick = btnAddBooleanClick
+      end
+      object N9: TMenuItem
+        Caption = #26085#26399#23646#24615
+        OnClick = btnAddDateClick
+      end
+      object N10: TMenuItem
+        Caption = #39068#33394#23646#24615
+        OnClick = btnAddColorClick
+      end
+    end
+    object N2: TMenuItem
+      Caption = #32534#36753#23646#24615
+      OnClick = EditINIPropertyClick
+    end
+    object N3: TMenuItem
+      Caption = #20462#25913#23646#24615#21517#31216
+      OnClick = RenameINIPropertyClick
+    end
+    object N4: TMenuItem
+      Caption = #21024#38500#23646#24615
+      OnClick = DeleteINIPropertyClick
+    end
+  end
+  object popupJSON: TPopupMenu
+    Left = 120
+    Top = 256
+    object MenuItem1: TMenuItem
+      Caption = #26032#24314#23646#24615
+      object MenuItem8: TMenuItem
+        Caption = #23383#20307#23646#24615
+        OnClick = btnAddFontClick
+      end
+      object MenuItem9: TMenuItem
+        Caption = #39068#33394#23646#24615
+        OnClick = btnAddColorComplexClick
+      end
+      object MenuItem10: TMenuItem
+        Caption = #25968#25454#24211#23646#24615
+        OnClick = btnAddDatabaseClick
+      end
+      object MenuItem11: TMenuItem
+        Caption = #21015#34920#23646#24615
+        OnClick = btnAddListClick
+      end
+      object MenuItem12: TMenuItem
+        Caption = #23545#35937#23646#24615
+        OnClick = btnAddObjectClick
+      end
+      object MenuItem13: TMenuItem
+        Caption = #25968#32452#23646#24615
+        OnClick = btnAddArrayClick
+      end
+    end
+    object MenuItem2: TMenuItem
+      Caption = #32534#36753#23646#24615
+      OnClick = EditJSONPropertyClick
+    end
+    object MenuItem3: TMenuItem
+      Caption = #20462#25913#23646#24615#21517#31216
+      OnClick = RenameJSONPropertyClick
+    end
+    object MenuItem4: TMenuItem
+      Caption = #21024#38500#23646#24615
+      OnClick = DeleteJSONPropertyClick
+    end
+  end
+end

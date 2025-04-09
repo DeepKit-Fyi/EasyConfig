@@ -1,0 +1,44 @@
+{
+  "Position": "left",
+  "Width": 250,
+  "Height": 500,
+  "SlideSpeed": 0.3,
+  "DampingFactor": 0.8,
+  "MinimizedSize": 20,
+  "BackgroundColor": "#f0f0f0",
+  "AutoHide": false,
+  "Title": "控制面板",
+  "TitleColor": "#333333",
+  "TitleBackgroundColor": "#d0d0d0",
+  "BorderWidth": 1,
+  "BorderColor": "#cccccc",
+  "ContentPadding": 10,
+  "NestedDrawers": [
+    {
+      "Position": "top",
+      "Width": 250,
+      "Height": 200,
+      "SlideSpeed": 0.3,
+      "DampingFactor": 0.8,
+      "MinimizedSize": 20,
+      "BackgroundColor": "#e8f5e9",
+      "AutoHide": true,
+      "Title": "快速工具",
+      "TitleColor": "#333333",
+      "TitleBackgroundColor": "#c8e6c9"
+    },
+    {
+      "Position": "bottom",
+      "Width": 250,
+      "Height": 150,
+      "SlideSpeed": 0.3,
+      "DampingFactor": 0.8,
+      "MinimizedSize": 20,
+      "BackgroundColor": "#e3f2fd",
+      "AutoHide": true,
+      "Title": "状态信息",
+      "TitleColor": "#333333",
+      "TitleBackgroundColor": "#bbdefb"
+    }
+  ]
+} 

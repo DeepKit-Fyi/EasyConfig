@@ -1,0 +1,22 @@
+{
+  "ThemeName": "Default",
+  "DarkMode": false,
+  "Colors": {
+    "Primary": "#3498db",
+    "Secondary": "#2ecc71",
+    "Background": "#ffffff",
+    "Text": "#333333",
+    "Highlight": "#e74c3c"
+  },
+  "Style": {
+    "ButtonRadius": 4,
+    "EnableShadows": true
+  },
+  "CustomColors": {
+    "Warning": "#f39c12",
+    "Info": "#3498db",
+    "Success": "#2ecc71",
+    "Error": "#e74c3c",
+    "Muted": "#95a5a6"
+  }
+} 

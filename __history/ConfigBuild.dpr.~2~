@@ -1,0 +1,15 @@
+﻿program ConfigBuild;
+
+uses
+  Vcl.Forms,
+  ViewMainConfig in 'ViewMainConfig.pas' {Form1},
+  ViewBuildConifg in 'ViewBuildConifg.pas' {ViewBuildConfig: TFrame};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

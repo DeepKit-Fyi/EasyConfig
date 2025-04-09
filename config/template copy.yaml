@@ -1,0 +1,235 @@
+TemplateName: 多层级配置模板
+
+- Text:
+
+  - Text.mainTitle
+    DisplayName: 主标题
+    Description: 页面的主要标题
+    ZOrder: 10
+    Visible: True
+    Value: Title
+    Pos:
+      X: 100
+      Y: 50
+      IsCenterX: True
+      IsCenterY: False
+    Font:
+      Name: Microsoft YaHei
+      Size: 14
+      Color: clBlack
+      Style: 
+        - Bold
+
+  - Text.secTitle
+    DisplayName: 二级标题
+    Description: 页面的二级标题
+    ZOrder: 20
+    Visible: True
+    Value: Secondary Title
+    Pos:
+      X: 100
+      Y: 80
+      IsCenterX: True
+      IsCenterY: False
+    Font:
+      Name: Microsoft YaHei
+      Size: 12
+      Color: clNavy
+      Style: 
+        - Bold
+        - Italic
+
+  - Text.subtitle
+    DisplayName: 副标题
+    Description: 页面的副标题
+    ZOrder: 30
+    Visible: True
+    Value: Subtitle
+    Pos:
+      X: 100
+      Y: 110
+      IsCenterX: True
+      IsCenterY: False
+    Font:
+      Name: Microsoft YaHei
+      Size: 10
+      Color: clGray
+      Style: 
+        - Italic
+
+- Dir:
+
+  - Dir.audios
+    DisplayName: 音频目录
+    Description: 音频文件存放目录
+    ZOrder: 100
+    Visible: True
+    Path: ""
+    Pos:
+      X: 0
+      Y: 0
+
+  - Dir.output
+    DisplayName: 输出目录
+    Description: 输出文件保存目录
+    ZOrder: 110
+    Visible: True
+    Path: ""
+    Pos:
+      X: 0
+      Y: 0
+
+  - Dir.temp
+    DisplayName: 临时目录
+    Description: 临时文件目录
+    ZOrder: 120
+    Visible: True
+    Path: z:/tempV2V
+    Pos:
+      X: 0
+      Y: 0
+
+- File:
+
+  - File.mp3
+    DisplayName: MP3文件
+    Description: MP3音频文件
+    ZOrder: 200
+    Visible: True
+    Path: ""
+    FileType: mp3
+    Pos:
+      X: 0
+      Y: 0
+
+- Input:
+
+  - Input.text
+    DisplayName: 文本输入
+    Description: 用户输入的文本
+    ZOrder: 300
+    Visible: True
+    Text: 这是它的默认值
+    Pos:
+      X: 0
+      Y: 0
+
+- Font:
+
+  - Font.MainFont
+    DisplayName: 主要字体
+    Description: 主要文本字体
+    ZOrder: 400
+    Visible: True
+    Name: Arial
+    Size: 12
+    Color: clBlack
+    Pos:
+      X: 0
+      Y: 0
+    Style: 
+
+- FontEffect:
+
+  - FontEffect.MainFontEffect
+    DisplayName: 主要字体特效
+    Description: 主要文本字体特效
+    ZOrder: 500
+    Visible: True
+    Bold: True
+    Italic: False
+    Underline: False
+    StrikeOut: False
+    Shadow: True
+    ShadowColor: clGray
+    ShadowOffsetX: 1
+    ShadowOffsetY: 1
+    Outline: False
+    OutlineColor: clBlack
+    OutlineWidth: 1
+    Pos:
+      X: 0
+      Y: 0
+
+- Image:
+
+  - Image.main
+    DisplayName: 主图像
+    Description: 页面的主要图像
+    ZOrder: 600
+    Visible: True
+    FileName: images/main.png
+    Transparent: True
+    TransparentColor: clWhite
+    Pos:
+      X: 200
+      Y: 150
+      IsCenterX: False
+      IsCenterY: False
+    Scale:
+      Width: 300
+      Height: 200
+      KeepAspectRatio: True
+
+  - Image.background
+    DisplayName: 背景图像
+    Description: 页面的背景图像
+    ZOrder: 550
+    Visible: True
+    FileName: images/background.jpg
+    Transparent: False
+    Pos:
+      X: 0
+      Y: 0
+      IsCenterX: False
+      IsCenterY: False
+    Scale:
+      Width: 800
+      Height: 600
+      KeepAspectRatio: False
+
+- ImageDrawer:
+
+  - ImageDrawer.MainDrawer
+    DisplayName: 主绘制器
+    Description: 主要图像绘制器
+    ZOrder: 700
+    Visible: True
+    DrawerType: Normal
+    Opacity: 255
+    BlendMode: Normal
+    Pos:
+      X: 400
+      Y: 300
+      IsCenterX: True
+      IsCenterY: True
+    DrawSettings:
+      FillColor: clWhite
+      StrokeColor: clBlack
+      StrokeWidth: 2
+      Shape: Rectangle
+      Width: 200
+      Height: 150
+      Radius: 10
+
+  - ImageDrawer.EffectDrawer
+    DisplayName: 特效绘制器
+    Description: 特效图像绘制器
+    ZOrder: 710
+    Visible: True
+    DrawerType: Gradient
+    Opacity: 200
+    BlendMode: Overlay
+    Pos:
+      X: 500
+      Y: 400
+      IsCenterX: False
+      IsCenterY: False
+    DrawSettings:
+      Shape: Ellipse
+      Width: 150
+      Height: 150
+      StartColor: clRed
+      EndColor: clBlue
+      GradientType: Linear
+      Direction: 45 

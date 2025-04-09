@@ -1,0 +1,52 @@
+﻿﻿program ConfigEditor;
+
+uses
+  Vcl.Forms,
+  ViewIntf in 'ViewIntf.pas',
+  ConfigTypes in 'ConfigTypes.pas',
+  ControllerIntf in 'ControllerIntf.pas',
+  ControllerMain in 'ControllerMain.pas',
+  INIConfig in 'INIConfig.pas',
+  JSONConfig in 'JSONConfig.pas',
+  ConfigTree in 'ConfigTree.pas',
+  ViewBuildConfig in 'ViewBuildConfig.pas' {ViewBuildConfig: TFrame},
+  FrameConfigEditor in 'FrameConfigEditor.pas' {frameConfigEditor: TFrame},
+  FramesComplexEditor in 'FramesComplexEditor.pas',
+  FrameFontEditor in 'FrameFontEditor.pas',
+  FrameAIAPIEditor in 'FrameAIAPIEditor.pas',
+  ReferenceEditor in 'ReferenceEditor.pas',
+  ModelConfig in 'ModelConfig.pas',
+  ModelRegistry in 'ModelRegistry.pas',
+  HelperForm in 'HelperForm.pas',
+  UtilsLog in 'UtilsLog.pas',
+  BaseConfig in 'BaseConfig.pas',
+  ConfigManager in 'ConfigManager.pas',
+  CreateConfigItem in 'CreateConfigItem.pas',
+  UTF8Converter in 'UTF8Converter.pas' {frmUTF8Converter},
+  FrameArrayEditor in 'FrameArrayEditor.pas',
+  ConfigValidator in 'ConfigValidator.pas',
+  ValidationDialog in 'ValidationDialog.pas' {frmValidation};
+
+{$R *.res}
+
+var
+  MainForm: TMainForm;
+  BuildConfigFrame: TViewBuildConfig;
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TMainForm, MainForm);
+
+  // 创建ViewBuildConfig作为主界面
+  BuildConfigFrame := TViewBuildConfig.Create(MainForm);
+  MainForm.SetBuildConfigFrame(BuildConfigFrame);
+
+  // 设置窗体标题和大小
+  MainForm.Caption := '配置生成器';
+  MainForm.Width := 1024;
+  MainForm.Height := 768;
+  MainForm.Position := poScreenCenter;
+
+  Application.Run;
+end.

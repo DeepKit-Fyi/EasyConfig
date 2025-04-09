@@ -1,0 +1,33 @@
+{
+  "ImagePath": "resources/images/background.jpg",
+  "Opacity": 0.8,
+  "FitMode": "cover",
+  "OffsetX": 0,
+  "OffsetY": 0,
+  "Rotation": 0,
+  "BlurRadius": 2,
+  "Description": "这是一个示例背景配置",
+  "Tags": ["默认", "主背景"],
+  "Variants": [
+    {
+      "Name": "Blurred",
+      "ImagePath": "resources/images/background.jpg",
+      "Opacity": 0.6,
+      "FitMode": "cover",
+      "OffsetX": 0,
+      "OffsetY": 0,
+      "Rotation": 0,
+      "BlurRadius": 10
+    },
+    {
+      "Name": "Dark",
+      "ImagePath": "resources/images/background_dark.jpg",
+      "Opacity": 0.7,
+      "FitMode": "cover",
+      "OffsetX": 0,
+      "OffsetY": 0,
+      "Rotation": 0,
+      "BlurRadius": 2
+    }
+  ]
+} 

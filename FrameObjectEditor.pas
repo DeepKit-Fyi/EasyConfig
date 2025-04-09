@@ -1,0 +1,494 @@
+unit FrameObjectEditor;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.JSON, System.UITypes, System.Generics.Collections,
+  Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, 
+  Vcl.Dialogs, Vcl.Grids, ConfigFrameBase, ConfigTypes;
+
+type
+  TObjectPropertyType = (ptString, ptNumber, ptBoolean, ptObject, ptArray);
+
+  TObjectProperty = record
+    Name: string;
+    PropertyType: TObjectPropertyType;
+    Value: string;
+  end;
+
+  TFrameObjectEditor = class(TBaseConfigFrame)
+  private
+    pnlMain: TPanel;
+    sgProperties: TStringGrid;
+    pnlControls: TPanel;
+    btnAdd: TButton;
+    btnEdit: TButton;
+    btnDelete: TButton;
+    cmbPropertyType: TComboBox;
+    
+    procedure btnAddClick(Sender: TObject);
+    procedure btnEditClick(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
+    procedure sgPropertiesSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+    procedure InitializeGrid;
+    function GetPropertyTypeAsString(PropertyType: TObjectPropertyType): string;
+    function GetPropertyTypeFromString(const TypeStr: string): TObjectPropertyType;
+  protected
+    procedure LoadFromJSON; override;
+    procedure SaveToJSON; override;
+    procedure CreateControls; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+{ TFrameObjectEditor }
+
+constructor TFrameObjectEditor.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  CreateControls;
+end;
+
+destructor TFrameObjectEditor.Destroy;
+begin
+  // 清理资源
+  inherited;
+end;
+
+procedure TFrameObjectEditor.CreateControls;
+begin
+  // 创建主面板
+  pnlMain := TPanel.Create(Self);
+  pnlMain.Parent := Self;
+  pnlMain.Align := alClient;
+  pnlMain.BevelOuter := bvNone;
+  
+  // 创建属性网格
+  sgProperties := TStringGrid.Create(pnlMain);
+  sgProperties.Parent := pnlMain;
+  sgProperties.Align := alClient;
+  sgProperties.AlignWithMargins := True;
+  sgProperties.Margins.SetBounds(5, 5, 5, 5);
+  sgProperties.Options := [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect, goEditing];
+  sgProperties.OnSelectCell := sgPropertiesSelectCell;
+  
+  // 初始化属性网格
+  InitializeGrid;
+  
+  // 创建控制面板
+  pnlControls := TPanel.Create(pnlMain);
+  pnlControls.Parent := pnlMain;
+  pnlControls.Align := alBottom;
+  pnlControls.Height := 40;
+  pnlControls.BevelOuter := bvNone;
+  
+  // 属性类型组合框
+  cmbPropertyType := TComboBox.Create(pnlControls);
+  cmbPropertyType.Parent := pnlControls;
+  cmbPropertyType.Left := 5;
+  cmbPropertyType.Top := 10;
+  cmbPropertyType.Width := 120;
+  cmbPropertyType.Style := csDropDownList;
+  cmbPropertyType.Items.Add('字符串');
+  cmbPropertyType.Items.Add('数字');
+  cmbPropertyType.Items.Add('布尔值');
+  cmbPropertyType.Items.Add('对象');
+  cmbPropertyType.Items.Add('数组');
+  cmbPropertyType.ItemIndex := 0;
+  
+  // 添加按钮
+  btnAdd := TButton.Create(pnlControls);
+  btnAdd.Parent := pnlControls;
+  btnAdd.Left := 130;
+  btnAdd.Top := 8;
+  btnAdd.Width := 80;
+  btnAdd.Caption := '添加属性';
+  btnAdd.OnClick := btnAddClick;
+  
+  // 编辑按钮
+  btnEdit := TButton.Create(pnlControls);
+  btnEdit.Parent := pnlControls;
+  btnEdit.Left := 215;
+  btnEdit.Top := 8;
+  btnEdit.Width := 80;
+  btnEdit.Caption := '编辑属性';
+  btnEdit.OnClick := btnEditClick;
+  btnEdit.Enabled := False;
+  
+  // 删除按钮
+  btnDelete := TButton.Create(pnlControls);
+  btnDelete.Parent := pnlControls;
+  btnDelete.Left := 300;
+  btnDelete.Top := 8;
+  btnDelete.Width := 80;
+  btnDelete.Caption := '删除属性';
+  btnDelete.OnClick := btnDeleteClick;
+  btnDelete.Enabled := False;
+end;
+
+procedure TFrameObjectEditor.InitializeGrid;
+begin
+  // 设置表格列
+  sgProperties.ColCount := 3;
+  sgProperties.RowCount := 1; // 仅标题行
+  sgProperties.FixedRows := 1;
+  sgProperties.ColWidths[0] := 150; // 属性名
+  sgProperties.ColWidths[1] := 100; // 类型
+  sgProperties.ColWidths[2] := 250; // 值
+  
+  // 设置标题
+  sgProperties.Cells[0, 0] := '属性名';
+  sgProperties.Cells[1, 0] := '类型';
+  sgProperties.Cells[2, 0] := '值';
+end;
+
+procedure TFrameObjectEditor.sgPropertiesSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+  // 选中了属性行
+  btnEdit.Enabled := ARow > 0;
+  btnDelete.Enabled := ARow > 0;
+end;
+
+function TFrameObjectEditor.GetPropertyTypeAsString(PropertyType: TObjectPropertyType): string;
+begin
+  case PropertyType of
+    ptString: Result := '字符串';
+    ptNumber: Result := '数字';
+    ptBoolean: Result := '布尔值';
+    ptObject: Result := '对象';
+    ptArray: Result := '数组';
+    else Result := '字符串';
+  end;
+end;
+
+function TFrameObjectEditor.GetPropertyTypeFromString(const TypeStr: string): TObjectPropertyType;
+begin
+  if TypeStr = '数字' then
+    Result := ptNumber
+  else if TypeStr = '布尔值' then
+    Result := ptBoolean
+  else if TypeStr = '对象' then
+    Result := ptObject
+  else if TypeStr = '数组' then
+    Result := ptArray
+  else
+    Result := ptString; // 默认为字符串
+end;
+
+procedure TFrameObjectEditor.btnAddClick(Sender: TObject);
+var
+  PropertyName, PropertyValue: string;
+  PropertyType: TObjectPropertyType;
+  NewRow: Integer;
+begin
+  // 添加新属性
+  if InputQuery('添加属性', '请输入属性名:', PropertyName) then
+  begin
+    // 检查属性名是否已存在
+    for NewRow := 1 to sgProperties.RowCount - 1 do
+    begin
+      if SameText(sgProperties.Cells[0, NewRow], PropertyName) then
+      begin
+        MessageDlg('属性名 "' + PropertyName + '" 已存在!', mtWarning, [mbOK], 0);
+        Exit;
+      end;
+    end;
+    
+    // 获取属性类型
+    PropertyType := TObjectPropertyType(cmbPropertyType.ItemIndex);
+    
+    // 根据类型获取属性值
+    case PropertyType of
+      ptString:
+        begin
+          if not InputQuery('添加字符串属性', '请输入字符串值:', PropertyValue) then
+            Exit;
+        end;
+      ptNumber:
+        begin
+          if not InputQuery('添加数字属性', '请输入数字值:', PropertyValue) then
+            Exit;
+          // 验证数字
+          try
+            StrToFloat(PropertyValue);
+          except
+            MessageDlg('无效的数字值!', mtError, [mbOK], 0);
+            Exit;
+          end;
+        end;
+      ptBoolean:
+        begin
+          if MessageDlg('选择布尔值', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+            PropertyValue := 'true'
+          else
+            PropertyValue := 'false';
+        end;
+      ptObject: PropertyValue := '{}';
+      ptArray: PropertyValue := '[]';
+    end;
+    
+    // 添加到网格
+    NewRow := sgProperties.RowCount;
+    sgProperties.RowCount := NewRow + 1;
+    sgProperties.Cells[0, NewRow] := PropertyName;
+    sgProperties.Cells[1, NewRow] := GetPropertyTypeAsString(PropertyType);
+    sgProperties.Cells[2, NewRow] := PropertyValue;
+    
+    // 设置修改标记
+    Modified := True;
+    
+    // 选中新行
+    sgProperties.Row := NewRow;
+  end;
+end;
+
+procedure TFrameObjectEditor.btnEditClick(Sender: TObject);
+var
+  SelectedRow: Integer;
+  PropertyName, PropertyValue: string;
+  PropertyType: TObjectPropertyType;
+begin
+  // 编辑选中的属性
+  SelectedRow := sgProperties.Row;
+  if SelectedRow <= 0 then
+    Exit;
+    
+  // 获取当前值
+  PropertyName := sgProperties.Cells[0, SelectedRow];
+  PropertyType := GetPropertyTypeFromString(sgProperties.Cells[1, SelectedRow]);
+  PropertyValue := sgProperties.Cells[2, SelectedRow];
+  
+  // 编辑属性名
+  if InputQuery('编辑属性', '请编辑属性名:', PropertyName) then
+  begin
+    // 检查属性名是否已存在（排除当前行）
+    for var i := 1 to sgProperties.RowCount - 1 do
+    begin
+      if (i <> SelectedRow) and SameText(sgProperties.Cells[0, i], PropertyName) then
+      begin
+        MessageDlg('属性名 "' + PropertyName + '" 已存在!', mtWarning, [mbOK], 0);
+        Exit;
+      end;
+    end;
+    
+    // 更新属性名
+    sgProperties.Cells[0, SelectedRow] := PropertyName;
+    
+    // 根据类型编辑属性值
+    case PropertyType of
+      ptString:
+        begin
+          if InputQuery('编辑字符串属性', '请编辑字符串值:', PropertyValue) then
+            sgProperties.Cells[2, SelectedRow] := PropertyValue;
+        end;
+      ptNumber:
+        begin
+          if InputQuery('编辑数字属性', '请编辑数字值:', PropertyValue) then
+          begin
+            // 验证数字
+            try
+              StrToFloat(PropertyValue);
+              sgProperties.Cells[2, SelectedRow] := PropertyValue;
+            except
+              MessageDlg('无效的数字值!', mtError, [mbOK], 0);
+            end;
+          end;
+        end;
+      ptBoolean:
+        begin
+          if MessageDlg('选择布尔值', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+            sgProperties.Cells[2, SelectedRow] := 'true'
+          else
+            sgProperties.Cells[2, SelectedRow] := 'false';
+        end;
+      ptObject, ptArray:
+        begin
+          MessageDlg('复杂类型无法直接编辑。请使用专用编辑器。', mtInformation, [mbOK], 0);
+        end;
+    end;
+    
+    // 设置修改标记
+    Modified := True;
+  end;
+end;
+
+procedure TFrameObjectEditor.btnDeleteClick(Sender: TObject);
+var
+  SelectedRow: Integer;
+begin
+  // 删除选中的属性
+  SelectedRow := sgProperties.Row;
+  if (SelectedRow <= 0) or (SelectedRow >= sgProperties.RowCount) then
+    Exit;
+    
+  if MessageDlg('确定要删除属性 "' + sgProperties.Cells[0, SelectedRow] + '" 吗?',
+                mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    // 删除行
+    for var i := SelectedRow to sgProperties.RowCount - 2 do
+    begin
+      sgProperties.Cells[0, i] := sgProperties.Cells[0, i + 1];
+      sgProperties.Cells[1, i] := sgProperties.Cells[1, i + 1];
+      sgProperties.Cells[2, i] := sgProperties.Cells[2, i + 1];
+    end;
+    
+    // 减少行数
+    sgProperties.RowCount := sgProperties.RowCount - 1;
+    
+    // 如果没有数据行，禁用编辑和删除按钮
+    if sgProperties.RowCount <= 1 then
+    begin
+      btnEdit.Enabled := False;
+      btnDelete.Enabled := False;
+    end;
+    
+    // 设置修改标记
+    Modified := True;
+  end;
+end;
+
+procedure TFrameObjectEditor.LoadFromJSON;
+var
+  Value: TJSONValue;
+  ObjectValue: TJSONObject;
+  PropertyPair: TJSONPair;
+  PropertyType: TObjectPropertyType;
+  PropertyValue: string;
+  RowIndex: Integer;
+begin
+  if not Assigned(JSONObject) then
+    Exit;
+
+  // 清空网格，只保留标题行
+  sgProperties.RowCount := 1;
+  
+  // 加载对象属性
+  Value := JSONObject.GetValue('value');
+  if Assigned(Value) and (Value is TJSONObject) then
+  begin
+    ObjectValue := TJSONObject(Value);
+    
+    // 遍历所有属性
+    for var i := 0 to ObjectValue.Count - 1 do
+    begin
+      PropertyPair := ObjectValue.Pairs[i];
+      if not Assigned(PropertyPair) then
+        Continue;
+        
+      // 确定属性类型和值
+      if PropertyPair.JsonValue is TJSONString then
+      begin
+        PropertyType := ptString;
+        PropertyValue := TJSONString(PropertyPair.JsonValue).Value;
+      end
+      else if PropertyPair.JsonValue is TJSONNumber then
+      begin
+        PropertyType := ptNumber;
+        PropertyValue := TJSONNumber(PropertyPair.JsonValue).ToString;
+      end
+      else if PropertyPair.JsonValue is TJSONBool then
+      begin
+        PropertyType := ptBoolean;
+        PropertyValue := LowerCase(BoolToStr(TJSONBool(PropertyPair.JsonValue).AsBoolean, True));
+      end
+      else if PropertyPair.JsonValue is TJSONObject then
+      begin
+        PropertyType := ptObject;
+        PropertyValue := '{}';
+      end
+      else if PropertyPair.JsonValue is TJSONArray then
+      begin
+        PropertyType := ptArray;
+        PropertyValue := '[]';
+      end
+      else
+      begin
+        PropertyType := ptString;
+        PropertyValue := '';
+      end;
+      
+      // 添加行
+      RowIndex := sgProperties.RowCount;
+      sgProperties.RowCount := RowIndex + 1;
+      sgProperties.Cells[0, RowIndex] := PropertyPair.JsonString.Value;
+      sgProperties.Cells[1, RowIndex] := GetPropertyTypeAsString(PropertyType);
+      sgProperties.Cells[2, RowIndex] := PropertyValue;
+    end;
+    
+    // 如果没有属性，确保禁用按钮
+    btnEdit.Enabled := sgProperties.RowCount > 1;
+    btnDelete.Enabled := sgProperties.RowCount > 1;
+  end;
+end;
+
+procedure TFrameObjectEditor.SaveToJSON;
+var
+  ObjectValue: TJSONObject;
+  PropertyName, PropertyValue: string;
+  PropertyType: TObjectPropertyType;
+begin
+  if not Assigned(JSONObject) then
+    Exit;
+    
+  // 保存类型信息
+  if JSONObject.GetValue('_type') = nil then
+    JSONObject.AddPair('_type', 'etObject');
+    
+  // 创建或清空对象
+  if JSONObject.GetValue('value') <> nil then
+  begin
+    if JSONObject.GetValue('value') is TJSONObject then
+      ObjectValue := TJSONObject(JSONObject.GetValue('value'))
+    else
+    begin
+      JSONObject.RemovePair('value');
+      ObjectValue := TJSONObject.Create;
+      JSONObject.AddPair('value', ObjectValue);
+    end;
+  end
+  else
+  begin
+    ObjectValue := TJSONObject.Create;
+    JSONObject.AddPair('value', ObjectValue);
+  end;
+  
+  // 清空现有属性
+  while ObjectValue.Count > 0 do
+    ObjectValue.RemovePair(ObjectValue.Pairs[0].JsonString.Value);
+  
+  // 添加所有属性
+  for var i := 1 to sgProperties.RowCount - 1 do
+  begin
+    PropertyName := sgProperties.Cells[0, i];
+    PropertyType := GetPropertyTypeFromString(sgProperties.Cells[1, i]);
+    PropertyValue := sgProperties.Cells[2, i];
+    
+    case PropertyType of
+      ptString:
+        ObjectValue.AddPair(PropertyName, PropertyValue);
+      
+      ptNumber:
+        begin
+          try
+            ObjectValue.AddPair(PropertyName, TJSONNumber.Create(StrToFloat(PropertyValue)));
+          except
+            ObjectValue.AddPair(PropertyName, TJSONNumber.Create(0));
+          end;
+        end;
+      
+      ptBoolean:
+        ObjectValue.AddPair(PropertyName, TJSONBool.Create(LowerCase(PropertyValue) = 'true'));
+      
+      ptObject:
+        ObjectValue.AddPair(PropertyName, TJSONObject.Create);
+      
+      ptArray:
+        ObjectValue.AddPair(PropertyName, TJSONArray.Create);
+    end;
+  end;
+end;
+
+end. 

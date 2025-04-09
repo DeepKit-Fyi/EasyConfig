@@ -1,0 +1,45 @@
+{
+  "PageTitle": "配置管理器",
+  "PageBackground": "#f5f5f5",
+  "HeaderBackground": "${Colors.Primary}",
+  "HeaderTextColor": "#ffffff",
+  "FooterBackground": "#333333",
+  "FooterTextColor": "#ffffff",
+  "PanelBackground": "#ffffff",
+  "PanelBorderColor": "#dddddd",
+  "PanelBorderRadius": 5,
+  "PanelShadow": true,
+  "PanelShadowColor": "rgba(0, 0, 0, 0.1)",
+  "PanelHeaderBackground": "#f9f9f9",
+  "PanelHeaderTextColor": "#333333",
+  "Sections": [
+    {
+      "Name": "SystemConfig",
+      "Title": "系统配置",
+      "Icon": "settings",
+      "Background": "#e1f5fe",
+      "TextColor": "#0288d1"
+    },
+    {
+      "Name": "UIConfig",
+      "Title": "界面配置",
+      "Icon": "palette",
+      "Background": "#f3e5f5",
+      "TextColor": "#7b1fa2"
+    },
+    {
+      "Name": "MediaConfig",
+      "Title": "多媒体配置",
+      "Icon": "movie",
+      "Background": "#e8f5e9",
+      "TextColor": "#388e3c"
+    },
+    {
+      "Name": "DatabaseConfig",
+      "Title": "数据库配置",
+      "Icon": "storage",
+      "Background": "#fff3e0",
+      "TextColor": "#ef6c00"
+    }
+  ]
+} 

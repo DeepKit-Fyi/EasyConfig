@@ -1,0 +1,154 @@
+{
+  "appSettings": {
+    "title": "配置编辑器",
+    "version": "1.0.0",
+    "theme": "默认",
+    "showDebugWindow": true,
+    "logLevel": "info"
+  },
+  "paths": {
+    "configPath": ".\\config",
+    "logPath": ".\\logs",
+    "tempPath": ".\\temp"
+  },
+  "database": {
+    "server": "localhost",
+    "port": 3306,
+    "dbName": "configdb",
+    "username": "admin",
+    "password": "password",
+    "timeout": 30,
+    "autoReconnect": true
+  },
+  "ui": {
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "showToolbar": true,
+    "showStatusBar": true,
+    "showWelcomePage": true
+  },
+  "UI": {
+    "fonts": {
+      "default_font": {
+        "_type": "etFont",
+        "_id": "default_font",
+        "name": "微软雅黑",
+        "size": 10,
+        "color": "#000000",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "strike_out": false,
+        "_description": "默认字体配置"
+      },
+      "title_font": {
+        "_type": "etFont",
+        "_id": "title_font",
+        "name": "微软雅黑",
+        "size": 16,
+        "color": "#1E90FF",
+        "bold": true,
+        "italic": false,
+        "underline": false,
+        "strike_out": false,
+        "_description": "标题字体配置"
+      }
+    },
+    "backgrounds": {
+      "main_background": {
+        "_type": "etBackGround",
+        "_id": "main_background",
+        "color": "#F5F5F5",
+        "image.path": "",
+        "image.opacity": 0.7,
+        "image.stretch": "uniform",
+        "gradient.start_color": "#F5F5F5",
+        "gradient.end_color": "#E0E0E0",
+        "gradient.direction": "vertical",
+        "_description": "主背景配置"
+      },
+      "header_background": {
+        "_type": "etBackGround",
+        "_id": "header_background",
+        "color": "#1E90FF",
+        "image.path": "",
+        "image.opacity": 0.5,
+        "image.stretch": "uniform",
+        "gradient.start_color": "#1E90FF",
+        "gradient.end_color": "#0000A0",
+        "gradient.direction": "horizontal",
+        "_description": "页眉背景配置"
+      }
+    },
+    "images": {
+      "app_logo": {
+        "_type": "etImage",
+        "_id": "app_logo",
+        "path": "assets/logo.png",
+        "width": 200,
+        "height": 100,
+        "format": "png",
+        "position.x": 0,
+        "position.y": 0,
+        "position.isXcenter": true,
+        "position.isYcenter": true,
+        "position.scale": 1.0,
+        "_description": "应用程序Logo"
+      }
+    },
+    "text_elements": {
+      "app_title": {
+        "_type": "etTextOnBG",
+        "_id": "app_title",
+        "text": "配置编辑器",
+        "font._ref": "etFont.title_font",
+        "position.x": 0,
+        "position.y": 10,
+        "position.isXcenter": true,
+        "position.isYcenter": false,
+        "position.scale": 1.0,
+        "position.z_index": 1,
+        "background._ref": "etBackGround.header_background",
+        "_description": "应用程序标题"
+      }
+    }
+  },
+  "System": {
+    "database": {
+      "main_connection": {
+        "_type": "etDatabase",
+        "_id": "main_connection",
+        "driver": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "database": "app_db",
+        "username": "root",
+        "password": "",
+        "_description": "主数据库连接"
+      },
+      "backup_connection": {
+        "_type": "etDatabase",
+        "_id": "backup_connection",
+        "driver": "mysql",
+        "host": "backup.example.com",
+        "port": 3306,
+        "database": "app_db_backup",
+        "username": "backup_user",
+        "password": "",
+        "_description": "备份数据库连接"
+      }
+    },
+    "ai_settings": {
+      "openai_api": {
+        "_type": "etAIAPI",
+        "_id": "openai_api",
+        "api_key": "",
+        "api_endpoint": "https://api.openai.com/v1",
+        "model": "gpt-4",
+        "temperature": 0.7,
+        "max_tokens": 2000,
+        "_description": "OpenAI API配置"
+      }
+    }
+  }
+} 

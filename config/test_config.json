@@ -1,0 +1,20 @@
+{
+  "appSettings": {
+    "name": "ConfigEditor",
+    "version": "1.0",
+    "language": "zh-CN"
+  },
+  "interface": {
+    "theme": "Windows",
+    "fontSize": 10,
+    "showToolbar": true,
+    "showStatusBar": true
+  },
+  "font": {
+    "_type": "etFont",
+    "name": "Microsoft YaHei UI",
+    "size": 10,
+    "style": ["bold", "italic"],
+    "color": "#000000"
+  }
+} 
