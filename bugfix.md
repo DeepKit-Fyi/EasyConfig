@@ -78,6 +78,62 @@
   - 删除了多余的包装层，使代码更加直观和易于维护
   - 减少了潜在的运行时错误来源
 
+## 2024-07-11 访问违规修复
+
+### 问题描述
+程序启动时出现访问违规错误：
+```
+Exception EAccessViolation in module ConfigBuild.exe at 00261326.
+Access violation at address 00C71326 in module 'ConfigBuild.exe' (offset 261326). Read of address 0000330.
+```
+
+### 原因分析
+通过代码审查确定问题出现在 `ViewBuildConfig.pas` 文件中的 `ClearAllData` 方法。当 `tvJSON` 组件未初始化或其 `Items.Count` 为零时，程序尝试访问 `tvJSON.Items[i]` 会导致访问违规。
+
+这种情况通常在以下场景中发生：
+1. 程序启动过程中，在 `tvJSON` 完全初始化之前调用了 `ClearAllData`
+2. 程序关闭时，在 `tvJSON` 已经被部分销毁后调用了 `ClearAllData`
+3. 当 `tvJSON.Items` 为空但程序仍尝试遍历其项目时
+
+### 修复方法
+在 `ClearAllData` 方法中添加了安全检查，在访问 TreeView 节点之前先验证 `tvJSON` 是否已分配以及是否有节点：
+
+```pascal
+procedure TFrmBuildConfig.ClearAllData;
+var
+  i: Integer;
+  Node: TTreeNode;
+  PropItem: PConfigPropertyItem;
+begin
+  // 添加安全检查
+  if not Assigned(tvJSON) or (tvJSON.Items.Count = 0) then Exit;
+
+  // 首先释放TreeView中所有节点的对象数据
+  for i := 0 to tvJSON.Items.Count - 1 do
+  begin
+    Node := tvJSON.Items[i];
+    if Assigned(Node.Data) then
+    begin
+      PropItem := PConfigPropertyItem(Node.Data);
+      Dispose(PropItem); // 释放对象
+      Node.Data := nil;  // 防止悬挂指针
+    end;
+  end;
+
+  // 然后清除所有数据
+  sgINI.RowCount := 1;
+  tvJSON.Items.Clear;
+  Memo1.Clear;
+  Memo2.Clear;
+end;
+```
+
+### 验证结果
+修复后程序可以正常启动和运行，不再出现访问违规错误。
+
+### 附加说明
+建议在程序的其他部分也添加类似的防御性编程，特别是在处理可能为空的对象或集合时，应该始终检查它们是否已经初始化。
+
 ## 总结
 通过以上修复，我们解决了程序的主要问题：
 1. 改进了代码结构，消除了嵌套过程

@@ -2,7 +2,9 @@ program ConfigBuild;
 
 uses
   Vcl.Forms,
-  ViewBuildConfig in 'ViewBuildConfig.pas' {MainForm},
+  System.SysUtils,
+  Vcl.Dialogs,
+  ViewBuildConfig in 'ViewBuildConfig.pas' {FrmBuildConfig},
   ConfigIntf in 'ConfigIntf.pas',
   ConfigTypes in 'ConfigTypes.pas',
   FrameFontEditor in 'FrameFontEditor.pas',
@@ -20,7 +22,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TFrmBuildConfig, MainForm);
+  Application.CreateForm(TFrmBuildConfig, FrmBuildConfig);
   Application.Run;
 end.
 

@@ -265,4 +265,9 @@ begin
 end;
 {$ENDIF}
 
+{$IFDEF DESIGNTIME}
+initialization
+  // 不要在运行时调用Register
+{$ENDIF}
+
 end. 
