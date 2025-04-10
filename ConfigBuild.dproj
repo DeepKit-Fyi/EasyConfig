@@ -123,15 +123,26 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="ViewMainConfig.pas">
-            <Form>Form1</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="ViewBuildConfig.pas">
-            <ModuleName>ViewBuildConifg</ModuleName>
-            <Form>ViewBuildConfig</Form>
-            <DesignClass>TFrame</DesignClass>
+            <ModuleName>ViewBuildConfig</ModuleName>
+            <Form>MainForm</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrmBuildConfig</DesignClass>
         </DCCReference>
+        <DCCReference Include="ConfigIntf.pas"/>
+        <DCCReference Include="ConfigTypes.pas"/>
+        <DCCReference Include="FrameFontEditor.pas"/>
+        <DCCReference Include="FrameAIAPIEditor.pas"/>
+        <DCCReference Include="FrameDBEditor.pas"/>
+        <DCCReference Include="FrameObjectEditor.pas"/>
+        <DCCReference Include="FrameListEditor.pas"/>
+        <DCCReference Include="FramesComplexEditor.pas"/>
+        <DCCReference Include="ConfigFrameBase.pas"/>
+        <DCCReference Include="FrameConfigEditor.pas">
+            <Form>frameConfigEditor</Form>
+            <DesignClass>TframeConfigEditor</DesignClass>
+        </DCCReference>
+        <DCCReference Include="FrameArrayEditor.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

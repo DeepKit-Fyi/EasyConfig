@@ -1,9 +1,8 @@
-﻿program ConfigBuild;
+program ConfigBuild;
 
 uses
   Vcl.Forms,
-  ViewMainConfig in 'ViewMainConfig.pas' {Form1},
-  ViewBuildConfig in 'ViewBuildConfig.pas' {ViewBuildConfig: TFrame},
+  ViewBuildConfig in 'ViewBuildConfig.pas' {MainForm},
   ConfigIntf in 'ConfigIntf.pas',
   ConfigTypes in 'ConfigTypes.pas',
   FrameFontEditor in 'FrameFontEditor.pas',
@@ -13,7 +12,7 @@ uses
   FrameListEditor in 'FrameListEditor.pas',
   FramesComplexEditor in 'FramesComplexEditor.pas',
   ConfigFrameBase in 'ConfigFrameBase.pas',
-  FrameConfigEditor in 'FrameConfigEditor.pas',
+  FrameConfigEditor in 'FrameConfigEditor.pas' {frameConfigEditor: TframeConfigEditor},
   FrameArrayEditor in 'FrameArrayEditor.pas';
 
 {$R *.res}
@@ -21,6 +20,8 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TFrmBuildConfig, MainForm);
   Application.Run;
 end.
+
+

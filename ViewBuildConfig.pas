@@ -1,4 +1,4 @@
-unit ViewBuildConfig;
+﻿unit ViewBuildConfig;
 
 interface
 
@@ -23,7 +23,7 @@ type
   end;
   PConfigPropertyItem = ^TConfigPropertyItem;
 
-  TViewBuildConfig = class(TFrame)
+  TFrmBuildConfig = class(TForm)
     Splitter1: TSplitter;
     Splitter2: TSplitter;
     Splitter3: TSplitter;
@@ -66,12 +66,6 @@ type
     btnAddList: TButton;
     btnAddObject: TButton;
     btnAddArray: TButton;
-    btnEditJSONProperty: TButton;
-    btnRenameJSONProperty: TButton;
-    btnDeleteJSONProperty: TButton;
-    btnEditINIProperty: TButton;
-    btnRenameINIProperty: TButton;
-    btnDeleteINIProperty: TButton;
     dlgOpenFile: TOpenDialog;
     dlgBrowseDir: TFileOpenDialog;
     dlgSelectColor: TColorDialog;
@@ -128,6 +122,8 @@ type
     procedure sgINIDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
     procedure tvJSONDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure tvJSONDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FCurrentIniFile: string;
     FCurrentJsonFile: string;
@@ -174,44 +170,59 @@ type
     procedure SaveConfigFiles;
   end;
 
+var
+  MainForm: TFrmBuildConfig;
+
 implementation
 
 {$R *.dfm}
 
-procedure TViewBuildConfig.tvJSONChange(Sender: TObject; Node: TTreeNode);
+procedure TFrmBuildConfig.tvJSONChange(Sender: TObject; Node: TTreeNode);
 begin
   if Node <> nil then
   begin
-    // 更新按钮状态
-    btnEditJSONProperty.Enabled := True;
-    btnRenameJSONProperty.Enabled := True;
-    btnDeleteJSONProperty.Enabled := True;
+    // 更新弹出菜单项状态
+    if Assigned(popupJSON) then
+    begin
+      if Assigned(MenuItem2) then MenuItem2.Enabled := True;  // 编辑属性
+      if Assigned(MenuItem3) then MenuItem3.Enabled := True;  // 重命名属性
+      if Assigned(MenuItem4) then MenuItem4.Enabled := True;  // 删除属性
+    end;
 
     // 显示属性编辑器
     ShowPropertyEditor(Node);
   end
   else
   begin
-    // 禁用按钮
-    btnEditJSONProperty.Enabled := False;
-    btnRenameJSONProperty.Enabled := False;
-    btnDeleteJSONProperty.Enabled := False;
+    // 禁用弹出菜单项
+    if Assigned(popupJSON) then
+    begin
+      if Assigned(MenuItem2) then MenuItem2.Enabled := False;
+      if Assigned(MenuItem3) then MenuItem3.Enabled := False;
+      if Assigned(MenuItem4) then MenuItem4.Enabled := False;
+    end;
 
     // 隐藏属性编辑器
     HidePropertyEditor;
   end;
 end;
 
-procedure TViewBuildConfig.sgINISelectCell(Sender: TObject; ACol, ARow: Integer;
+procedure TFrmBuildConfig.sgINISelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
 begin
-  // 更新按钮状态
-  btnEditINIProperty.Enabled := (ARow > 0) and (sgINI.Cells[0, ARow] <> '');
-  btnRenameINIProperty.Enabled := btnEditINIProperty.Enabled;
-  btnDeleteINIProperty.Enabled := btnEditINIProperty.Enabled;
+  // 更新按钮状态可用性（通过弹出菜单项实现）
+  var canEdit := (ARow > 0) and (sgINI.Cells[0, ARow] <> '');
+  
+  // 如果菜单项存在，更新其状态
+  if Assigned(popupINI) then
+  begin
+    if Assigned(N2) then N2.Enabled := canEdit;  // 编辑属性
+    if Assigned(N3) then N3.Enabled := canEdit;  // 重命名属性
+    if Assigned(N4) then N4.Enabled := canEdit;  // 删除属性
+  end;
 end;
 
-procedure TViewBuildConfig.sgINIDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TFrmBuildConfig.sgINIDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   SourceRow, TargetRow: Integer;
   TempSection, TempKey, TempValue: string;
@@ -249,13 +260,13 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.sgINIDragOver(Sender, Source: TObject; X, Y: Integer;
+procedure TFrmBuildConfig.sgINIDragOver(Sender, Source: TObject; X, Y: Integer;
   State: TDragState; var Accept: Boolean);
 begin
   Accept := Source = Sender;
 end;
 
-procedure TViewBuildConfig.tvJSONDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TFrmBuildConfig.tvJSONDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   SourceNode, TargetNode: TTreeNode;
   PropItem: PConfigPropertyItem;
@@ -284,13 +295,13 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.tvJSONDragOver(Sender, Source: TObject; X, Y: Integer;
+procedure TFrmBuildConfig.tvJSONDragOver(Sender, Source: TObject; X, Y: Integer;
   State: TDragState; var Accept: Boolean);
 begin
   Accept := Source = Sender;
 end;
 
-function TViewBuildConfig.BuildPropertyPath(Node: TTreeNode): string;
+function TFrmBuildConfig.BuildPropertyPath(Node: TTreeNode): string;
 var
   Path: string;
   CurrentNode: TTreeNode;
@@ -309,7 +320,7 @@ begin
   Result := Path;
 end;
 
-constructor TViewBuildConfig.Create(AOwner: TComponent);
+constructor TFrmBuildConfig.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   InitializeFrame;
@@ -318,13 +329,28 @@ begin
   InitializeDragDrop;
 end;
 
-destructor TViewBuildConfig.Destroy;
+destructor TFrmBuildConfig.Destroy;
 begin
   ClearAllData;
   inherited;
 end;
 
-procedure TViewBuildConfig.InitializeFrame;
+procedure TFrmBuildConfig.FormCreate(Sender: TObject);
+begin
+  // 初始化表单
+  InitializeFrame;
+  InitializeButtons;
+  InitializePopupMenus;
+  InitializeDragDrop;
+end;
+
+procedure TFrmBuildConfig.FormDestroy(Sender: TObject);
+begin
+  // 清理资源
+  ClearAllData;
+end;
+
+procedure TFrmBuildConfig.InitializeFrame;
 begin
   // 初始化框架
   Self.Visible := True;
@@ -356,7 +382,7 @@ begin
   if Assigned(tvJSON) then tvJSON.Visible := True;
 end;
 
-procedure TViewBuildConfig.InitializeGridColumns;
+procedure TFrmBuildConfig.InitializeGridColumns;
 begin
   // 检查 sgINI 是否已分配
   if not Assigned(sgINI) then
@@ -380,31 +406,42 @@ begin
   sgINI.Cells[2, 1] := '';
 end;
 
-procedure TViewBuildConfig.InitializeButtons;
+procedure TFrmBuildConfig.InitializeButtons;
 begin
-  // 检查按钮是否已分配
-  if Assigned(btnEditINIProperty) then btnEditINIProperty.Enabled := False;
-  if Assigned(btnRenameINIProperty) then btnRenameINIProperty.Enabled := False;
-  if Assigned(btnDeleteINIProperty) then btnDeleteINIProperty.Enabled := False;
-
-  if Assigned(btnEditJSONProperty) then btnEditJSONProperty.Enabled := False;
-  if Assigned(btnRenameJSONProperty) then btnRenameJSONProperty.Enabled := False;
-  if Assigned(btnDeleteJSONProperty) then btnDeleteJSONProperty.Enabled := False;
+  // 初始化菜单项的状态
+  if Assigned(popupINI) then
+  begin
+    if Assigned(N2) then N2.Enabled := False;  // 编辑属性
+    if Assigned(N3) then N3.Enabled := False;  // 重命名属性
+    if Assigned(N4) then N4.Enabled := False;  // 删除属性
+  end;
+  
+  if Assigned(popupJSON) then
+  begin
+    if Assigned(MenuItem2) then MenuItem2.Enabled := False;
+    if Assigned(MenuItem3) then MenuItem3.Enabled := False;
+    if Assigned(MenuItem4) then MenuItem4.Enabled := False;
+  end;
 end;
 
-procedure TViewBuildConfig.InitializePopupMenus;
+procedure TFrmBuildConfig.InitializePopupMenus;
 begin
   // 初始化弹出菜单
+  if Assigned(sgINI) and Assigned(popupINI) then
+    sgINI.PopupMenu := popupINI;
+    
+  if Assigned(tvJSON) and Assigned(popupJSON) then
+    tvJSON.PopupMenu := popupJSON;
 end;
 
-procedure TViewBuildConfig.InitializeDragDrop;
+procedure TFrmBuildConfig.InitializeDragDrop;
 begin
   // 初始化拖放功能
   if Assigned(sgINI) then sgINI.DragMode := dmAutomatic;
   if Assigned(tvJSON) then tvJSON.DragMode := dmAutomatic;
 end;
 
-procedure TViewBuildConfig.AddPropertyToGrid(const Section, PropertyName, PropertyValue: string);
+procedure TFrmBuildConfig.AddPropertyToGrid(const Section, PropertyName, PropertyValue: string);
 var
   Row: Integer;
 begin
@@ -415,7 +452,7 @@ begin
   sgINI.Cells[2, Row] := PropertyValue;
 end;
 
-function TViewBuildConfig.AddPropertyToTree(const PropertyName, PropertyType, PropertyValue: string;
+function TFrmBuildConfig.AddPropertyToTree(const PropertyName, PropertyType, PropertyValue: string;
   EditorType: TEditorType; ParentNode: TTreeNode): TTreeNode;
 var
   PropItem: PConfigPropertyItem;
@@ -434,7 +471,7 @@ begin
   PropItem^.PropertyPath := BuildPropertyPath(Result);
 end;
 
-procedure TViewBuildConfig.ShowPropertyEditor(Node: TTreeNode);
+procedure TFrmBuildConfig.ShowPropertyEditor(Node: TTreeNode);
 begin
   if Node = nil then Exit;
 
@@ -445,14 +482,14 @@ begin
   pnlEditing.Visible := True;
 end;
 
-procedure TViewBuildConfig.HidePropertyEditor;
+procedure TFrmBuildConfig.HidePropertyEditor;
 begin
   // 隐藏属性编辑器的逻辑
   FIsEditing := False;
   pnlEditing.Visible := False;
 end;
 
-procedure TViewBuildConfig.LoadIniFile(const FileName: string);
+procedure TFrmBuildConfig.LoadIniFile(const FileName: string);
 var
   IniFile: TIniFile;
   Sections, Keys: TStringList;
@@ -509,7 +546,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.SaveIniFile(const FileName: string);
+procedure TFrmBuildConfig.SaveIniFile(const FileName: string);
 var
   IniFile: TIniFile;
   i: Integer;
@@ -545,7 +582,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.LoadJsonFile(const FileName: string);
+procedure TFrmBuildConfig.LoadJsonFile(const FileName: string);
 var
   JsonStr: string;
   JsonValue: TJSONValue;
@@ -629,7 +666,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.SaveJsonFile(const FileName: string);
+procedure TFrmBuildConfig.SaveJsonFile(const FileName: string);
 
   function BuildJsonObject(Node: TTreeNode): TJSONValue;
   var
@@ -719,7 +756,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.UpdateIniMemo;
+procedure TFrmBuildConfig.UpdateIniMemo;
 begin
   // 更新INI备忘录的逻辑
   Memo1.Lines.Clear;
@@ -730,7 +767,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.UpdateJsonMemo;
+procedure TFrmBuildConfig.UpdateJsonMemo;
 
   procedure ProcessNode(Node: TTreeNode; Indent: Integer);
   var
@@ -825,7 +862,7 @@ begin
   Memo2.Lines.Add('}');
 end;
 
-procedure TViewBuildConfig.ClearAllData;
+procedure TFrmBuildConfig.ClearAllData;
 begin
   // 清除所有数据的逻辑
   sgINI.RowCount := 1;
@@ -834,13 +871,13 @@ begin
   Memo2.Clear;
 end;
 
-function TViewBuildConfig.GetPropertyInputFromUser(const Caption, Prompt: string; var Value: string): Boolean;
+function TFrmBuildConfig.GetPropertyInputFromUser(const Caption, Prompt: string; var Value: string): Boolean;
 begin
   // 从用户获取属性输入的逻辑
   Result := InputQuery(Caption, Prompt, Value);
 end;
 
-function TViewBuildConfig.GetNewPropertyName(const DefaultName: string): string;
+function TFrmBuildConfig.GetNewPropertyName(const DefaultName: string): string;
 var
   NewName: string;
 begin
@@ -851,7 +888,7 @@ begin
     Result := DefaultName;
 end;
 
-function TViewBuildConfig.GetColorValue: string;
+function TFrmBuildConfig.GetColorValue: string;
 begin
   // 获取颜色值的逻辑
   Result := '';
@@ -859,7 +896,7 @@ begin
     Result := Format('$%.8x', [dlgSelectColor.Color]);
 end;
 
-function TViewBuildConfig.GetPathValue: string;
+function TFrmBuildConfig.GetPathValue: string;
 begin
   // 获取路径值的逻辑
   Result := '';
@@ -867,7 +904,7 @@ begin
     Result := dlgBrowseDir.FileName;
 end;
 
-procedure TViewBuildConfig.LoadConfigFiles(const IniFileName, JsonFileName: string);
+procedure TFrmBuildConfig.LoadConfigFiles(const IniFileName, JsonFileName: string);
 begin
   ClearAllData;
   if FileExists(IniFileName) then
@@ -876,7 +913,7 @@ begin
     LoadJsonFile(JsonFileName);
 end;
 
-procedure TViewBuildConfig.SaveConfigFiles;
+procedure TFrmBuildConfig.SaveConfigFiles;
 begin
   if FCurrentIniFile <> '' then
     SaveIniFile(FCurrentIniFile);
@@ -884,7 +921,7 @@ begin
     SaveJsonFile(FCurrentJsonFile);
 end;
 
-procedure TViewBuildConfig.btnAddTextClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddTextClick(Sender: TObject);
 var
   PropertyName, PropertyValue: string;
   Section: string;
@@ -909,7 +946,7 @@ begin
   UpdateIniMemo;
 end;
 
-procedure TViewBuildConfig.btnAddNumberClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddNumberClick(Sender: TObject);
 var
   PropertyName, PropertyValue: string;
   Section: string;
@@ -946,7 +983,7 @@ begin
   UpdateIniMemo;
 end;
 
-procedure TViewBuildConfig.btnAddPathClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddPathClick(Sender: TObject);
 var
   PropertyName: string;
   PathValue: string;
@@ -973,7 +1010,7 @@ begin
   UpdateIniMemo;
 end;
 
-procedure TViewBuildConfig.btnAddBooleanClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddBooleanClick(Sender: TObject);
 var
   PropertyName: string;
   BoolValue: Boolean;
@@ -1010,7 +1047,7 @@ begin
   UpdateIniMemo;
 end;
 
-procedure TViewBuildConfig.btnAddDateClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddDateClick(Sender: TObject);
 var
   PropertyName: string;
   DateValue: TDateTime;
@@ -1081,7 +1118,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.btnAddColorClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddColorClick(Sender: TObject);
 var
   PropertyName: string;
   ColorValue: string;
@@ -1108,7 +1145,7 @@ begin
   UpdateIniMemo;
 end;
 
-procedure TViewBuildConfig.btnAddFontClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddFontClick(Sender: TObject);
 var
   PropertyName: string;
   Section: string;
@@ -1157,12 +1194,12 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.btnAddColorComplexClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddColorComplexClick(Sender: TObject);
 begin
   // 添加复杂颜色属性的逻辑
 end;
 
-procedure TViewBuildConfig.btnAddDatabaseClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddDatabaseClick(Sender: TObject);
 var
   PropertyName: string;
   Section: string;
@@ -1249,7 +1286,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.btnAddListClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddListClick(Sender: TObject);
 var
   PropertyName: string;
   Section: string;
@@ -1349,7 +1386,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.btnAddObjectClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddObjectClick(Sender: TObject);
 var
   PropertyName: string;
   Section: string;
@@ -1431,7 +1468,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.btnAddArrayClick(Sender: TObject);
+procedure TFrmBuildConfig.btnAddArrayClick(Sender: TObject);
 var
   PropertyName: string;
   Section: string;
@@ -1515,7 +1552,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.EditINIPropertyClick(Sender: TObject);
+procedure TFrmBuildConfig.EditINIPropertyClick(Sender: TObject);
 var
   Row: Integer;
   PropertyType, PropertyValue: string;
@@ -1623,7 +1660,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.RenameINIPropertyClick(Sender: TObject);
+procedure TFrmBuildConfig.RenameINIPropertyClick(Sender: TObject);
 var
   Row: Integer;
   Section, Key, Value: string;
@@ -1650,7 +1687,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.DeleteINIPropertyClick(Sender: TObject);
+procedure TFrmBuildConfig.DeleteINIPropertyClick(Sender: TObject);
 var
   RowIndex, i: Integer;
 begin
@@ -1687,7 +1724,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.EditJSONPropertyClick(Sender: TObject);
+procedure TFrmBuildConfig.EditJSONPropertyClick(Sender: TObject);
 var
   Node: TTreeNode;
   PropItem: PConfigPropertyItem;
@@ -1799,7 +1836,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.RenameJSONPropertyClick(Sender: TObject);
+procedure TFrmBuildConfig.RenameJSONPropertyClick(Sender: TObject);
 var
   Node: TTreeNode;
   PropItem: PConfigPropertyItem;
@@ -1826,7 +1863,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.DeleteJSONPropertyClick(Sender: TObject);
+procedure TFrmBuildConfig.DeleteJSONPropertyClick(Sender: TObject);
 var
   Node: TTreeNode;
 begin
@@ -1849,7 +1886,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.btnUpdateClick(Sender: TObject);
+procedure TFrmBuildConfig.btnUpdateClick(Sender: TObject);
 var
   Node: TTreeNode;
   PropItem: PConfigPropertyItem;
@@ -1875,7 +1912,7 @@ begin
   HidePropertyEditor;
 end;
 
-procedure TViewBuildConfig.btnSaveClick(Sender: TObject);
+procedure TFrmBuildConfig.btnSaveClick(Sender: TObject);
 var
   IniFileName, JsonFileName: string;
 begin
@@ -1920,26 +1957,12 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.btnCloseClick(Sender: TObject);
+procedure TFrmBuildConfig.btnCloseClick(Sender: TObject);
 begin
-  // 关闭按钮点击事件的逻辑
-  if FCurrentIniFile <> '' then
-  begin
-    // 如果有未保存的更改，提示保存
-    if MessageDlg('是否保存当前配置文件？', mtConfirmation, mbYesNoCancel, 0) = mrYes then
-      btnSaveClick(Sender);
-  end;
-
-  // 清除数据
-  ClearAllData;
-
-  // 重置文件名
-  FCurrentIniFile := '';
-  FCurrentJsonFile := '';
-  edtFileName.Text := '';
+  Close;
 end;
 
-procedure TViewBuildConfig.btnOpenConfigClick(Sender: TObject);
+procedure TFrmBuildConfig.btnOpenConfigClick(Sender: TObject);
 var
   IniFileName, JsonFileName: string;
 begin
@@ -1960,20 +1983,20 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.sgINIDblClick(Sender: TObject);
+procedure TFrmBuildConfig.sgINIDblClick(Sender: TObject);
 begin
   // INI网格双击事件的逻辑
   EditINIPropertyClick(Sender);
 end;
 
-procedure TViewBuildConfig.tvJSONDblClick(Sender: TObject);
+procedure TFrmBuildConfig.tvJSONDblClick(Sender: TObject);
 begin
   // JSON树双击事件的逻辑
   EditJSONPropertyClick(Sender);
 end;
 
 // 数据库编辑器事件处理
-procedure TViewBuildConfig.OnDBSave(Sender: TObject);
+procedure TFrmBuildConfig.OnDBSave(Sender: TObject);
 begin
   if Sender is TFrameDBEditor then
   begin
@@ -1987,7 +2010,7 @@ begin
   end;
 end;
 
-procedure TViewBuildConfig.OnDBCancel(Sender: TObject);
+procedure TFrmBuildConfig.OnDBCancel(Sender: TObject);
 begin
   if Sender is TFrameDBEditor then
   begin
@@ -2000,5 +2023,12 @@ begin
       TForm(DBForm).ModalResult := mrCancel;
   end;
 end;
+
+{$IFDEF DESIGNTIME}
+procedure Register;
+begin
+  RegisterComponents('Custom', [TFrmBuildConfig]);
+end;
+{$ENDIF}
 
 end.

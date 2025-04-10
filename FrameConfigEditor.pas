@@ -12,6 +12,7 @@ type
     pnlMain: TPanel;
     tabControl: TTabControl;
     pnlEditor: TPanel;
+    ButtonPanel: TPanel;
     btnSave: TButton;
     btnCancel: TButton;
     procedure btnSaveClick(Sender: TObject);
@@ -54,64 +55,6 @@ uses
 constructor TframeConfigEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  
-  // 创建主面板
-  pnlMain := TPanel.Create(Self);
-  pnlMain.Parent := Self;
-  pnlMain.Align := alClient;
-  pnlMain.BevelOuter := bvNone;
-  pnlMain.Visible := True;
-  
-  // 创建Tab控件
-  tabControl := TTabControl.Create(Self);
-  tabControl.Parent := pnlMain;
-  tabControl.Align := alTop;
-  tabControl.Height := 30;
-  tabControl.TabHeight := 25;
-  tabControl.Tabs.Add('编辑器');
-  tabControl.Tabs.Add('原始数据');
-  tabControl.OnChange := tabControlChange;
-  tabControl.Visible := True;
-  
-  // 创建编辑器面板
-  pnlEditor := TPanel.Create(Self);
-  pnlEditor.Parent := pnlMain;
-  pnlEditor.Align := alClient;
-  pnlEditor.BevelOuter := bvNone;
-  pnlEditor.Visible := True;
-  
-  // 创建底部按钮面板
-  var ButtonPanel := TPanel.Create(Self);
-  ButtonPanel.Parent := pnlMain;
-  ButtonPanel.Align := alBottom;
-  ButtonPanel.Height := 40;
-  ButtonPanel.BevelOuter := bvNone;
-  ButtonPanel.Visible := True;
-  
-  // 创建保存按钮
-  btnSave := TButton.Create(Self);
-  btnSave.Parent := ButtonPanel;
-  btnSave.Align := alRight;
-  btnSave.Caption := '保存';
-  btnSave.Width := 80;
-  btnSave.OnClick := btnSaveClick;
-  btnSave.Enabled := False;
-  btnSave.Visible := True;
-  
-  // 创建取消按钮
-  btnCancel := TButton.Create(Self);
-  btnCancel.Parent := ButtonPanel;
-  btnCancel.Align := alLeft;
-  btnCancel.Caption := '取消';
-  btnCancel.Width := 80;
-  btnCancel.OnClick := btnCancelClick;
-  btnCancel.Enabled := False;
-  btnCancel.Visible := True;
-  
-  Self.Width := 200;
-  Self.Height := 400;
-  Self.Visible := True;
-  
   FModified := False;
 end;
 
@@ -314,5 +257,12 @@ begin
   btnSave.Enabled := FModified and Assigned(FCurrentEditor);
   btnCancel.Enabled := Assigned(FCurrentEditor);
 end;
+
+{$IFDEF DESIGNTIME}
+procedure Register;
+begin
+  RegisterComponents('Custom', [TframeConfigEditor]);
+end;
+{$ENDIF}
 
 end. 

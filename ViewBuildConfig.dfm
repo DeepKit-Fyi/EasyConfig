@@ -1,13 +1,20 @@
-object ViewBuildConfig: TViewBuildConfig
+object FrmBuildConfig: TFrmBuildConfig
   Left = 0
   Top = 0
-  Width = 640
-  Height = 480
-  TabOrder = 0
+  Caption = #38320#23943#30086#37922#29112#22426#23480#12517#21503
+  ClientHeight = 616
+  ClientWidth = 961
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  TextHeight = 15
   object Splitter1: TSplitter
     Left = 0
-    Top = 436
-    Width = 640
+    Top = 572
+    Width = 961
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -16,9 +23,9 @@ object ViewBuildConfig: TViewBuildConfig
     ExplicitWidth = 354
   end
   object Splitter2: TSplitter
-    Left = 596
+    Left = 917
     Top = 85
-    Height = 351
+    Height = 487
     Align = alRight
     ExplicitLeft = 400
     ExplicitTop = 160
@@ -27,7 +34,7 @@ object ViewBuildConfig: TViewBuildConfig
   object Splitter3: TSplitter
     Left = 300
     Top = 85
-    Height = 351
+    Height = 487
     ExplicitLeft = 392
     ExplicitTop = 152
     ExplicitHeight = 100
@@ -35,7 +42,7 @@ object ViewBuildConfig: TViewBuildConfig
   object Splitter4: TSplitter
     Left = 0
     Top = 82
-    Width = 640
+    Width = 961
     Height = 3
     Cursor = crVSplit
     Align = alTop
@@ -45,13 +52,11 @@ object ViewBuildConfig: TViewBuildConfig
   object pnlIni: TPanel
     Left = 0
     Top = 0
-    Width = 640
+    Width = 961
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitLeft = 56
-    ExplicitTop = 32
-    ExplicitWidth = 185
+    ExplicitWidth = 618
     object btnAddText: TButton
       Left = 9
       Top = 7
@@ -104,11 +109,11 @@ object ViewBuildConfig: TViewBuildConfig
   object pnlJson: TPanel
     Left = 0
     Top = 41
-    Width = 640
+    Width = 961
     Height = 41
     Align = alTop
     TabOrder = 1
-    ExplicitTop = 8
+    ExplicitWidth = 618
     object btnAddFont: TButton
       Left = 9
       Top = 8
@@ -162,20 +167,18 @@ object ViewBuildConfig: TViewBuildConfig
     Left = 0
     Top = 85
     Width = 300
-    Height = 351
+    Height = 487
     Align = alLeft
     TabOrder = 2
-    ExplicitLeft = 2
-    ExplicitTop = 82
+    ExplicitHeight = 295
     object Panel1: TPanel
       Left = 1
       Top = 1
       Width = 300
-      Height = 349
+      Height = 485
       Align = alLeft
       TabOrder = 0
-      ExplicitLeft = 2
-      ExplicitTop = -1
+      ExplicitHeight = 293
       object sgINI: TStringGrid
         Left = 1
         Top = 1
@@ -194,17 +197,18 @@ object ViewBuildConfig: TViewBuildConfig
         Left = 1
         Top = 113
         Width = 300
-        Height = 235
+        Height = 371
         Align = alLeft
         TabOrder = 1
-        ExplicitLeft = 0
+        ExplicitHeight = 179
         object Panel3: TPanel
           Left = 1
           Top = 1
           Width = 300
-          Height = 233
+          Height = 369
           Align = alLeft
           TabOrder = 0
+          ExplicitHeight = 177
           object Splitter5: TSplitter
             Left = 1
             Top = 1
@@ -217,16 +221,13 @@ object ViewBuildConfig: TViewBuildConfig
             Left = 1
             Top = 45
             Width = 298
-            Height = 187
+            Height = 323
             Align = alClient
             DragMode = dmAutomatic
             Indent = 19
             TabOrder = 0
             OnDblClick = tvJSONDblClick
-            ExplicitLeft = 32
-            ExplicitTop = 48
-            ExplicitWidth = 121
-            ExplicitHeight = 97
+            ExplicitHeight = 131
           end
           object pnlEditing: TPanel
             Left = 1
@@ -235,9 +236,6 @@ object ViewBuildConfig: TViewBuildConfig
             Height = 41
             Align = alTop
             TabOrder = 1
-            ExplicitLeft = 0
-            ExplicitTop = 8
-            ExplicitWidth = 640
             object edtEditing: TEdit
               AlignWithMargins = True
               Left = 11
@@ -251,6 +249,7 @@ object ViewBuildConfig: TViewBuildConfig
               Align = alLeft
               TabOrder = 0
               Text = 'edtEditing'
+              ExplicitHeight = 23
             end
             object btnUpdate: TButton
               AlignWithMargins = True
@@ -273,51 +272,49 @@ object ViewBuildConfig: TViewBuildConfig
     end
   end
   object pnlRigth: TPanel
-    Left = 599
+    Left = 920
     Top = 85
     Width = 41
-    Height = 351
+    Height = 487
     Align = alRight
     TabOrder = 3
-    ExplicitLeft = 0
-    ExplicitTop = 123
-    ExplicitHeight = 640
+    Visible = False
+    ExplicitLeft = 577
+    ExplicitHeight = 295
   end
   object pnlContent: TPanel
     Left = 303
     Top = 85
-    Width = 293
-    Height = 351
+    Width = 614
+    Height = 487
     Align = alClient
     TabOrder = 4
-    ExplicitLeft = 297
-    ExplicitTop = 257
-    ExplicitWidth = 296
-    ExplicitHeight = 41
+    ExplicitWidth = 271
+    ExplicitHeight = 295
     object PageControl1: TPageControl
       Left = 1
       Top = 1
-      Width = 291
-      Height = 349
+      Width = 612
+      Height = 485
       ActivePage = tsEditor
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 269
+      ExplicitHeight = 293
       object tsINI: TTabSheet
         Caption = 'INI'#20869#23481
         object Memo1: TMemo
           Left = 0
           Top = 0
-          Width = 283
-          Height = 319
+          Width = 604
+          Height = 455
           Align = alClient
           Lines.Strings = (
             'Memo1')
           ScrollBars = ssBoth
           TabOrder = 0
-          ExplicitLeft = 88
-          ExplicitTop = 104
-          ExplicitWidth = 185
-          ExplicitHeight = 89
+          ExplicitWidth = 267
+          ExplicitHeight = 280
         end
       end
       object tsJSON: TTabSheet
@@ -326,17 +323,15 @@ object ViewBuildConfig: TViewBuildConfig
         object Memo2: TMemo
           Left = 0
           Top = 0
-          Width = 283
-          Height = 319
+          Width = 604
+          Height = 455
           Align = alClient
           Lines.Strings = (
             'Memo1')
           ScrollBars = ssBoth
           TabOrder = 0
-          ExplicitLeft = 88
-          ExplicitTop = 104
-          ExplicitWidth = 185
-          ExplicitHeight = 89
+          ExplicitWidth = 267
+          ExplicitHeight = 280
         end
       end
       object tsEditor: TTabSheet
@@ -344,14 +339,13 @@ object ViewBuildConfig: TViewBuildConfig
         ImageIndex = 2
         object Panel4: TPanel
           Left = 0
-          Top = 278
-          Width = 283
+          Top = 414
+          Width = 604
           Height = 41
           Align = alBottom
           TabOrder = 0
-          ExplicitLeft = 1
-          ExplicitTop = 0
-          ExplicitWidth = 638
+          ExplicitTop = 222
+          ExplicitWidth = 261
           object btnSave: TButton
             AlignWithMargins = True
             Left = 184
@@ -370,26 +364,25 @@ object ViewBuildConfig: TViewBuildConfig
         object pnlEditorContent: TPanel
           Left = 0
           Top = 0
-          Width = 283
-          Height = 278
+          Width = 604
+          Height = 414
           Align = alClient
           TabOrder = 1
-          ExplicitWidth = 291
-          ExplicitHeight = 298
+          ExplicitWidth = 261
+          ExplicitHeight = 222
         end
       end
     end
   end
   object pnlBottom: TPanel
     Left = 0
-    Top = 439
-    Width = 640
+    Top = 575
+    Width = 961
     Height = 41
     Align = alBottom
     TabOrder = 5
-    ExplicitLeft = 1
-    ExplicitTop = 0
-    ExplicitWidth = 638
+    ExplicitTop = 383
+    ExplicitWidth = 618
     object edtFileName: TEdit
       AlignWithMargins = True
       Left = 11
@@ -403,10 +396,11 @@ object ViewBuildConfig: TViewBuildConfig
       Align = alLeft
       TabOrder = 0
       Text = 'edtFileName'
+      ExplicitHeight = 23
     end
     object btnClose: TButton
       AlignWithMargins = True
-      Left = 576
+      Left = 897
       Top = 11
       Width = 53
       Height = 19
@@ -418,10 +412,11 @@ object ViewBuildConfig: TViewBuildConfig
       Caption = #36864#20986
       TabOrder = 1
       OnClick = btnCloseClick
+      ExplicitLeft = 554
     end
     object btnOpenConfig: TButton
       AlignWithMargins = True
-      Left = 463
+      Left = 784
       Top = 11
       Width = 93
       Height = 19
@@ -433,7 +428,7 @@ object ViewBuildConfig: TViewBuildConfig
       Caption = #25171#24320#37197#32622#25991#20214
       TabOrder = 2
       OnClick = btnOpenConfigClick
-      ExplicitLeft = 536
+      ExplicitLeft = 441
     end
   end
   object dlgOpenFile: TOpenDialog
