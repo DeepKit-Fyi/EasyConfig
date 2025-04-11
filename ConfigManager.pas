@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.IniFiles, System.JSON, System.Generics.Collections,
-  ConfigTypes, INIConfig, JSONConfig;
+   INIConfig, JSONConfig;
 
 type
   TConfigManager = class

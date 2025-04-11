@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Generics.Collections, System.JSON,
-  ConfigTypes;
+  UtilsTypes;
 
 type
   TValidationSeverity = (vsInfo, vsWarning, vsError);

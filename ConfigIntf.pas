@@ -1,10 +1,10 @@
-unit ConfigIntf;
+﻿unit ConfigIntf;
 
 interface
 
 uses
   System.SysUtils, System.Classes, System.JSON, Vcl.Graphics, Vcl.Forms,
-  Vcl.Controls, ConfigTypes;
+  Vcl.Controls, UtilsTypes;
 
 type
   // INI配置接口

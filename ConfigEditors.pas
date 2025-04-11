@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  System.JSON, ConfigTypes, JSONConfig, INIConfig, System.TypInfo, System.Generics.Collections, 
+  System.JSON, JSONConfig, INIConfig, System.TypInfo, System.Generics.Collections,
   ConfigEditorsBase;
 
 type

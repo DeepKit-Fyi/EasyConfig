@@ -3,8 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Generics.Collections,
-  ConfigTypes;
+  System.SysUtils, System.Classes, System.Generics.Collections;
 
 type
   // 閰嶇疆瀵硅薄娉ㄥ唽琛?

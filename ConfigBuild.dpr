@@ -6,7 +6,7 @@ uses
   Vcl.Dialogs,
   ViewBuildConfig in 'ViewBuildConfig.pas' {FrmBuildConfig},
   ConfigIntf in 'ConfigIntf.pas',
-  ConfigTypes in 'ConfigTypes.pas',
+  UtilsTypes in 'UtilsTypes.pas',
   FrameFontEditor in 'FrameFontEditor.pas',
   FrameAIAPIEditor in 'FrameAIAPIEditor.pas',
   FrameDBEditor in 'FrameDBEditor.pas',

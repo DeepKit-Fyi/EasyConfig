@@ -24,24 +24,29 @@ object FrmBuildConfig: TFrmBuildConfig
   end
   object Splitter2: TSplitter
     Left = 873
-    Top = 85
-    Height = 487
+    Top = 124
+    Height = 448
     Align = alRight
     ExplicitLeft = 917
+    ExplicitTop = 85
+    ExplicitHeight = 487
   end
   object Splitter3: TSplitter
     Left = 465
-    Top = 85
-    Height = 487
+    Top = 124
+    Height = 448
     ExplicitLeft = 300
+    ExplicitTop = 85
+    ExplicitHeight = 487
   end
   object Splitter4: TSplitter
     Left = 0
-    Top = 82
+    Top = 121
     Width = 1212
     Height = 3
     Cursor = crVSplit
     Align = alTop
+    ExplicitTop = 82
     ExplicitWidth = 961
   end
   object pnlIni: TPanel
@@ -51,351 +56,545 @@ object FrmBuildConfig: TFrmBuildConfig
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 1192
-    object btnAddText: TButton
-      Left = 9
-      Top = 7
-      Width = 40
-      Height = 25
-      Caption = #25991#26412
-      ParentShowHint = False
-      ShowHint = True
+    object flpIni: TFlowPanel
+      Left = 1
+      Top = 1
+      Width = 1210
+      Height = 39
+      Align = alClient
+      BevelOuter = bvNone
       TabOrder = 0
-      OnClick = btnAddTextClick
-    end
-    object btnAddNumber: TButton
-      Left = 55
-      Top = 7
-      Width = 42
-      Height = 25
-      Caption = #25968#23383
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 1
-      OnClick = btnAddNumberClick
-    end
-    object btnRootPath: TButton
-      Left = 103
-      Top = 7
-      Width = 74
-      Height = 25
-      Caption = #39033#30446#26681#30446#24405
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 2
-      OnClick = btnRootPathClick
-    end
-    object btnAddBoolean: TButton
-      Left = 479
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #30495'/'#20551
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 3
-      OnClick = btnAddBooleanClick
-    end
-    object btnAddDate: TButton
-      Left = 599
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #26085#26399
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 4
-      OnClick = btnAddDateClick
-    end
-    object btnAddColor: TButton
-      Left = 539
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #39068#33394
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 5
-      OnClick = btnAddColorClick
-    end
-    object btnAddININetwork: TButton
-      Left = 719
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = 'IP'#22320#22336
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 6
-      OnClick = btnAddININetworkClick
-    end
-    object btnAddINITime: TButton
-      Left = 659
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #26102#38388
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 7
-      OnClick = btnAddINITimeClick
-    end
-    object btnReFileName: TButton
-      Left = 331
-      Top = 7
-      Width = 68
-      Height = 25
-      Caption = #25991#20214#21517
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 8
-      OnClick = btnReFileNameClick
-    end
-    object btnAbsFilename: TButton
-      Left = 405
-      Top = 7
-      Width = 68
-      Height = 25
-      Caption = #30446#24405'+'#25991#20214
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 9
-      OnClick = btnAbsFilenameClick
-    end
-    object btnAbsPath: TButton
-      Left = 183
-      Top = 7
-      Width = 68
-      Height = 25
-      Caption = #32477#23545#36335#24452
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 10
-      OnClick = btnAbsPathClick
-    end
-    object btnSection: TButton
-      Left = 779
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #20998#33410#21517
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 11
-      OnClick = btnSectionClick
-    end
-    object btnEmptyLine: TButton
-      Left = 839
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #31354#34892
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 12
-      OnClick = btnEmptyLineClick
-    end
-    object btnRePath: TButton
-      Left = 257
-      Top = 7
-      Width = 68
-      Height = 25
-      Caption = #30456#23545#36335#24452
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 13
-      OnClick = btnRePathClick
-    end
-    object btnList: TButton
-      Left = 899
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #21015#34920
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 14
-      OnClick = btnListClick
-    end
-    object btnKey: TButton
-      Left = 959
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #31192#38053
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 15
-    end
-    object btnReg: TButton
-      Left = 1019
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #27491#21017
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 16
-    end
-    object btnEMail: TButton
-      Left = 1079
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = #37038#31665
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 17
-    end
-    object btnUrl: TButton
-      Left = 1139
-      Top = 7
-      Width = 56
-      Height = 25
-      Caption = 'Url'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 18
+      object btnAddText: TButton
+        Left = 0
+        Top = 0
+        Width = 40
+        Height = 25
+        Caption = #25991#26412
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 0
+        OnClick = btnAddTextClick
+      end
+      object btnAddNumber: TButton
+        Left = 40
+        Top = 0
+        Width = 42
+        Height = 25
+        Caption = #25968#23383
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 1
+        OnClick = btnAddNumberClick
+      end
+      object btnRootPath: TButton
+        Left = 82
+        Top = 0
+        Width = 74
+        Height = 25
+        Caption = #39033#30446#26681#30446#24405
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
+        OnClick = btnRootPathClick
+      end
+      object btnAddBoolean: TButton
+        Left = 156
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #30495'/'#20551
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 3
+        OnClick = btnAddBooleanClick
+      end
+      object btnAddDate: TButton
+        Left = 212
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #26085#26399
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 4
+        OnClick = btnAddDateClick
+      end
+      object btnAddColor: TButton
+        Left = 268
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #39068#33394
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 5
+        OnClick = btnAddColorClick
+      end
+      object btnAddININetwork: TButton
+        Left = 324
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = 'IP'#22320#22336
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 6
+        OnClick = btnAddININetworkClick
+      end
+      object btnAddINITime: TButton
+        Left = 380
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #26102#38388
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 7
+        OnClick = btnAddINITimeClick
+      end
+      object btnReFileName: TButton
+        Left = 436
+        Top = 0
+        Width = 68
+        Height = 25
+        Caption = #25991#20214#21517
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 8
+        OnClick = btnReFileNameClick
+      end
+      object btnAbsFilename: TButton
+        Left = 504
+        Top = 0
+        Width = 68
+        Height = 25
+        Caption = #30446#24405'+'#25991#20214
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 9
+        OnClick = btnAbsFilenameClick
+      end
+      object btnAbsPath: TButton
+        Left = 572
+        Top = 0
+        Width = 68
+        Height = 25
+        Caption = #32477#23545#36335#24452
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 10
+        OnClick = btnAbsPathClick
+      end
+      object btnSection: TButton
+        Left = 640
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #20998#33410#21517
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 11
+        OnClick = btnSectionClick
+      end
+      object btnEmptyLine: TButton
+        Left = 696
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #31354#34892
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 12
+        OnClick = btnEmptyLineClick
+      end
+      object btnRePath: TButton
+        Left = 752
+        Top = 0
+        Width = 68
+        Height = 25
+        Caption = #30456#23545#36335#24452
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 13
+        OnClick = btnRePathClick
+      end
+      object btnList: TButton
+        Left = 820
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #21015#34920
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 14
+        OnClick = btnListClick
+      end
+      object btnKey: TButton
+        Left = 876
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #31192#38053
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 15
+      end
+      object btnReg: TButton
+        Left = 932
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #27491#21017
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 16
+      end
+      object btnEMail: TButton
+        Left = 988
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = #37038#31665
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 17
+      end
+      object btnUrl: TButton
+        Left = 1044
+        Top = 0
+        Width = 56
+        Height = 25
+        Caption = 'Url'
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 18
+      end
     end
   end
   object pnlJson: TPanel
     Left = 0
     Top = 41
     Width = 1212
-    Height = 41
+    Height = 80
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 1192
-    object btnAddFont: TButton
-      Left = 9
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#23383#20307
+    object flpJson: TFlowPanel
+      Left = 1
+      Top = 1
+      Width = 1210
+      Height = 78
+      Align = alClient
+      BevelOuter = bvNone
       TabOrder = 0
-      OnClick = btnAddFontClick
-    end
-    object btnAddColorComplex: TButton
-      Left = 90
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#39068#33394
-      TabOrder = 1
-      OnClick = btnAddColorComplexClick
-    end
-    object btnAddDatabase: TButton
-      Left = 171
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#25968#25454#24211
-      TabOrder = 2
-      OnClick = btnAddDatabaseClick
-    end
-    object btnAddList: TButton
-      Left = 252
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#21015#34920
-      TabOrder = 3
-      OnClick = btnAddListClick
-    end
-    object btnAddObject: TButton
-      Left = 333
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#23545#35937
-      TabOrder = 4
-      OnClick = btnAddObjectClick
-    end
-    object btnAddArray: TButton
-      Left = 414
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#25968#32452
-      TabOrder = 5
-      OnClick = btnAddArrayClick
-    end
-    object btnAddAPI: TButton
-      Left = 495
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#63009#14518
-      TabOrder = 6
-      OnClick = btnAddAPIClick
-    end
-    object btnAddRootNode: TButton
-      Left = 576
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #22686#21152#26681#33410#28857
-      TabOrder = 7
-      OnClick = btnAddRootNodeClick
-    end
-    object btnAddJsonSecurity: TButton
-      Left = 657
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#23433#20840
-      TabOrder = 8
-      OnClick = btnAddJsonSecurityClick
-    end
-    object btnAddJsonAI: TButton
-      Left = 738
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#20154#24037#26234#33021
-      TabOrder = 9
-      OnClick = btnAddJsonAIClick
-    end
-    object btnAddJsonModule: TButton
-      Left = 819
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = #28155#21152#27169#22359
-      TabOrder = 10
-      OnClick = btnAddJsonModuleClick
+      object btnAddFont: TButton
+        Left = 0
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#23383#20307
+        TabOrder = 0
+        OnClick = showConfigByTag
+      end
+      object btnAddColorComplex: TButton
+        Left = 75
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#39068#33394
+        TabOrder = 1
+        OnClick = showConfigByTag
+      end
+      object btnAddDatabase: TButton
+        Left = 150
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#25968#25454#24211
+        TabOrder = 2
+        OnClick = showConfigByTag
+      end
+      object btnAddList: TButton
+        Left = 225
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#21015#34920
+        TabOrder = 3
+        OnClick = showConfigByTag
+      end
+      object btnAddObject: TButton
+        Left = 300
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#23545#35937
+        TabOrder = 4
+        OnClick = showConfigByTag
+      end
+      object btnAddArray: TButton
+        Left = 375
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#25968#32452
+        TabOrder = 5
+        OnClick = showConfigByTag
+      end
+      object btnAddAPI: TButton
+        Left = 450
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#63009#14518
+        TabOrder = 6
+        OnClick = showConfigByTag
+      end
+      object btnAddRootNode: TButton
+        Left = 525
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #22686#21152#26681#33410#28857
+        TabOrder = 7
+        OnClick = showConfigByTag
+      end
+      object btnAddJsonSecurity: TButton
+        Left = 600
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#23433#20840
+        TabOrder = 8
+        OnClick = showConfigByTag
+      end
+      object btnAddJsonAI: TButton
+        Left = 675
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#20154#24037#26234#33021
+        TabOrder = 9
+        OnClick = showConfigByTag
+      end
+      object btnAddJsonModule: TButton
+        Left = 750
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #28155#21152#27169#22359
+        TabOrder = 10
+        OnClick = showConfigByTag
+      end
+      object btnAddDateTimeRange: TButton
+        Left = 825
+        Top = 0
+        Width = 90
+        Height = 25
+        Caption = #26085#26399#26102#38388#33539#22260
+        TabOrder = 11
+        OnClick = showConfigByTag
+      end
+      object btnAddKeyValueDict: TButton
+        Left = 915
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #38190#20540#23383#20856
+        TabOrder = 12
+        OnClick = showConfigByTag
+      end
+      object btnAddUrlConfig: TButton
+        Left = 990
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = 'URL'#37197#32622
+        TabOrder = 13
+        OnClick = showConfigByTag
+      end
+      object btnAddPermission: TButton
+        Left = 1065
+        Top = 0
+        Width = 75
+        Height = 25
+        Caption = #26435#38480#35774#32622
+        TabOrder = 14
+        OnClick = showConfigByTag
+      end
+      object btnAddNetConfig: TButton
+        Left = 0
+        Top = 25
+        Width = 75
+        Height = 25
+        Caption = #32593#32476#37197#32622
+        TabOrder = 15
+        OnClick = showConfigByTag
+      end
+      object btnAddEncrypt: TButton
+        Left = 75
+        Top = 25
+        Width = 75
+        Height = 25
+        Caption = #21152#23494#35774#32622
+        TabOrder = 16
+        OnClick = showConfigByTag
+      end
+      object btnAddGeoLocation: TButton
+        Left = 150
+        Top = 25
+        Width = 75
+        Height = 25
+        Caption = #22320#29702#20301#32622
+        TabOrder = 17
+        OnClick = showConfigByTag
+      end
+      object btnAddMediaSettings: TButton
+        Left = 225
+        Top = 25
+        Width = 90
+        Height = 25
+        Caption = #22810#23186#20307#35774#32622
+        TabOrder = 18
+        OnClick = showConfigByTag
+      end
+      object btnAddChartConfig: TButton
+        Left = 315
+        Top = 25
+        Width = 75
+        Height = 25
+        Caption = #22270#34920#37197#32622
+        TabOrder = 19
+        OnClick = showConfigByTag
+      end
+      object btnAddWorkflow: TButton
+        Left = 390
+        Top = 25
+        Width = 75
+        Height = 25
+        Caption = #24037#20316#27969#31243
+        TabOrder = 20
+        OnClick = showConfigByTag
+      end
+      object btnAddSchedule: TButton
+        Left = 465
+        Top = 25
+        Width = 75
+        Height = 25
+        Caption = #23450#26102#20219#21153
+        TabOrder = 21
+        OnClick = showConfigByTag
+      end
+      object btnAddI18n: TButton
+        Left = 540
+        Top = 25
+        Width = 90
+        Height = 25
+        Caption = #22269#38469#21270#35774#32622
+        TabOrder = 22
+        OnClick = showConfigByTag
+      end
+      object btnAddUnitConversion: TButton
+        Left = 630
+        Top = 25
+        Width = 75
+        Height = 25
+        Caption = #21333#20301#36716#25442
+        TabOrder = 23
+        OnClick = showConfigByTag
+      end
+      object btnAddVersionControl: TButton
+        Left = 705
+        Top = 25
+        Width = 90
+        Height = 25
+        Caption = #29256#26412#25511#21046
+        TabOrder = 24
+        OnClick = showConfigByTag
+      end
+      object btnAddBgDraw: TButton
+        Left = 795
+        Top = 25
+        Width = 100
+        Height = 25
+        Caption = #32972#26223#22270#19978#32472#22270
+        TabOrder = 25
+        OnClick = showConfigByTag
+      end
+      object btnAddTextOnBg: TButton
+        Left = 895
+        Top = 25
+        Width = 100
+        Height = 25
+        Caption = #32972#26223#19978#25991#23383
+        TabOrder = 26
+        OnClick = showConfigByTag
+      end
+      object btnAddImageOnBg: TButton
+        Left = 995
+        Top = 25
+        Width = 100
+        Height = 25
+        Caption = #32972#26223#19978#22270#20687
+        TabOrder = 27
+        OnClick = showConfigByTag
+      end
+      object btnAddCaptionOnBg: TButton
+        Left = 1095
+        Top = 25
+        Width = 100
+        Height = 25
+        Caption = #32972#26223#19978#23383#24149
+        TabOrder = 28
+        OnClick = showConfigByTag
+      end
+      object btnAddVideoClip: TButton
+        Left = 0
+        Top = 50
+        Width = 75
+        Height = 25
+        Caption = #35270#39057#29255#27573
+        TabOrder = 29
+        OnClick = showConfigByTag
+      end
+      object btnAddVideo: TButton
+        Left = 75
+        Top = 50
+        Width = 75
+        Height = 25
+        Caption = #35270#39057
+        TabOrder = 30
+        OnClick = showConfigByTag
+      end
     end
   end
   object pnlLeft: TPanel
     Left = 0
-    Top = 85
+    Top = 124
     Width = 465
-    Height = 487
+    Height = 448
     Align = alLeft
     TabOrder = 2
     object pnlattribute: TPanel
       Left = 1
       Top = 1
       Width = 463
-      Height = 485
+      Height = 446
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 301
       object pcAttribute: TPageControl
         Left = 1
         Top = 1
         Width = 461
-        Height = 483
+        Height = 444
         ActivePage = tsINIGrid
         Align = alClient
         TabOrder = 0
         OnChange = pcAttributeChange
-        ExplicitWidth = 298
         object tsINIGrid: TTabSheet
           Caption = 'INI'#34920
           object Splitter5: TSplitter
             Left = 0
-            Top = 409
+            Top = 370
             Width = 453
             Height = 3
             Cursor = crVSplit
@@ -405,14 +604,11 @@ object FrmBuildConfig: TFrmBuildConfig
           end
           object pnlEditing: TPanel
             Left = 0
-            Top = 412
+            Top = 373
             Width = 453
             Height = 41
             Align = alBottom
             TabOrder = 0
-            ExplicitLeft = 1
-            ExplicitTop = 1
-            ExplicitWidth = 298
             object edtEditing: TEdit
               AlignWithMargins = True
               Left = 11
@@ -442,14 +638,13 @@ object FrmBuildConfig: TFrmBuildConfig
               Caption = #20445#23384#20462#25913
               TabOrder = 1
               OnClick = btnUpdateClick
-              ExplicitLeft = 224
             end
           end
           object sgINI: TStringGrid
             Left = 0
             Top = 0
             Width = 453
-            Height = 409
+            Height = 370
             Align = alClient
             ColCount = 3
             FixedCols = 0
@@ -459,8 +654,6 @@ object FrmBuildConfig: TFrmBuildConfig
             TabOrder = 1
             OnDblClick = sgINIDblClick
             OnSelectCell = sgINISelectCell
-            ExplicitWidth = 281
-            ExplicitHeight = 232
             ColWidths = (
               100
               120
@@ -474,7 +667,7 @@ object FrmBuildConfig: TFrmBuildConfig
             Left = 0
             Top = 0
             Width = 453
-            Height = 453
+            Height = 414
             Align = alClient
             DragMode = dmAutomatic
             Indent = 19
@@ -482,7 +675,6 @@ object FrmBuildConfig: TFrmBuildConfig
             TabOrder = 0
             OnChange = tvJSONChange
             OnDblClick = tvJSONDblClick
-            ExplicitWidth = 315
           end
         end
       end
@@ -490,45 +682,40 @@ object FrmBuildConfig: TFrmBuildConfig
   end
   object pnlRigth: TPanel
     Left = 876
-    Top = 85
+    Top = 124
     Width = 336
-    Height = 487
+    Height = 448
     Align = alRight
     TabOrder = 3
     Visible = False
-    ExplicitLeft = 856
   end
   object pnlContent: TPanel
     Left = 468
-    Top = 85
+    Top = 124
     Width = 405
-    Height = 487
+    Height = 448
     Align = alClient
     TabOrder = 4
-    ExplicitLeft = 303
-    ExplicitWidth = 845
     object PageControl1: TPageControl
       Left = 1
       Top = 1
       Width = 403
-      Height = 485
+      Height = 446
       ActivePage = tsJSON
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 843
       object tsINI: TTabSheet
         Caption = 'INI'#20869#23481
         object MeoINI: TMemo
           Left = 0
           Top = 0
           Width = 395
-          Height = 455
+          Height = 416
           Align = alClient
           Lines.Strings = (
             '')
           ScrollBars = ssBoth
           TabOrder = 0
-          ExplicitWidth = 835
         end
       end
       object tsJSON: TTabSheet
@@ -538,13 +725,12 @@ object FrmBuildConfig: TFrmBuildConfig
           Left = 0
           Top = 0
           Width = 395
-          Height = 455
+          Height = 416
           Align = alClient
           Lines.Strings = (
             '')
           ScrollBars = ssBoth
           TabOrder = 0
-          ExplicitWidth = 835
         end
       end
       object tsEditor: TTabSheet
@@ -552,12 +738,12 @@ object FrmBuildConfig: TFrmBuildConfig
         ImageIndex = 2
         object Panel4: TPanel
           Left = 0
-          Top = 414
+          Top = 375
           Width = 395
           Height = 41
           Align = alBottom
           TabOrder = 0
-          ExplicitWidth = 835
+          ExplicitTop = 414
           object btnSave: TButton
             AlignWithMargins = True
             Left = 184
@@ -577,10 +763,10 @@ object FrmBuildConfig: TFrmBuildConfig
           Left = 0
           Top = 0
           Width = 395
-          Height = 414
+          Height = 375
           Align = alClient
           TabOrder = 1
-          ExplicitWidth = 835
+          ExplicitHeight = 414
         end
       end
     end
@@ -592,7 +778,6 @@ object FrmBuildConfig: TFrmBuildConfig
     Height = 41
     Align = alBottom
     TabOrder = 5
-    ExplicitWidth = 1192
     object btnClose: TButton
       AlignWithMargins = True
       Left = 1148
@@ -607,7 +792,6 @@ object FrmBuildConfig: TFrmBuildConfig
       Caption = #36864#20986
       TabOrder = 0
       OnClick = btnCloseClick
-      ExplicitLeft = 1128
     end
     object btnOpenConfig: TButton
       AlignWithMargins = True
@@ -623,7 +807,6 @@ object FrmBuildConfig: TFrmBuildConfig
       Caption = #25171#24320#37197#32622#25991#20214
       TabOrder = 1
       OnClick = btnOpenConfigClick
-      ExplicitLeft = 1015
     end
     object btnSaveConfig: TButton
       AlignWithMargins = True
@@ -639,9 +822,6 @@ object FrmBuildConfig: TFrmBuildConfig
       Caption = #20445#23384#37197#32622
       TabOrder = 2
       OnClick = btnSaveConfigClick
-      ExplicitLeft = 456
-      ExplicitTop = 8
-      ExplicitHeight = 25
     end
     object cbFileName: TComboBox
       Left = 274
@@ -665,7 +845,6 @@ object FrmBuildConfig: TFrmBuildConfig
       Caption = #21024#38500#37197#32622
       TabOrder = 4
       OnClick = btnDeleteConfigClick
-      ExplicitTop = 8
     end
     object btnNewConfig: TButton
       AlignWithMargins = True
@@ -681,8 +860,6 @@ object FrmBuildConfig: TFrmBuildConfig
       Caption = #26032#24314#37197#32622
       TabOrder = 5
       OnClick = btnNewConfigClick
-      ExplicitLeft = 67
-      ExplicitTop = 6
     end
   end
   object dlgOpenFile: TOpenDialog

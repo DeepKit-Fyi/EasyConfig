@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
-  ConfigFrameBase, ConfigTypes;
+  ConfigFrameBase, UtilsTypes;
 
 type
   TFontEditorFrame = class(TBaseConfigFrame)

@@ -9,6 +9,10 @@ object frameConfigEditor: TframeConfigEditor
     Top = 0
     Width = 640
     Height = 480
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -17,12 +21,17 @@ object frameConfigEditor: TframeConfigEditor
       Top = 0
       Width = 640
       Height = 30
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
       Align = alTop
       TabHeight = 25
       TabOrder = 0
       Tabs.Strings = (
         #32534#36753#22120
         #21407#22987#25968#25454)
+      TabIndex = 0
       OnChange = tabControlChange
     end
     object pnlEditor: TPanel
@@ -30,6 +39,10 @@ object frameConfigEditor: TframeConfigEditor
       Top = 30
       Width = 640
       Height = 410
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
@@ -39,6 +52,10 @@ object frameConfigEditor: TframeConfigEditor
       Top = 440
       Width = 640
       Height = 40
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 2
@@ -47,6 +64,10 @@ object frameConfigEditor: TframeConfigEditor
         Top = 0
         Width = 80
         Height = 40
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
         Align = alRight
         Caption = #20445#23384
         Enabled = False
@@ -58,6 +79,10 @@ object frameConfigEditor: TframeConfigEditor
         Top = 0
         Width = 80
         Height = 40
+        Margins.Left = 5
+        Margins.Top = 5
+        Margins.Right = 5
+        Margins.Bottom = 5
         Align = alLeft
         Caption = #21462#28040
         Enabled = False
@@ -67,4 +92,3 @@ object frameConfigEditor: TframeConfigEditor
     end
   end
 end
-

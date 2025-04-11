@@ -3,8 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, System.IOUtils, System.Generics.Collections,
-  ConfigTypes;
+  System.SysUtils, System.Classes, System.JSON, System.IOUtils, System.Generics.Collections;
 
 type
   TJSONConfig = class

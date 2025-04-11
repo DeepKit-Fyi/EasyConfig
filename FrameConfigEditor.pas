@@ -1,11 +1,11 @@
-unit FrameConfigEditor;
+﻿unit FrameConfigEditor;
 
 interface
 
 uses
   System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
-  ConfigIntf, ConfigTypes, ConfigFrameBase, System.UITypes, System.Generics.Collections;
+  ConfigIntf, ConfigFrameBase, System.UITypes, System.Generics.Collections, UtilsTypes;
 
 type
   TframeConfigEditor = class(TFrame, IConfigEditor)

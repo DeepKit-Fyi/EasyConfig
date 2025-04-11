@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
   Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Dialogs, System.JSON, Vcl.Grids, Vcl.ValEdit,
-  ConfigTypes, ConfigManager, System.Generics.Collections, ComplexEditors;
+  ConfigManager, System.Generics.Collections, ComplexEditors;
 
 type
   TfrmReferenceEditor = class(TForm)

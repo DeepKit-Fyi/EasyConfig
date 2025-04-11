@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.ComCtrls, Vcl.Menus, Vcl.Controls,
-  System.Generics.Collections, ConfigManager, ConfigTypes, System.IOUtils, System.IniFiles, System.JSON;
+  System.Generics.Collections, ConfigManager,  System.IOUtils, System.IniFiles, System.JSON;
 
 type
   // 树节点类型

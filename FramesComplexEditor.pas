@@ -1,12 +1,12 @@
-unit FramesComplexEditor;
+﻿unit FramesComplexEditor;
 
 interface
 
 uses
   System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
-  ConfigTypes, ConfigFrameBase, FrameFontEditor, FrameAIAPIEditor, 
-  FrameDBEditor, FrameListEditor, FrameObjectEditor, FrameArrayEditor;
+   ConfigFrameBase, FrameFontEditor, FrameAIAPIEditor,
+  FrameDBEditor, FrameListEditor, FrameObjectEditor, FrameArrayEditor, UtilsTypes;
 
 // 前向声明
 type

@@ -3,8 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.IniFiles, System.JSON,
-  ConfigTypes;
+  System.SysUtils, System.Classes, System.IniFiles, System.JSON;
 
 type
   // INI配置文件处理类（旧版本，保留但不使用）

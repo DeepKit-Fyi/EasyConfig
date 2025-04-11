@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.JSON, System.UITypes, System.Generics.Collections,
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, 
-  Vcl.Dialogs, Vcl.Grids, ConfigFrameBase, ConfigTypes;
+  Vcl.Dialogs, Vcl.Grids, ConfigFrameBase, UtilsTypes;
 
 type
   TArrayItemType = (aitString, aitNumber, aitBoolean, aitObject);

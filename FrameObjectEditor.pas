@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.JSON, System.UITypes, System.Generics.Collections,
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, 
-  Vcl.Dialogs, Vcl.Grids, ConfigFrameBase, ConfigTypes;
+  Vcl.Dialogs, Vcl.Grids, ConfigFrameBase, UtilsTypes;
 
 type
   TObjectPropertyType = (ptString, ptNumber, ptBoolean, ptObject, ptArray);
@@ -215,7 +215,7 @@ begin
           try
             StrToFloat(PropertyValue);
           except
-            MessageDlg('无效的数字值!', mtError, [mbOK], 0);
+            MessageDlg('无效的数字值', mtError, [mbOK], 0);
             Exit;
           end;
         end;
@@ -293,7 +293,7 @@ begin
               StrToFloat(PropertyValue);
               sgProperties.Cells[2, SelectedRow] := PropertyValue;
             except
-              MessageDlg('无效的数字值!', mtError, [mbOK], 0);
+              MessageDlg('无效的数字值', mtError, [mbOK], 0);
             end;
           end;
         end;
@@ -324,7 +324,7 @@ begin
   if (SelectedRow <= 0) or (SelectedRow >= sgProperties.RowCount) then
     Exit;
     
-  if MessageDlg('确定要删除属性 "' + sgProperties.Cells[0, SelectedRow] + '" 吗?',
+  if MessageDlg('确定要删除属性"' + sgProperties.Cells[0, SelectedRow] + '"吗?',
                 mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
     // 删除行

@@ -4,8 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Dialogs, Vcl.Graphics, Vcl.Grids, Vcl.ValEdit,
-  ConfigTypes;
+  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Dialogs, Vcl.Graphics, Vcl.Grids, Vcl.ValEdit;
 
 type
   TfrmSimpleEditor = class(TForm)
