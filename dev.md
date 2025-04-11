@@ -121,43 +121,11 @@ etBoolean.show_welcome = true
 
 ## 四、配置类型系统
 
-### 1. 配置类型枚举
+**注意：** 完整的配置属性类型列表已移至 [attribute.md](attribute.md) 文件。该文档按照使用频率从高到低列出了所有简单和复杂属性类型，包含每种类型的描述和使用场景。
 
 ```pascal
 // ConfigTypes.pas
 type
-  // 配置类型枚举
-  TConfigType = (
-    // 简单类型
-    etText,      // 文本型
-    etNumber,    // 数值型
-    etBoolean,   // 布尔型
-    etEnum,      // 枚举型
-    etFile,      // 文件型
-    etPath,      // 路径型
-    etColor,     // 颜色型
-    etDateTime,  // 日期时间型
-    etTimeSpan,  // 时间段型
-
-    // 复杂类型
-    etFont,         // 字体
-    etDatabase,     // 数据库连接
-    etBackGround,   // 背景
-    etImage,        // 图像
-    etTextOnBG,     // 背景上的文本
-    etImageOnBG,    // 背景上的图像
-    etDrawerOnBG,   // 背景上的绘图器
-    etSubtitle,     // 字幕
-    etPage,         // 页面
-    etVideoClip,    // 视频片段
-    etConnection,   // 网络连接
-    etCredential,   // 凭证
-    etLocalization, // 本地化
-    etArray,        // 数组
-    etAIAPI,        // AI大模型配置
-    etCustom        // 自定义类型
-  );
-
   // 配置组类型 - 用于区分简单类型和复杂类型
   TConfigGroupType = (
     cgtSimple,     // 简单类型（存储在INI文件中）

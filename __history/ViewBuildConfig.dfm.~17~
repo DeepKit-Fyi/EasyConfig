@@ -1,7 +1,7 @@
 object FrmBuildConfig: TFrmBuildConfig
   Left = 0
   Top = 0
-  Caption = #37197#32622#29031#29256#32534#36753#22120
+  Caption = #37197#32622#32534#36753#22120
   ClientHeight = 616
   ClientWidth = 1192
   Color = clBtnFace
@@ -11,6 +11,7 @@ object FrmBuildConfig: TFrmBuildConfig
   Font.Name = 'Segoe UI'
   Font.Style = []
   Visible = True
+  OnCreate = FormCreate
   TextHeight = 15
   object Splitter1: TSplitter
     Left = 0
@@ -22,16 +23,17 @@ object FrmBuildConfig: TFrmBuildConfig
     ExplicitWidth = 961
   end
   object Splitter2: TSplitter
-    Left = 1148
+    Left = 853
     Top = 85
     Height = 487
     Align = alRight
     ExplicitLeft = 917
   end
   object Splitter3: TSplitter
-    Left = 300
+    Left = 327
     Top = 85
     Height = 487
+    ExplicitLeft = 300
   end
   object Splitter4: TSplitter
     Left = 0
@@ -49,123 +51,159 @@ object FrmBuildConfig: TFrmBuildConfig
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 961
     object btnAddText: TButton
       Left = 9
       Top = 7
-      Width = 68
+      Width = 40
       Height = 25
       Caption = #25991#26412
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       OnClick = btnAddTextClick
     end
     object btnAddNumber: TButton
-      Left = 90
+      Left = 55
       Top = 7
-      Width = 68
+      Width = 42
       Height = 25
       Caption = #25968#23383
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       OnClick = btnAddNumberClick
     end
-    object btnAddPath: TButton
-      Left = 171
+    object btnRootPath: TButton
+      Left = 103
       Top = 7
-      Width = 68
+      Width = 74
       Height = 25
-      Caption = #30456#23545#36335#24452
+      Caption = #39033#30446#26681#30446#24405
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 2
-      OnClick = btnAddPathClick
+      OnClick = btnRootPathClick
     end
     object btnAddBoolean: TButton
-      Left = 252
+      Left = 479
       Top = 7
       Width = 68
       Height = 25
       Caption = #30495'/'#20551
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 3
       OnClick = btnAddBooleanClick
     end
     object btnAddDate: TButton
-      Left = 333
+      Left = 627
       Top = 7
       Width = 68
       Height = 25
       Caption = #26085#26399
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 4
       OnClick = btnAddDateClick
     end
     object btnAddColor: TButton
-      Left = 414
+      Left = 553
       Top = 7
       Width = 68
       Height = 25
       Caption = #39068#33394
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 5
       OnClick = btnAddColorClick
     end
     object btnAddININetwork: TButton
-      Left = 819
+      Left = 775
       Top = 7
       Width = 68
       Height = 25
       Caption = 'IP'#22320#22336
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 6
       OnClick = btnAddININetworkClick
     end
     object btnAddINITime: TButton
-      Left = 495
+      Left = 701
       Top = 7
       Width = 68
       Height = 25
       Caption = #26102#38388
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 7
       OnClick = btnAddINITimeClick
     end
-    object btnAddINIPlugin: TButton
-      Left = 576
+    object btnReFileName: TButton
+      Left = 331
       Top = 7
       Width = 68
       Height = 25
       Caption = #25991#20214#21517
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 8
-      OnClick = btnAddINIPluginClick
+      OnClick = btnReFileNameClick
     end
-    object btnAddINILog: TButton
-      Left = 657
+    object btnAbsFilename: TButton
+      Left = 405
       Top = 7
       Width = 68
       Height = 25
       Caption = #30446#24405'+'#25991#20214
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 9
-      OnClick = btnAddINILogClick
+      OnClick = btnAbsFilenameClick
     end
-    object Button1: TButton
-      Left = 738
+    object btnAbsPath: TButton
+      Left = 183
       Top = 7
       Width = 68
       Height = 25
       Caption = #32477#23545#36335#24452
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 10
-      OnClick = btnAddINILogClick
+      OnClick = btnAbsPathClick
     end
-    object Button2: TButton
-      Left = 900
+    object btnSection: TButton
+      Left = 849
       Top = 7
       Width = 68
       Height = 25
       Caption = #20998#33410#21517
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 11
-      OnClick = btnAddININetworkClick
+      OnClick = btnSectionClick
     end
-    object Button3: TButton
-      Left = 981
+    object btnEmptyLine: TButton
+      Left = 923
       Top = 7
       Width = 68
       Height = 25
       Caption = #31354#34892
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 12
-      OnClick = btnAddININetworkClick
+      OnClick = btnEmptyLineClick
+    end
+    object btnRePath: TButton
+      Left = 257
+      Top = 7
+      Width = 68
+      Height = 25
+      Caption = #30456#23545#36335#24452
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 13
+      OnClick = btnRePathClick
     end
   end
   object pnlJson: TPanel
@@ -175,7 +213,6 @@ object FrmBuildConfig: TFrmBuildConfig
     Height = 41
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 961
     object btnAddFont: TButton
       Left = 9
       Top = 8
@@ -279,87 +316,50 @@ object FrmBuildConfig: TFrmBuildConfig
   object pnlLeft: TPanel
     Left = 0
     Top = 85
-    Width = 300
+    Width = 327
     Height = 487
     Align = alLeft
     TabOrder = 2
-    object Panel1: TPanel
+    object pnlattribute: TPanel
       Left = 1
       Top = 1
-      Width = 300
+      Width = 325
       Height = 485
-      Align = alLeft
+      Align = alClient
       TabOrder = 0
-      object Splitter5: TSplitter
-        Left = 1
-        Top = 233
-        Width = 298
-        Height = 3
-        Cursor = crVSplit
-        Align = alTop
-        ExplicitTop = 1
-      end
-      object sgINI: TStringGrid
+      ExplicitWidth = 301
+      object pcAttribute: TPageControl
         Left = 1
         Top = 1
-        Width = 298
-        Height = 232
-        Align = alTop
-        ColCount = 3
-        FixedCols = 0
-        RowCount = 2
-        FixedRows = 0
-        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goRowSelect]
-        PopupMenu = popupINI
+        Width = 323
+        Height = 483
+        ActivePage = tsINIGrid
+        Align = alClient
         TabOrder = 0
-        OnDblClick = sgINIDblClick
-        OnSelectCell = sgINISelectCell
-        ColWidths = (
-          100
-          120
-          200)
-      end
-      object Panel2: TPanel
-        Left = 1
-        Top = 236
-        Width = 300
-        Height = 248
-        Align = alLeft
-        TabOrder = 1
-        ExplicitTop = 113
-        ExplicitHeight = 371
-        object Panel3: TPanel
-          Left = 1
-          Top = 1
-          Width = 300
-          Height = 246
-          Align = alLeft
-          TabOrder = 0
-          ExplicitHeight = 369
-          object tvJSON: TTreeView
-            Left = 1
-            Top = 42
-            Width = 298
-            Height = 203
-            Align = alClient
-            DragMode = dmAutomatic
-            Indent = 19
-            PopupMenu = popupJSON
-            TabOrder = 0
-            OnChange = tvJSONChange
-            OnDblClick = tvJSONDblClick
-            ExplicitTop = 45
-            ExplicitHeight = 323
+        OnChange = pcAttributeChange
+        ExplicitWidth = 298
+        object tsINIGrid: TTabSheet
+          Caption = 'INI'#34920
+          object Splitter5: TSplitter
+            Left = 0
+            Top = 409
+            Width = 315
+            Height = 3
+            Cursor = crVSplit
+            Align = alBottom
+            ExplicitTop = 232
+            ExplicitWidth = 290
           end
           object pnlEditing: TPanel
-            Left = 1
-            Top = 1
-            Width = 298
+            Left = 0
+            Top = 412
+            Width = 315
             Height = 41
-            Align = alTop
-            TabOrder = 1
-            Visible = False
-            ExplicitTop = 4
+            Align = alBottom
+            TabOrder = 0
+            ExplicitLeft = 1
+            ExplicitTop = 1
+            ExplicitWidth = 298
             object edtEditing: TEdit
               AlignWithMargins = True
               Left = 11
@@ -377,7 +377,7 @@ object FrmBuildConfig: TFrmBuildConfig
             end
             object btnUpdate: TButton
               AlignWithMargins = True
-              Left = 224
+              Left = 241
               Top = 11
               Width = 63
               Height = 19
@@ -389,52 +389,91 @@ object FrmBuildConfig: TFrmBuildConfig
               Caption = #20445#23384#20462#25913
               TabOrder = 1
               OnClick = btnUpdateClick
+              ExplicitLeft = 224
             end
+          end
+          object sgINI: TStringGrid
+            Left = 0
+            Top = 0
+            Width = 315
+            Height = 409
+            Align = alClient
+            ColCount = 3
+            FixedCols = 0
+            RowCount = 2
+            Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goRowSelect]
+            PopupMenu = popupINI
+            TabOrder = 1
+            OnDblClick = sgINIDblClick
+            OnSelectCell = sgINISelectCell
+            ExplicitWidth = 281
+            ExplicitHeight = 232
+            ColWidths = (
+              100
+              120
+              200)
+          end
+        end
+        object tsJSONTree: TTabSheet
+          Caption = 'JSON'#26641
+          ImageIndex = 1
+          object tvJSON: TTreeView
+            Left = 0
+            Top = 0
+            Width = 315
+            Height = 453
+            Align = alClient
+            DragMode = dmAutomatic
+            Indent = 19
+            PopupMenu = popupJSON
+            TabOrder = 0
+            OnChange = tvJSONChange
+            OnDblClick = tvJSONDblClick
           end
         end
       end
     end
   end
   object pnlRigth: TPanel
-    Left = 1151
+    Left = 856
     Top = 85
-    Width = 41
+    Width = 336
     Height = 487
     Align = alRight
     TabOrder = 3
     Visible = False
-    ExplicitLeft = 920
   end
   object pnlContent: TPanel
-    Left = 303
+    Left = 330
     Top = 85
-    Width = 845
+    Width = 523
     Height = 487
     Align = alClient
     TabOrder = 4
-    ExplicitWidth = 614
+    ExplicitLeft = 303
+    ExplicitWidth = 845
     object PageControl1: TPageControl
       Left = 1
       Top = 1
-      Width = 843
+      Width = 521
       Height = 485
-      ActivePage = tsINI
+      ActivePage = tsJSON
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 612
+      ExplicitWidth = 843
       object tsINI: TTabSheet
         Caption = 'INI'#20869#23481
         object MeoINI: TMemo
           Left = 0
           Top = 0
-          Width = 835
+          Width = 513
           Height = 455
           Align = alClient
           Lines.Strings = (
             '')
           ScrollBars = ssBoth
           TabOrder = 0
-          ExplicitWidth = 604
+          ExplicitWidth = 835
         end
       end
       object tsJSON: TTabSheet
@@ -443,14 +482,14 @@ object FrmBuildConfig: TFrmBuildConfig
         object MeoJSON: TMemo
           Left = 0
           Top = 0
-          Width = 835
+          Width = 513
           Height = 455
           Align = alClient
           Lines.Strings = (
             '')
           ScrollBars = ssBoth
           TabOrder = 0
-          ExplicitWidth = 604
+          ExplicitWidth = 835
         end
       end
       object tsEditor: TTabSheet
@@ -459,11 +498,11 @@ object FrmBuildConfig: TFrmBuildConfig
         object Panel4: TPanel
           Left = 0
           Top = 414
-          Width = 835
+          Width = 513
           Height = 41
           Align = alBottom
           TabOrder = 0
-          ExplicitWidth = 604
+          ExplicitWidth = 835
           object btnSave: TButton
             AlignWithMargins = True
             Left = 184
@@ -482,11 +521,11 @@ object FrmBuildConfig: TFrmBuildConfig
         object pnlEditorContent: TPanel
           Left = 0
           Top = 0
-          Width = 835
+          Width = 513
           Height = 414
           Align = alClient
           TabOrder = 1
-          ExplicitWidth = 604
+          ExplicitWidth = 835
         end
       end
     end
@@ -498,21 +537,6 @@ object FrmBuildConfig: TFrmBuildConfig
     Height = 41
     Align = alBottom
     TabOrder = 5
-    ExplicitWidth = 961
-    object edtFileName: TEdit
-      AlignWithMargins = True
-      Left = 11
-      Top = 11
-      Width = 406
-      Height = 19
-      Margins.Left = 10
-      Margins.Top = 10
-      Margins.Right = 10
-      Margins.Bottom = 10
-      Align = alLeft
-      TabOrder = 0
-      ExplicitHeight = 23
-    end
     object btnClose: TButton
       AlignWithMargins = True
       Left = 1128
@@ -525,9 +549,8 @@ object FrmBuildConfig: TFrmBuildConfig
       Margins.Bottom = 10
       Align = alRight
       Caption = #36864#20986
-      TabOrder = 1
+      TabOrder = 0
       OnClick = btnCloseClick
-      ExplicitLeft = 897
     end
     object btnOpenConfig: TButton
       AlignWithMargins = True
@@ -541,9 +564,67 @@ object FrmBuildConfig: TFrmBuildConfig
       Margins.Bottom = 10
       Align = alRight
       Caption = #25171#24320#37197#32622#25991#20214
-      TabOrder = 2
+      TabOrder = 1
       OnClick = btnOpenConfigClick
-      ExplicitLeft = 784
+    end
+    object btnSaveConfig: TButton
+      AlignWithMargins = True
+      Left = 191
+      Top = 9
+      Width = 75
+      Height = 23
+      Margins.Left = 10
+      Margins.Top = 8
+      Margins.Right = 5
+      Margins.Bottom = 8
+      Align = alLeft
+      Caption = #20445#23384#37197#32622
+      TabOrder = 2
+      OnClick = btnSaveConfigClick
+      ExplicitLeft = 456
+      ExplicitTop = 8
+      ExplicitHeight = 25
+    end
+    object cbFileName: TComboBox
+      Left = 274
+      Top = 6
+      Width = 453
+      Height = 23
+      TabOrder = 3
+      OnChange = cbFileNameChange
+    end
+    object btnDeleteConfig: TButton
+      AlignWithMargins = True
+      Left = 101
+      Top = 9
+      Width = 75
+      Height = 23
+      Margins.Left = 10
+      Margins.Top = 8
+      Margins.Right = 5
+      Margins.Bottom = 8
+      Align = alLeft
+      Caption = #21024#38500#37197#32622
+      TabOrder = 4
+      OnClick = btnDeleteConfigClick
+      ExplicitTop = 8
+    end
+    object btnNewConfig: TButton
+      AlignWithMargins = True
+      Left = 11
+      Top = 9
+      Width = 75
+      Height = 23
+      Margins.Left = 10
+      Margins.Top = 8
+      Margins.Right = 5
+      Margins.Bottom = 8
+      Align = alLeft
+      Caption = #26032#24314#37197#32622
+      TabOrder = 5
+      OnClick = btnNewConfigClick
+      ExplicitLeft = 67
+      ExplicitTop = 6
     end
   end
   object dlgOpenFile: TOpenDialog
