@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <style>
+    .panel { fill:#f8f8f8; stroke:#999; stroke-width:1; }
+    .header { fill:#2f3b4c; stroke:#1f2833; stroke-width:1; }
+    .header-text { fill:#ffffff; font-family:"Segoe UI",sans-serif; font-size:16px; }
+    .label { fill:#555; font-family:"Segoe UI",sans-serif; font-size:12px; }
+    .title { fill:#333; font-family:"Segoe UI",sans-serif; font-size:14px; font-weight:bold; }
+    .border-dash { fill:none; stroke:#bbb; stroke-width:1; stroke-dasharray:4 4; }
+    .action { fill:#e6f2ff; stroke:#6699cc; stroke-width:1; }
+  </style>
+
+  <!-- 顶部：标题 + 主菜单 + 工具栏（绑定 TAction） -->
+  <rect x="0" y="0" width="1200" height="40" class="header"/>
+  <text x="20" y="25" class="header-text">通用配置编辑器（FMX 主界面示意）</text>
+  <text x="420" y="25" class="header-text">文件  编辑  视图  配置  验证  窗口  帮助</text>
+
+  <!-- 工具栏（动作：打开 / 新增 / 验证 / 保存 / 撤销 / 重做） -->
+  <rect x="0" y="40" width="1200" height="36" fill="#e9edf2" stroke="#c0c4cc" stroke-width="1"/>
+  <rect x="10" y="46" width="80" height="24" class="action"/>
+  <text x="20" y="62" class="label">actOpen</text>
+  <rect x="100" y="46" width="110" height="24" class="action"/>
+  <text x="110" y="62" class="label">actAddSimple</text>
+  <rect x="220" y="46" width="120" height="24" class="action"/>
+  <text x="230" y="62" class="label">actAddComplex</text>
+  <rect x="350" y="46" width="90" height="24" class="action"/>
+  <text x="360" y="62" class="label">actValidate</text>
+  <rect x="450" y="46" width="80" height="24" class="action"/>
+  <text x="460" y="62" class="label">actSave</text>
+  <rect x="540" y="46" width="70" height="24" class="action"/>
+  <text x="548" y="62" class="label">actUndo</text>
+  <rect x="620" y="46" width="70" height="24" class="action"/>
+  <text x="628" y="62" class="label">actRedo</text>
+
+  <!-- 主内容顶层 Tab：配置编辑 / 文件浏览 -->
+  <rect x="0" y="76" width="140" height="26" fill="#ffffff" stroke="#999" stroke-width="1"/>
+  <text x="12" y="94" class="label">配置编辑</text>
+  <rect x="140" y="76" width="140" height="26" fill="#e4e4e4" stroke="#999" stroke-width="1"/>
+  <text x="152" y="94" class="label">文件浏览</text>
+
+  <!-- 左侧：工程 / 配置树面板 -->
+  <rect x="0" y="76" width="260" height="554" class="panel"/>
+  <text x="15" y="96" class="title">工程与配置树</text>
+  <rect x="10" y="106" width="240" height="514" class="border-dash"/>
+  <text x="20" y="130" class="label">• 最近工程 / INI 文件列表</text>
+  <text x="20" y="150" class="label">• 当前 app_config.ini / .json</text>
+  <text x="30" y="175" class="label">├─ INI 节节点</text>
+  <text x="30" y="195" class="label">└─ JSON 对象树节点</text>
+
+  <!-- 中间：上半部分为结构 + 值（属性表），下半为复杂属性编辑器区域 -->
+  <rect x="260" y="76" width="580" height="320" class="panel"/>
+  <text x="275" y="96" class="title">配置结构与值（属性网格）</text>
+  <!-- 属性网格类似 Delphi 属性编辑器：左列属性名，右列值 -->
+  <rect x="275" y="110" width="550" height="35" fill="#f0f0f0" stroke="#ccc" stroke-width="1"/>
+  <text x="285" y="132" class="label">属性</text>
+  <text x="545" y="132" class="label">值</text>
+  <rect x="275" y="145" width="550" height="235" class="border-dash"/>
+  <text x="285" y="168" class="label">[常规]</text>
+  <text x="295" y="188" class="label">键名 (name)</text>
+  <text x="545" y="188" class="label">AppTitle</text>
+  <text x="295" y="208" class="label">类型 (Type)</text>
+  <text x="545" y="208" class="label">ctString</text>
+  <text x="295" y="228" class="label">默认值 (Default)</text>
+  <text x="545" y="228" class="label">MyApp</text>
+  <text x="285" y="258" class="label">[验证]</text>
+  <text x="295" y="278" class="label">必填 (Required)</text>
+  <text x="545" y="278" class="label">True</text>
+
+  <!-- 中间下方：复杂属性编辑器容器（Frame） -->
+  <rect x="260" y="396" width="580" height="234" class="panel"/>
+  <text x="275" y="416" class="title">复杂属性编辑器区域（Frame 容器）</text>
+  <rect x="275" y="430" width="550" height="190" class="border-dash"/>
+  <text x="285" y="452" class="label">此区域根据当前属性类型加载：</text>
+  <text x="300" y="472" class="label">• 字体编辑器 Frame</text>
+  <text x="300" y="492" class="label">• 数据库连接编辑器 Frame</text>
+  <text x="300" y="512" class="label">• AI API / 背景 / 视频等编辑器</text>
+
+  <!-- 右侧上：属性编辑器（类似 Delphi 对象检查器） -->
+  <rect x="840" y="76" width="360" height="260" class="panel"/>
+  <text x="855" y="96" class="title">属性编辑器（对象检查器风格）</text>
+  <rect x="850" y="110" width="340" height="30" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="860" y="129" class="label">筛选/搜索 (Filter)</text>
+  <rect x="850" y="142" width="340" height="180" class="border-dash"/>
+  <text x="860" y="164" class="label">[常规]</text>
+  <text x="870" y="184" class="label">名称 (Name)</text>
+  <text x="1070" y="184" class="label">General.Config</text>
+  <text x="870" y="204" class="label">数据类型 (ConfigType)</text>
+  <text x="1070" y="204" class="label">ctInteger</text>
+  <text x="870" y="224" class="label">编辑器 (Editor)</text>
+  <text x="1070" y="224" class="label">etSpinEdit</text>
+  <text x="860" y="254" class="label">[验证]</text>
+  <text x="870" y="274" class="label">最小值 / 最大值</text>
+  <text x="1070" y="274" class="label">0 / 100</text>
+
+  <!-- 右侧中：类型工具箱（可拖拽的 TAction 入口） -->
+  <rect x="840" y="336" width="360" height="170" class="panel"/>
+  <text x="855" y="356" class="title">类型工具箱（拖拽创建复杂属性）</text>
+  <rect x="850" y="370" width="340" height="130" class="border-dash"/>
+  <rect x="860" y="380" width="90" height="28" class="action"/>
+  <text x="870" y="398" class="label">Font</text>
+  <rect x="960" y="380" width="90" height="28" class="action"/>
+  <text x="970" y="398" class="label">Database</text>
+  <rect x="1060" y="380" width="90" height="28" class="action"/>
+  <text x="1070" y="398" class="label">AI API</text>
+  <rect x="860" y="414" width="90" height="28" class="action"/>
+  <text x="870" y="432" class="label">BgDraw</text>
+  <rect x="960" y="414" width="90" height="28" class="action"/>
+  <text x="970" y="432" class="label">VideoClip</text>
+  <rect x="1060" y="414" width="90" height="28" class="action"/>
+  <text x="1070" y="432" class="label">Video</text>
+  <text x="860" y="458" class="label">拖拽类型块 → JSON 树 / 复杂属性区域，触发同一 TAction 逻辑</text>
+
+  <!-- 右侧下：验证摘要 -->
+  <rect x="840" y="506" width="360" height="124" class="panel"/>
+  <text x="855" y="526" class="title">验证摘要</text>
+  <rect x="850" y="540" width="340" height="80" class="border-dash"/>
+  <text x="860" y="562" class="label">✔ 必填字段：15 / 15</text>
+  <text x="860" y="582" class="label">⚠ 警告：2 条（点击可定位）</text>
+  <text x="860" y="602" class="label">✖ 错误：1 条（必须修复）</text>
+
+  <!-- 底部：日志 / 验证结果列表 -->
+  <rect x="0" y="630" width="1200" height="140" class="panel"/>
+  <text x="15" y="650" class="title">日志 / 验证结果</text>
+  <rect x="10" y="662" width="1180" height="100" class="border-dash"/>
+  <text x="20" y="682" class="label">[INFO] actOpen: 已加载 app_config.ini / app_config.json</text>
+  <text x="20" y="702" class="label">[WARN] actValidate: General.Age 超出推荐范围，建议设置为 18</text>
+  <text x="20" y="722" class="label">[ERROR] actSave: 写入 app_config.json 失败，路径不可写</text>
+
+  <!-- 状态栏 -->
+  <rect x="0" y="770" width="1200" height="30" fill="#e9edf2" stroke="#c0c4cc" stroke-width="1"/>
+  <text x="15" y="790" class="label">文件: D:\Projects\sample\app_config.ini [已修改]</text>
+  <text x="500" y="790" class="label">验证: 1 个错误 / 2 个警告</text>
+  <text x="800" y="790" class="label">最近: 属性 General.Title 已修改</text>
+</svg>

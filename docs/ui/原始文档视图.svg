@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+  <style>
+    .panel { fill:#f8f8f8; stroke:#999; stroke-width:1; }
+    .title { fill:#333; font-family:"Segoe UI",sans-serif; font-size:14px; font-weight:bold; }
+    .label { fill:#555; font-family:"Segoe UI",sans-serif; font-size:12px; }
+    .border-dash { fill:none; stroke:#bbb; stroke-width:1; stroke-dasharray:4 4; }
+  </style>
+
+  <rect x="0" y="0" width="900" height="600" class="panel"/>
+  <text x="16" y="24" class="title">当前工程 - 原始文档视图</text>
+
+  <!-- 顶部二级 Tab：结构视图 / 原始文档 -->
+  <rect x="12" y="32" width="120" height="26" fill="#e4e4e4" stroke="#999" stroke-width="1"/>
+  <text x="26" y="50" class="label">结构视图</text>
+  <rect x="132" y="32" width="120" height="26" fill="#ffffff" stroke="#999" stroke-width="1"/>
+  <text x="146" y="50" class="label">原始文档</text>
+
+  <!-- 左：当前工程树（精简） -->
+  <rect x="12" y="70" width="220" height="518" class="panel"/>
+  <text x="22" y="90" class="title">配置树</text>
+  <rect x="20" y="102" width="204" height="476" class="border-dash"/>
+  <text x="28" y="126" class="label">app_config.ini</text>
+  <text x="38" y="146" class="label">[json_file]</text>
+  <text x="38" y="166" class="label">[app_settings]</text>
+  <text x="38" y="186" class="label">[ui_settings]</text>
+  <text x="28" y="216" class="label">app_config.json</text>
+  <text x="38" y="236" class="label">fonts</text>
+  <text x="38" y="256" class="label">database</text>
+  <text x="38" y="276" class="label">videos</text>
+
+  <!-- 右：原始文档双 Tab：INI / JSON -->
+  <rect x="244" y="70" width="644" height="518" class="panel"/>
+  <text x="256" y="90" class="title">原始 INI / JSON 文本</text>
+
+  <!-- 内部 Tab：INI / JSON -->
+  <rect x="256" y="104" width="80" height="24" fill="#ffffff" stroke="#999" stroke-width="1"/>
+  <text x="270" y="120" class="label">INI 原文</text>
+  <rect x="340" y="104" width="80" height="24" fill="#e4e4e4" stroke="#999" stroke-width="1"/>
+  <text x="352" y="120" class="label">JSON 原文</text>
+
+  <!-- INI 原文区域 -->
+  <rect x="256" y="132" width="612" height="200" class="border-dash"/>
+  <text x="266" y="154" class="label">; app_config.ini 示例</text>
+  <text x="266" y="174" class="label">[json_file]</text>
+  <text x="266" y="194" class="label">file_path=app_config.json</text>
+  <text x="266" y="214" class="label">[app_settings]</text>
+  <text x="266" y="234" class="label">AppTitle=MyApp</text>
+
+  <!-- JSON 原文区域 -->
+  <rect x="256" y="344" width="612" height="220" class="border-dash"/>
+  <text x="266" y="366" class="label">{</text>
+  <text x="280" y="386" class="label">"fonts": [ ... ],</text>
+  <text x="280" y="406" class="label">"database": { ... },</text>
+  <text x="280" y="426" class="label">"videos": [ ... ]</text>
+  <text x="266" y="446" class="label">}</text>
+</svg>

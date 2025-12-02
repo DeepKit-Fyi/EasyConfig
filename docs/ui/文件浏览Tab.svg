@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="700" viewBox="0 0 1000 700">
+  <style>
+    .panel { fill:#f8f8f8; stroke:#999; stroke-width:1; }
+    .title { fill:#333; font-family:"Segoe UI",sans-serif; font-size:14px; font-weight:bold; }
+    .label { fill:#555; font-family:"Segoe UI",sans-serif; font-size:12px; }
+    .border-dash { fill:none; stroke:#bbb; stroke-width:1; stroke-dasharray:4 4; }
+    .button { fill:#e6f2ff; stroke:#6699cc; stroke-width:1; }
+  </style>
+
+  <rect x="0" y="0" width="1000" height="700" class="panel"/>
+  <text x="16" y="24" class="title">文件浏览 Tab（INI / JSON 原始文件管理）</text>
+
+  <!-- 顶部：驱动器 / 路径 / 控制按钮 / 过滤复选框 -->
+  <rect x="12" y="32" width="976" height="54" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="20" y="50" class="label">驱动器：</text>
+  <rect x="72" y="36" width="80" height="22" fill="#ffffff" stroke="#999" stroke-width="1"/>
+  <text x="80" y="51" class="label">C:\</text>
+
+  <text x="170" y="50" class="label">路径：</text>
+  <rect x="212" y="36" width="420" height="22" fill="#ffffff" stroke="#999" stroke-width="1"/>
+  <text x="220" y="51" class="label">D:\Projects\ConfigRoot</text>
+
+  <rect x="640" y="36" width="60" height="22" class="button"/>
+  <text x="650" y="51" class="label">上一级</text>
+  <rect x="708" y="36" width="60" height="22" class="button"/>
+  <text x="718" y="51" class="label">刷新</text>
+
+  <text x="780" y="50" class="label">过滤：</text>
+  <rect x="820" y="38" width="12" height="12" fill="#ffffff" stroke="#555" stroke-width="1"/>
+  <text x="836" y="48" class="label">INI</text>
+  <rect x="872" y="38" width="12" height="12" fill="#ffffff" stroke="#555" stroke-width="1"/>
+  <text x="888" y="48" class="label">JSON</text>
+  <rect x="932" y="38" width="12" height="12" fill="#ffffff" stroke="#555" stroke-width="1"/>
+  <text x="948" y="48" class="label">所有</text>
+
+  <!-- 中间：左中目录 + 左下文件列表 / 右侧文档预览 -->
+  <!-- 左中：目录 -->
+  <rect x="12" y="92" width="280" height="260" class="panel"/>
+  <text x="24" y="112" class="title">目录</text>
+  <rect x="20" y="124" width="264" height="220" class="border-dash"/>
+  <text x="30" y="148" class="label">D:\\Projects</text>
+  <text x="40" y="168" class="label">├─ ConfigRoot</text>
+  <text x="40" y="188" class="label">└─ OtherApp</text>
+
+  <!-- 左下：文件列表 -->
+  <rect x="12" y="362" width="280" height="260" class="panel"/>
+  <text x="24" y="382" class="title">文件列表</text>
+  <rect x="20" y="394" width="264" height="220" class="border-dash"/>
+  <text x="28" y="414" class="label">名称</text>
+  <text x="180" y="414" class="label">类型</text>
+  <text x="28" y="438" class="label">[x] app_config.ini</text>
+  <text x="180" y="438" class="label">INI</text>
+  <text x="28" y="458" class="label">[ ] app_config.json</text>
+  <text x="180" y="458" class="label">JSON</text>
+
+  <!-- 右侧：文档预览（可编辑 + 保存） -->
+  <rect x="304" y="92" width="684" height="530" class="panel"/>
+  <text x="316" y="112" class="title">文档预览与编辑</text>
+  <rect x="312" y="124" width="668" height="460" class="border-dash"/>
+  <text x="322" y="146" class="label">; 在此区域显示选中文件的内容，用户可直接修改文本并保存。</text>
+  <text x="322" y="166" class="label">[json_file]</text>
+  <text x="322" y="186" class="label">file_path=app_config.json</text>
+
+  <!-- 文档保存按钮提示 -->
+  <rect x="312" y="592" width="668" height="40" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <rect x="320" y="598" width="90" height="26" class="button"/>
+  <text x="330" y="616" class="label">保存修改</text>
+  <text x="422" y="616" class="label">保存会直接写回磁盘上的 INI / JSON 文件。</text>
+</svg>
+</svg>

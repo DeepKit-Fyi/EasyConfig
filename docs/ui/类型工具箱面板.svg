@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="260" viewBox="0 0 480 260">
+  <style>
+    .panel { fill:#f8f8f8; stroke:#999; stroke-width:1; }
+    .title { fill:#333; font-family:"Segoe UI",sans-serif; font-size:14px; font-weight:bold; }
+    .label { fill:#555; font-family:"Segoe UI",sans-serif; font-size:12px; }
+    .border-dash { fill:none; stroke:#bbb; stroke-width:1; stroke-dasharray:4 4; }
+    .action { fill:#e6f2ff; stroke:#6699cc; stroke-width:1; }
+  </style>
+
+  <rect x="0" y="0" width="480" height="260" class="panel"/>
+  <text x="16" y="24" class="title">类型工具箱面板（拖拽创建复杂属性）</text>
+
+  <text x="16" y="46" class="label">提示：从下面的类型块拖动到 JSON 树或复杂属性区域，即可创建对应类型的对象。</text>
+
+  <rect x="12" y="60" width="456" height="188" class="border-dash"/>
+
+  <!-- 第一行类型块 -->
+  <rect x="24" y="72" width="90" height="32" class="action"/>
+  <text x="34" y="92" class="label">Font</text>
+
+  <rect x="134" y="72" width="90" height="32" class="action"/>
+  <text x="144" y="92" class="label">Database</text>
+
+  <rect x="244" y="72" width="90" height="32" class="action"/>
+  <text x="254" y="92" class="label">AI API</text>
+
+  <rect x="354" y="72" width="90" height="32" class="action"/>
+  <text x="364" y="92" class="label">Workflow</text>
+
+  <!-- 第二行类型块 -->
+  <rect x="24" y="116" width="90" height="32" class="action"/>
+  <text x="34" y="136" class="label">BgDraw</text>
+
+  <rect x="134" y="116" width="90" height="32" class="action"/>
+  <text x="144" y="136" class="label">TextOnBg</text>
+
+  <rect x="244" y="116" width="90" height="32" class="action"/>
+  <text x="254" y="136" class="label">ImageOnBg</text>
+
+  <rect x="354" y="116" width="90" height="32" class="action"/>
+  <text x="364" y="136" class="label">Layout</text>
+
+  <!-- 第三行类型块 -->
+  <rect x="24" y="160" width="90" height="32" class="action"/>
+  <text x="34" y="180" class="label">VideoClip</text>
+
+  <rect x="134" y="160" width="90" height="32" class="action"/>
+  <text x="144" y="180" class="label">Video</text>
+
+  <rect x="244" y="160" width="90" height="32" class="action"/>
+  <text x="254" y="180" class="label">Timeline</text>
+
+  <rect x="354" y="160" width="90" height="32" class="action"/>
+  <text x="364" y="180" class="label">Custom…</text>
+
+  <text x="16" y="220" class="label">这些类型块在实现中可以绑定到 TAction（如 actAddFont、actAddDatabase 等），支持菜单/按钮/拖动复用同一逻辑。</text>
+</svg>

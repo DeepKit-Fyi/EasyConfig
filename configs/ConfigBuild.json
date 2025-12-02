@@ -1,0 +1,187 @@
+{
+  "templates": {
+    "bgDraw": {
+      "_type": "etBgDraw",
+      "_id": "etBgDraw.default",
+      "background": "",
+      "elements": []
+    },
+    "videoClip": {
+      "_type": "etVideoClip",
+      "_id": "etVideoClip.default",
+      "background": "",
+      "duration": 10.0,
+      "fps": 30,
+      "audio": "",
+      "captions": []
+    },
+    "video": {
+      "_type": "etVideo",
+      "_id": "etVideo.default",
+      "cover": "",
+      "ending": "",
+      "bg_directory": "",
+      "audio_directory": "",
+      "subtitle_file": "",
+      "media_settings": {},
+      "clips": []
+    },
+    "font": {
+      "_type": "etFont",
+      "_id": "etFont.default",
+      "name": "Arial",
+      "size": 12,
+      "color": "#000000",
+      "style": "normal"
+    },
+    "database": {
+      "_type": "etDatabase",
+      "_id": "etDatabase.default",
+      "type": "MySQL",
+      "server": "localhost",
+      "port": 3306,
+      "database": "mydatabase",
+      "username": "root",
+      "password": "",
+      "options": "charset=utf8"
+    }
+  },
+  "defaultPaths": {
+    "images": "D:\\Resources\\Images",
+    "videos": "D:\\Resources\\Videos",
+    "audio": "D:\\Resources\\Audio",
+    "exports": "D:\\Exports"
+  },
+  "validation": {
+    "rules": [
+      {
+        "type": "required",
+        "message": "该字段不能为空"
+      },
+      {
+        "type": "minLength",
+        "value": 3,
+        "message": "字段长度不能小于3个字符"
+      },
+      {
+        "type": "maxLength",
+        "value": 100,
+        "message": "字段长度不能超过100个字符"
+      },
+      {
+        "type": "pattern",
+        "regex": "^[a-zA-Z0-9_]+$",
+        "message": "只能包含字母、数字和下划线"
+      },
+      {
+        "type": "range",
+        "min": 0,
+        "max": 100,
+        "message": "值必须在0-100之间"
+      }
+    ],
+    "strictMode": true,
+    "autoValidate": true
+  },
+  "customTypes": [
+    {
+      "name": "电子邮件设置",
+      "type": "emailSettings",
+      "fields": [
+        {
+          "name": "server",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "port",
+          "type": "integer",
+          "default": 25
+        },
+        {
+          "name": "useSSL",
+          "type": "boolean",
+          "default": true
+        },
+        {
+          "name": "username",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "API连接设置",
+      "type": "apiConnection",
+      "fields": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "apiKey",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "timeout",
+          "type": "integer",
+          "default": 30000
+        },
+        {
+          "name": "headers",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Content-Type",
+              "type": "string",
+              "default": "application/json"
+            },
+            {
+              "name": "Accept",
+              "type": "string",
+              "default": "application/json"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ui": {
+    "theme": "light",
+    "colors": {
+      "primary": "#007bff",
+      "secondary": "#6c757d",
+      "success": "#28a745",
+      "danger": "#dc3545",
+      "warning": "#ffc107",
+      "info": "#17a2b8",
+      "background": "#ffffff",
+      "text": "#212529"
+    },
+    "fonts": {
+      "default": "Segoe UI",
+      "editor": "Consolas",
+      "sizes": {
+        "small": 10,
+        "normal": 12,
+        "large": 14
+      }
+    }
+  },
+  "shortcuts": {
+    "save": "Ctrl+S",
+    "open": "Ctrl+O",
+    "new": "Ctrl+N",
+    "undo": "Ctrl+Z",
+    "redo": "Ctrl+Y",
+    "find": "Ctrl+F",
+    "replace": "Ctrl+H"
+  }
+}

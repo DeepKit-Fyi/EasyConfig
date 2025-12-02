@@ -1,0 +1,112 @@
+{
+  "$schema": "配置扩展文件，存储复杂属性",
+  "$version": "1.0",
+  
+  "Application.TitleFont": {
+    "$type": "Font",
+    "Name": "Microsoft YaHei UI",
+    "Size": 14,
+    "Style": ["Bold"],
+    "Color": "#333333"
+  },
+  
+  "Application.ContentFont": {
+    "$type": "Font",
+    "Name": "Microsoft YaHei",
+    "Size": 10,
+    "Style": [],
+    "Color": "#000000"
+  },
+  
+  "Database.Connection": {
+    "$type": "Database",
+    "Type": "SQLite",
+    "Host": "",
+    "Port": 0,
+    "Database": "data\\app.db",
+    "User": "",
+    "Password": "",
+    "Options": {
+      "JournalMode": "WAL",
+      "Synchronous": "Normal",
+      "BusyTimeout": 5000
+    }
+  },
+  
+  "AI.DefaultProvider": {
+    "$type": "AIAPI",
+    "Provider": "OpenAI",
+    "Model": "gpt-4o-mini",
+    "Endpoint": "https://api.openai.com/v1",
+    "APIKey": "",
+    "MaxTokens": 4096,
+    "Temperature": 0.7,
+    "Timeout": 60000
+  },
+  
+  "AI.LocalProvider": {
+    "$type": "AIAPI",
+    "Provider": "Ollama",
+    "Model": "llama3.2",
+    "Endpoint": "http://localhost:11434",
+    "APIKey": "",
+    "MaxTokens": 2048,
+    "Temperature": 0.8,
+    "Timeout": 120000
+  },
+  
+  "UI.Background": {
+    "$type": "BgDraw",
+    "Type": "Gradient",
+    "Color1": "#FFFFFF",
+    "Color2": "#F0F0F0",
+    "Direction": "Vertical",
+    "ImagePath": "",
+    "ImageMode": "Stretch"
+  },
+  
+  "Media.IntroClip": {
+    "$type": "VideoClip",
+    "SourcePath": "assets\\intro.mp4",
+    "StartTime": 0,
+    "EndTime": 5000,
+    "Volume": 0.8,
+    "Loop": false,
+    "FadeIn": 500,
+    "FadeOut": 500
+  },
+  
+  "Media.Player": {
+    "$type": "Video",
+    "Decoder": "FFmpeg",
+    "HardwareAccel": true,
+    "PreferredCodec": "H264",
+    "AudioOutput": "Default",
+    "SubtitleEnabled": true,
+    "SubtitleFont": {
+      "Name": "Microsoft YaHei",
+      "Size": 16,
+      "Color": "#FFFFFF"
+    }
+  },
+  
+  "Export.PDFSettings": {
+    "$type": "Custom",
+    "PageSize": "A4",
+    "Orientation": "Portrait",
+    "Margins": {
+      "Top": 20,
+      "Bottom": 20,
+      "Left": 15,
+      "Right": 15
+    },
+    "HeaderFont": {
+      "$type": "Font",
+      "Name": "Arial",
+      "Size": 12,
+      "Style": ["Bold"],
+      "Color": "#000000"
+    },
+    "IncludePageNumbers": true
+  }
+}
