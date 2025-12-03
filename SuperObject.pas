@@ -3,7 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Variants, System.JSON, System.Generics.Collections;
+  System.SysUtils, System.Classes, System.Variants, System.JSON, JSONHelpers, System.Generics.Collections;
 
 type
   ISuperObject = interface

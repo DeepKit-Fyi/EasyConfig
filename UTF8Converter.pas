@@ -1,4 +1,4 @@
-unit UTF8Converter;
+﻿unit UTF8Converter;
 
 interface
 
@@ -52,13 +52,13 @@ begin
 
   if not FileExists(FileName) then
   begin
-    AddLog('文件不存在: ' + FileName);
+    AddLog('文件不存在：' + FileName);
     Exit;
   end;
 
   if IsUTF8File(FileName) then
   begin
-    AddLog('文件已经是UTF-8编码: ' + FileName);
+    AddLog('文件已经是UTF-8编码：' + FileName);
     Result := True;
     Exit;
   end;
@@ -81,7 +81,7 @@ begin
       // 以UTF-8编码保存文件
       FileContent.SaveToFile(FileName, TEncoding.UTF8);
 
-      AddLog('成功转换文件为UTF-8编码: ' + FileName);
+      AddLog('成功转换文件为UTF-8编码：' + FileName);
       Result := True;
     finally
       FileContent.Free;
@@ -89,7 +89,7 @@ begin
   except
     on E: Exception do
     begin
-      AddLog('转换文件时出错: ' + E.Message);
+      AddLog('转换文件时出错：' + E.Message);
       Result := False;
     end;
   end;
@@ -122,7 +122,7 @@ var
 begin
   if not DirectoryExists(Directory) then
   begin
-    AddLog('目录不存在: ' + Directory);
+    AddLog('目录不存在：' + Directory);
     Result := 0;
     Exit;
   end;
@@ -205,171 +205,117 @@ begin
   end;
 end;
 
-procedure TfrmUTF8Converter.FormCreate(Sender: TObject);
+class function TfrmUTF8Converter.ExecuteCommandLine(const Params: TArray<string>): Integer;
+var
+  Converter: TfrmUTF8Converter;
+  i: Integer;
+  Param: string;
+  SuccessCount: Integer;
 begin
-  memLog.Clear;
-  AddLog('UTF-8转换工具已启动');
+  Result := 0;
+  SuccessCount := 0;
+
+  if Length(Params) = 0 then
+  begin
+    WriteLn('请指定要转换的文件或目录');
+    Exit;
+  end;
+
+  Converter := TfrmUTF8Converter.Create(nil);
+  try
+    for i := 0 to High(Params) do
+    begin
+      Param := Params[i];
+      
+      if FileExists(Param) then
+      begin
+        if Converter.ConvertFileToUTF8(Param) then
+          Inc(SuccessCount);
+      end
+      else if DirectoryExists(Param) then
+      begin
+        Inc(SuccessCount, Converter.ConvertDirectoryToUTF8(Param));
+      end
+      else
+      begin
+        WriteLn('目录不存在：' + Param);
+      end;
+    end;
+
+    Result := SuccessCount;
+  finally
+    Converter.Free;
+  end;
 end;
 
 function TfrmUTF8Converter.IsUTF8File(const FileName: string): Boolean;
 var
   Stream: TFileStream;
   Buffer: TBytes;
-  Preamble: TBytes;
-  i, Count: Integer;
-  c, c2, c3, c4: Byte;
+  BytesRead: Integer;
+  i: Integer;
+  UTF8Preamble: TBytes;
 begin
   Result := False;
 
+  // 首先检查是否有UTF-8的BOM
+  UTF8Preamble := TEncoding.UTF8.GetPreamble;
   Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
   try
-    // 首先检查BOM
-    Preamble := TEncoding.UTF8.GetPreamble;
-    if (Preamble <> nil) and (Length(Preamble) > 0) and (Stream.Size >= Length(Preamble)) then
-    begin
-      SetLength(Buffer, Length(Preamble));
-      Stream.ReadBuffer(Buffer[0], Length(Preamble));
+    SetLength(Buffer, Length(UTF8Preamble));
+    BytesRead := Stream.Read(Buffer[0], Length(UTF8Preamble));
 
-      if CompareMem(@Preamble[0], @Buffer[0], Length(Preamble)) then
-      begin
-        Result := True;
-        Exit;
-      end;
+    if (BytesRead = Length(UTF8Preamble)) and
+       CompareMem(@Buffer[0], @UTF8Preamble[0], Length(UTF8Preamble)) then
+    begin
+      Result := True;
+      Exit;
     end;
 
-    // 如果没有BOM，尝试通过内容检测
+    // 如果没有BOM，检查文件内容是否符合UTF-8编码规则
     Stream.Position := 0;
-    Count := Min(Stream.Size, 4096); // 只检查前4KB
-    SetLength(Buffer, Count);
-    Stream.ReadBuffer(Buffer[0], Count);
+    SetLength(Buffer, 4096); // 读取4KB进行检查
+    BytesRead := Stream.Read(Buffer[0], Length(Buffer));
+    SetLength(Buffer, BytesRead);
 
     i := 0;
-    while i < Count do
+    while i < BytesRead do
     begin
-      c := Buffer[i];
-
-      // ASCII字符
-      if c < $80 then
+      if Buffer[i] < $80 then
+        Inc(i)
+      else if Buffer[i] < $C0 then
+        Exit // 非法UTF-8序列
+      else if Buffer[i] < $E0 then
       begin
-        Inc(i);
-        Continue;
-      end;
-
-      // 检查UTF-8多字节序列
-      if (c >= $C2) and (c <= $DF) and (i + 1 < Count) then
-      begin
-        c2 := Buffer[i + 1];
-        if (c2 >= $80) and (c2 <= $BF) then
-        begin
-          Inc(i, 2);
-          Result := True;
-          Continue;
-        end;
+        if (i + 1 >= BytesRead) or
+           ((Buffer[i + 1] and $C0) <> $80) then
+          Exit;
+        Inc(i, 2);
       end
-      else if (c >= $E0) and (c <= $EF) and (i + 2 < Count) then
+      else if Buffer[i] < $F0 then
       begin
-        c2 := Buffer[i + 1];
-        c3 := Buffer[i + 2];
-        if (c2 >= $80) and (c2 <= $BF) and (c3 >= $80) and (c3 <= $BF) then
-        begin
-          Inc(i, 3);
-          Result := True;
-          Continue;
-        end;
+        if (i + 2 >= BytesRead) or
+           ((Buffer[i + 1] and $C0) <> $80) or
+           ((Buffer[i + 2] and $C0) <> $80) then
+          Exit;
+        Inc(i, 3);
       end
-      else if (c >= $F0) and (c <= $F4) and (i + 3 < Count) then
+      else if Buffer[i] < $F5 then
       begin
-        c2 := Buffer[i + 1];
-        c3 := Buffer[i + 2];
-        c4 := Buffer[i + 3];
-        if (c2 >= $80) and (c2 <= $BF) and (c3 >= $80) and (c3 <= $BF) and (c4 >= $80) and (c4 <= $BF) then
-        begin
-          Inc(i, 4);
-          Result := True;
-          Continue;
-        end;
-      end;
-
-      // 如果到这里，说明不是有效的UTF-8序列
-      Inc(i);
+        if (i + 3 >= BytesRead) or
+           ((Buffer[i + 1] and $C0) <> $80) or
+           ((Buffer[i + 2] and $C0) <> $80) or
+           ((Buffer[i + 3] and $C0) <> $80) then
+          Exit;
+        Inc(i, 4);
+      end
+      else
+        Exit; // 非法UTF-8序列
     end;
+
+    Result := True; // 如果没有发现非法序列，则认为是UTF-8编码
   finally
     Stream.Free;
-  end;
-end;
-
-class function TfrmUTF8Converter.ExecuteCommandLine(const Params: TArray<string>): Integer;
-var
-  Converter: TfrmUTF8Converter;
-  i: Integer;
-  Param: string;
-  Files: TArray<string>;
-  Directories: TArray<string>;
-  SuccessCount: Integer;
-begin
-  Result := 0;
-
-  if Length(Params) = 0 then
-  begin
-    WriteLn('用法: UTF8Converter [文件路径...] [-d 目录路径...]');
-    WriteLn('  -d: 指定要处理的目录');
-    Exit;
-  end;
-
-  Converter := TfrmUTF8Converter.Create(nil);
-  try
-    Files := [];
-    Directories := [];
-
-    i := 0;
-    while i < Length(Params) do
-    begin
-      Param := Params[i];
-
-      if Param = '-d' then
-      begin
-        Inc(i);
-        if i < Length(Params) then
-        begin
-          SetLength(Directories, Length(Directories) + 1);
-          Directories[High(Directories)] := Params[i];
-        end;
-      end
-      else
-      begin
-        SetLength(Files, Length(Files) + 1);
-        Files[High(Files)] := Param;
-      end;
-
-      Inc(i);
-    end;
-
-    // 处理文件
-    if Length(Files) > 0 then
-    begin
-      WriteLn('处理指定文件...');
-      SuccessCount := Converter.ConvertFilesToUTF8(Files);
-      WriteLn(Format('共处理 %d 个文件，成功转换 %d 个文件', [Length(Files), SuccessCount]));
-      Result := Result + SuccessCount;
-    end;
-
-    // 处理目录
-    for Param in Directories do
-    begin
-      if DirectoryExists(Param) then
-      begin
-        WriteLn('处理目录: ' + Param);
-        SuccessCount := Converter.ConvertDirectoryToUTF8(Param);
-        WriteLn(Format('目录转换完成，共成功转换 %d 个文件', [SuccessCount]));
-        Result := Result + SuccessCount;
-      end
-      else
-      begin
-        WriteLn('目录不存在: ' + Param);
-      end;
-    end;
-  finally
-    Converter.Free;
   end;
 end;
 

@@ -2,12 +2,13 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2025/04/08 11:29:19.000.440,=D:\Personal\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2025/04/08 11:31:19.000.352,D:\Personal\Documents\Embarcadero\Studio\Projects\Unit1.pas=D:\SynologyDrive\Progs\_Delphi\EncodeOK\Unit1.pas</Transaction>
     <Transaction>2025/04/08 11:31:19.000.352,D:\Personal\Documents\Embarcadero\Studio\Projects\Unit1.dfm=D:\SynologyDrive\Progs\_Delphi\EncodeOK\Unit1.dfm</Transaction>
+    <Transaction>2025/04/08 11:31:19.000.352,D:\Personal\Documents\Embarcadero\Studio\Projects\Unit1.pas=D:\SynologyDrive\Progs\_Delphi\EncodeOK\Unit1.pas</Transaction>
     <Transaction>2025/04/08 11:35:29.000.355,D:\Personal\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\SynologyDrive\Progs\_Delphi\ConfigBuild\ConfigBuild.dproj</Transaction>
     <Transaction>2025/04/08 11:36:24.000.948,=D:\SynologyDrive\Progs\_Delphi\ConfigBuild\ViewBuildConfig.pas</Transaction>
     <Transaction>2025/04/08 11:38:01.000.671,=D:\SynologyDrive\Progs\_Delphi\ConfigBuild\Unit1.pas</Transaction>
     <Transaction>2025/04/08 11:38:25.000.057,D:\SynologyDrive\Progs\_Delphi\ConfigBuild\Unit1.dfm=D:\SynologyDrive\Progs\_Delphi\ConfigBuild\ViewMainConfig.dfm</Transaction>
     <Transaction>2025/04/08 11:38:25.000.057,D:\SynologyDrive\Progs\_Delphi\ConfigBuild\Unit1.pas=D:\SynologyDrive\Progs\_Delphi\ConfigBuild\ViewMainConfig.pas</Transaction>
+    <Transaction>2025/04/15 09:52:33.000.404,=D:\SynologyDrive\Progs\_Delphi\ConfigBuild\FrameKeyValueDictEditor.pas</Transaction>
   </Transactions>
 </BorlandProject>

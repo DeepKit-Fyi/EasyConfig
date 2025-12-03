@@ -1,0 +1,315 @@
+object FrameUrlConfigEditor: TFrameUrlConfigEditor
+  Left = 0
+  Top = 0
+  ClientHeight = 594
+  ClientWidth = 628
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  TextHeight = 15
+  object pnlMain: TPanel
+    Left = 0
+    Top = 0
+    Width = 628
+    Height = 594
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 0
+    ExplicitWidth = 650
+    ExplicitHeight = 650
+    object grpUrlConfig: TGroupBox
+      Left = 16
+      Top = 16
+      Width = 618
+      Height = 573
+      Caption = 'URL'#37197#32622
+      TabOrder = 0
+      object lblName: TLabel
+        Left = 24
+        Top = 32
+        Width = 29
+        Height = 15
+        Caption = #21517#31216':'
+      end
+      object lblDescription: TLabel
+        Left = 24
+        Top = 64
+        Width = 29
+        Height = 15
+        Caption = #25551#36848':'
+      end
+      object lblBaseUrl: TLabel
+        Left = 24
+        Top = 106
+        Width = 50
+        Height = 15
+        Caption = #22522#30784'URL:'
+      end
+      object lblProtocol: TLabel
+        Left = 24
+        Top = 138
+        Width = 29
+        Height = 15
+        Caption = #21327#35758':'
+      end
+      object lblPort: TLabel
+        Left = 296
+        Top = 138
+        Width = 29
+        Height = 15
+        Caption = #31471#21475':'
+      end
+      object lblTimeout: TLabel
+        Left = 440
+        Top = 138
+        Width = 63
+        Height = 15
+        Caption = #36229#26102'('#27627#31186'):'
+      end
+      object lblHeaders: TLabel
+        Left = 24
+        Top = 169
+        Width = 42
+        Height = 15
+        Caption = #35831#27714#22836':'
+      end
+      object lblParameters: TLabel
+        Left = 24
+        Top = 305
+        Width = 55
+        Height = 15
+        Caption = #35831#27714#21442#25968':'
+      end
+      object lblAuthentication: TLabel
+        Left = 24
+        Top = 433
+        Width = 55
+        Height = 15
+        Caption = #35748#35777#26041#24335':'
+      end
+      object lblUsername: TLabel
+        Left = 24
+        Top = 467
+        Width = 42
+        Height = 15
+        Caption = #29992#25143#21517':'
+      end
+      object lblPassword: TLabel
+        Left = 296
+        Top = 467
+        Width = 29
+        Height = 15
+        Caption = #23494#30721':'
+      end
+      object lblApiKey: TLabel
+        Left = 24
+        Top = 499
+        Width = 43
+        Height = 15
+        Caption = 'API Key:'
+      end
+      object edtName: TEdit
+        Left = 96
+        Top = 32
+        Width = 201
+        Height = 25
+        TabOrder = 0
+      end
+      object memDescription: TMemo
+        Left = 96
+        Top = 64
+        Width = 489
+        Height = 33
+        ScrollBars = ssVertical
+        TabOrder = 1
+      end
+      object edtBaseUrl: TEdit
+        Left = 96
+        Top = 104
+        Width = 489
+        Height = 25
+        TabOrder = 2
+      end
+      object cbbProtocol: TComboBox
+        Left = 96
+        Top = 136
+        Width = 89
+        Height = 25
+        Style = csDropDownList
+        TabOrder = 3
+        OnChange = cbbProtocolChange
+      end
+      object chkUseSSL: TCheckBox
+        Left = 193
+        Top = 138
+        Width = 97
+        Height = 17
+        Caption = #20351#29992'SSL'
+        TabOrder = 4
+        OnClick = chkUseSSLClick
+      end
+      object edtPort: TEdit
+        Left = 336
+        Top = 136
+        Width = 65
+        Height = 25
+        TabOrder = 5
+        Text = '443'
+      end
+      object edtTimeout: TEdit
+        Left = 520
+        Top = 136
+        Width = 65
+        Height = 25
+        TabOrder = 6
+        Text = '30000'
+      end
+      object sgHeaders: TStringGrid
+        Left = 24
+        Top = 192
+        Width = 489
+        Height = 105
+        ColCount = 2
+        FixedCols = 0
+        RowCount = 2
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goTabs]
+        TabOrder = 7
+      end
+      object pnlHeaderButtons: TPanel
+        Left = 520
+        Top = 192
+        Width = 65
+        Height = 105
+        BevelOuter = bvNone
+        TabOrder = 8
+        object btnAddHeader: TButton
+          Left = 0
+          Top = 0
+          Width = 65
+          Height = 25
+          Caption = #28155#21152
+          TabOrder = 0
+          OnClick = btnAddHeaderClick
+        end
+        object btnDeleteHeader: TButton
+          Left = 0
+          Top = 31
+          Width = 65
+          Height = 25
+          Caption = #21024#38500
+          TabOrder = 1
+          OnClick = btnDeleteHeaderClick
+        end
+      end
+      object sgParameters: TStringGrid
+        Left = 24
+        Top = 328
+        Width = 489
+        Height = 97
+        ColCount = 3
+        FixedCols = 0
+        RowCount = 2
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goTabs]
+        TabOrder = 9
+      end
+      object pnlParamButtons: TPanel
+        Left = 520
+        Top = 328
+        Width = 65
+        Height = 97
+        BevelOuter = bvNone
+        TabOrder = 10
+        object btnAddParam: TButton
+          Left = 0
+          Top = 0
+          Width = 65
+          Height = 25
+          Caption = #28155#21152
+          TabOrder = 0
+          OnClick = btnAddParamClick
+        end
+        object btnDeleteParam: TButton
+          Left = 0
+          Top = 31
+          Width = 65
+          Height = 25
+          Caption = #21024#38500
+          TabOrder = 1
+          OnClick = btnDeleteParamClick
+        end
+      end
+      object cbbAuthType: TComboBox
+        Left = 96
+        Top = 432
+        Width = 153
+        Height = 25
+        Style = csDropDownList
+        TabOrder = 11
+        OnChange = cbbAuthTypeChange
+      end
+      object edtUsername: TEdit
+        Left = 96
+        Top = 464
+        Width = 185
+        Height = 25
+        TabOrder = 12
+      end
+      object edtPassword: TEdit
+        Left = 336
+        Top = 464
+        Width = 185
+        Height = 25
+        PasswordChar = '*'
+        TabOrder = 13
+      end
+      object edtApiKey: TEdit
+        Left = 96
+        Top = 496
+        Width = 489
+        Height = 25
+        TabOrder = 14
+      end
+      object btnTestUrl: TButton
+        Left = 475
+        Top = 528
+        Width = 110
+        Height = 33
+        Caption = #27979#35797#36830#25509
+        TabOrder = 15
+        OnClick = btnTestUrlClick
+      end
+    end
+    object pnlButtons: TPanel
+      Left = 0
+      Top = 548
+      Width = 628
+      Height = 46
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 1
+      ExplicitTop = 604
+      ExplicitWidth = 650
+      object btnUpdate: TButton
+        Left = 450
+        Top = 10
+        Width = 75
+        Height = 25
+        Caption = #20445#23384
+        TabOrder = 0
+        OnClick = btnUpdateClick
+      end
+      object btnCancel: TButton
+        Left = 554
+        Top = 10
+        Width = 75
+        Height = 25
+        Caption = #21462#28040
+        TabOrder = 1
+        OnClick = btnCancelClick
+      end
+    end
+  end
+end

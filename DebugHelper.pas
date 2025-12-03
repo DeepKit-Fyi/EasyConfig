@@ -1,4 +1,4 @@
-unit DebugHelper;
+﻿unit DebugHelper;
 
 interface
 
@@ -31,7 +31,7 @@ begin
     Writeln(F, FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + ' - INFO: ' + AMessage);
     CloseFile(F);
   except
-    // 忽略日志错误
+    // 蹇界暐鏃ュ織閿欒
   end;
 end;
 
@@ -48,7 +48,7 @@ begin
     Writeln(F, FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + ' - ERROR: ' + AError);
     CloseFile(F);
   except
-    // 忽略日志错误
+    // 蹇界暐鏃ュ織閿欒
   end;
 end;
 
@@ -65,7 +65,7 @@ begin
     Writeln(F, FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + ' - DEBUG [' + AModule + ']: ' + AMessage);
     CloseFile(F);
   except
-    // 忽略日志错误
+    // 蹇界暐鏃ュ織閿欒
   end;
 end;
 
@@ -76,9 +76,9 @@ begin
 end;
 
 initialization
-  LogMessage('DebugHelper 初始化');
+  LogMessage('DebugHelper 鍒濆鍖?);
 
 finalization
-  LogMessage('DebugHelper 结束');
+  LogMessage('DebugHelper 缁撴潫');
 
 end. 

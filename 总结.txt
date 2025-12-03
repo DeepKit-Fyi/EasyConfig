@@ -1,0 +1,36 @@
+# JSON问题修复总结
+
+## 问题分析
+
+在项目编译过程中，我们遇到了"未声明标识符：AddPair"错误。经过分析，我们发现：
+
+1. 这个错误出现在多个Frame文件中，如FrameDateTimeRangeEditor.pas、FrameEncryptEditor.pas等
+2. 这些文件使用System.JSON单元，并调用TJSONObject的AddPair方法
+3. 然而，在当前版本的System.JSON中，TJSONObject类并不直接提供AddPair方法
+
+## 解决方案
+
+我们通过以下步骤解决了这个问题：
+
+1. 创建/更新了JSONHelpers.pas文件：
+   - 使用Delphi的类扩展(Class Helper)机制扩展TJSONObject类
+   - 实现了5种重载的AddPair方法，支持字符串、TJSONValue、布尔值、整数和浮点数类型参数
+
+2. 确保所有使用System.JSON的Frame文件都在uses列表中包含了JSONHelpers单元：
+   - 手动更新了一些文件
+   - 创建并运行check_all_frames.ps1脚本自动检查和修复其余文件
+
+3. 记录了修复过程：
+   - 创建了JSON修复说明.md文件，详细描述了问题和解决方案
+   - 列出了所有受影响的文件
+   - 提供了注意事项和扩展阅读资源
+
+## 预期结果
+
+通过这些修复，项目应该能够成功编译，不再出现"未声明标识符：AddPair"错误。今后，只要确保所有使用System.JSON的新文件都包含JSONHelpers单元，就可以正常使用AddPair方法。
+
+## 后续建议
+
+1. 在项目文档中记录这个修复方案
+2. 考虑使用新版本的Delphi IDE，这可能已经内置了AddPair方法
+3. 定期运行check_all_frames.ps1脚本，确保所有文件都正确引用了JSONHelpers单元

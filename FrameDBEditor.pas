@@ -1,11 +1,11 @@
-﻿unit FrameDBEditor;
+unit FrameDBEditor;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.ComCtrls, System.JSON, ConfigFrameBase, UtilsTypes;
+  Vcl.ComCtrls, ConfigFrameBase, UtilsTypes, System.JSON, JSONHelpers;
 
 type
   TNotifyEventEx = procedure(Sender: TObject) of object;
@@ -71,7 +71,7 @@ constructor TFrameDBEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   
-  // 初始化数据库类型下拉框
+  // ��ʼ�����ݿ�����������
   cmbDBType.Items.Clear;
   cmbDBType.Items.Add('MSSQL');
   cmbDBType.Items.Add('MySQL');
@@ -80,7 +80,7 @@ begin
   cmbDBType.Items.Add('SQLite');
   cmbDBType.ItemIndex := 0;
   
-  // 默认值
+  // Ĭ��ֵ
   FDBType := 'MSSQL';
   FServer := 'localhost';
   FPort := '1433';
@@ -105,14 +105,14 @@ begin
   if not Assigned(JSONObj) then
     Exit;
     
-  // 从JSON对象中获取连接信息
+  // ��JSON�����л�ȡ������Ϣ
   Value := JSONObj.GetValue('dbtype');
   if Assigned(Value) and (Value is TJSONString) then
     FDBType := TJSONString(Value).Value
   else
     FDBType := 'MSSQL';
     
-  // 设置数据库类型下拉框
+  // �������ݿ�����������
   cmbDBType.ItemIndex := cmbDBType.Items.IndexOf(FDBType);
   if cmbDBType.ItemIndex < 0 then
     cmbDBType.ItemIndex := 0;
@@ -159,7 +159,7 @@ begin
     FPassword := '';
   edtPassword.Text := FPassword;
   
-  // 更新界面
+  // ���½���
   UpdateControls;
   Result := True;
 end;
@@ -175,7 +175,7 @@ begin
   if not Assigned(JSONObj) then
     Exit;
     
-  // 从界面获取数据
+  // �ӽ����ȡ����
   FDBType := cmbDBType.Text;
   FServer := edtServer.Text;
   FPort := edtPort.Text;
@@ -184,11 +184,11 @@ begin
   FUsername := edtUsername.Text;
   FPassword := edtPassword.Text;
   
-  // 设置数据库配置类型
+  // �������ݿ���������
   if JSONObj.GetValue('_type') = nil then
     JSONObj.AddPair('_type', ConfigTypeToString(ctDatabase));
   
-  // 保存到JSON对象
+  // ���浽JSON����
   if JSONObj.GetValue('dbtype') <> nil then
     JSONObj.RemovePair('dbtype');
   JSONObj.AddPair('dbtype', FDBType);
@@ -217,7 +217,7 @@ begin
     JSONObj.RemovePair('password');
   JSONObj.AddPair('password', FPassword);
   
-  // 构建并保存连接字符串
+  // ���������������ַ���
   if JSONObj.GetValue('connection_string') <> nil then
     JSONObj.RemovePair('connection_string');
   JSONObj.AddPair('connection_string', BuildConnectionString);
@@ -227,7 +227,7 @@ end;
 
 procedure TFrameDBEditor.SaveToJSON;
 begin
-  // 确保JSONObject不为空
+  // ȷ��JSONObject��Ϊ��
   if not Assigned(JSONObject) then
     JSONObject := TJSONObject.Create;
     
@@ -237,14 +237,14 @@ end;
 
 procedure TFrameDBEditor.btnCancelClick(Sender: TObject);
 begin
-  // 取消编辑
+  // ȡ���༭
   if Assigned(FOnCancel) then
     FOnCancel(Self);
 end;
 
 procedure TFrameDBEditor.btnSaveClick(Sender: TObject);
 begin
-  // 保存连接信息
+  // ����������Ϣ
   FDBType := cmbDBType.Text;
   FServer := edtServer.Text;
   FPort := edtPort.Text;
@@ -253,32 +253,32 @@ begin
   FUsername := edtUsername.Text;
   FPassword := edtPassword.Text;
   
-  // 构建连接字符串
+  // ���������ַ���
   FConnectionString := BuildConnectionString;
   
-  // 触发保存事件
+  // ���������¼�
   if Assigned(FOnSave) then
     FOnSave(Self);
 end;
 
 procedure TFrameDBEditor.btnTestConnectionClick(Sender: TObject);
 begin
-  // 测试连接
+  // ��������
   if TestConnection then
-    ShowMessage('连接成功！')
+    ShowMessage('���ӳɹ���')
   else
-    ShowMessage('连接失败，请检查连接信息。');
+    ShowMessage('����ʧ�ܣ�����������Ϣ��');
 end;
 
 procedure TFrameDBEditor.chkIntegratedSecurityClick(Sender: TObject);
 begin
-  // 更新控件状态
+  // ���¿ؼ�״̬
   UpdateControls;
 end;
 
 procedure TFrameDBEditor.cmbDBTypeChange(Sender: TObject);
 begin
-  // 根据数据库类型更新默认端口
+  // �������ݿ����͸���Ĭ�϶˿�
   FDBType := cmbDBType.Text;
   
   if FDBType = 'MSSQL' then
@@ -292,13 +292,13 @@ begin
   else if FDBType = 'SQLite' then
     edtPort.Text := '';
   
-  // 更新控件状态
+  // ���¿ؼ�״̬
   UpdateControls;
 end;
 
 procedure TFrameDBEditor.UpdateControls;
 begin
-  // 根据数据库类型和集成安全性设置控件状态
+  // �������ݿ����ͺͼ��ɰ�ȫ�����ÿؼ�״̬
   lblPort.Visible := FDBType <> 'SQLite';
   edtPort.Visible := FDBType <> 'SQLite';
   
@@ -313,7 +313,7 @@ end;
 
 function TFrameDBEditor.BuildConnectionString: string;
 begin
-  // 根据数据库类型构建连接字符串
+  // �������ݿ����͹��������ַ���
   if FDBType = 'MSSQL' then
   begin
     if FIntegratedSecurity then
@@ -340,7 +340,7 @@ var
 begin
   Result := False;
   
-  // 默认值
+  // Ĭ��ֵ
   FDBType := 'MSSQL';
   FServer := 'localhost';
   FPort := '1433';
@@ -349,7 +349,7 @@ begin
   FPassword := '';
   FIntegratedSecurity := False;
   
-  // 解析连接字符串
+  // ���������ַ���
   Parts := ConnectionString.Split([';']);
   
   for Part in Parts do
@@ -364,7 +364,7 @@ begin
       
       if SameText(Key, 'Server') then
       begin
-        // 处理服务器和端口
+        // �����������Ͷ˿�
         i := Pos(',', Value);
         if i > 0 then
         begin
@@ -387,7 +387,7 @@ begin
     end;
   end;
   
-  // 根据连接字符串推断数据库类型
+  // ���������ַ����ƶ����ݿ�����
   if Pos('Integrated Security=SSPI', ConnectionString) > 0 then
     FDBType := 'MSSQL'
   else if Pos('Uid=', ConnectionString) > 0 then
@@ -395,7 +395,7 @@ begin
   else if Pos('Version=3', ConnectionString) > 0 then
     FDBType := 'SQLite';
   
-  // 更新界面
+  // ���½���
   cmbDBType.ItemIndex := cmbDBType.Items.IndexOf(FDBType);
   edtServer.Text := FServer;
   edtPort.Text := FPort;
@@ -410,12 +410,13 @@ end;
 
 function TFrameDBEditor.TestConnection: Boolean;
 begin
-  // 在实际应用中，这里应该尝试建立数据库连接
-  // 为了演示，我们只是返回一个模拟的结果
+  // ��ʵ��Ӧ���У�����Ӧ�ó��Խ������ݿ�����
+  // Ϊ����ʾ������ֻ�Ƿ���һ��ģ��Ľ��
   Result := (FServer <> '') and (FDatabase <> '');
   
   if not Result then
-    ShowMessage('服务器和数据库名称不能为空');
+    ShowMessage('�����������ݿ����Ʋ���Ϊ��');
 end;
 
 end.
+

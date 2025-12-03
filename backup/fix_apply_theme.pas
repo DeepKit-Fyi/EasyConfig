@@ -1,0 +1,39 @@
+﻿﻿procedure TfrmMain.ApplyTheme(const ThemeName: string);
+var
+  IniFile: TIniFile;
+begin
+  try
+    FormHelper.AddDebugText(meoDebug, '灏濊瘯搴旂敤涓婚: ' + ThemeName);
+    
+    if TStyleManager.TrySetStyle(ThemeName) then
+    begin
+      FormHelper.AddDebugText(meoDebug, '宸叉垚鍔熷簲鐢ㄤ富棰? ' + ThemeName);
+      
+      // 淇濆瓨涓婚璁剧疆鍒伴厤缃枃浠?
+      IniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+      try
+        IniFile.WriteString('Settings', 'Theme', ThemeName);
+        FormHelper.AddDebugText(meoDebug, '宸蹭繚瀛樹富棰樿缃埌閰嶇疆鏂囦欢');
+      except
+        on E: Exception do
+        begin
+          FormHelper.AddDebugText(meoDebug, '淇濆瓨涓婚璁剧疆鏃跺嚭閿? ' + E.Message);
+        end;
+      finally
+        IniFile.Free;
+      end;
+      
+      // 鍒锋柊鐣岄潰
+      Self.Refresh;
+    end
+    else
+    begin
+      FormHelper.AddDebugText(meoDebug, '鏃犳硶搴旂敤涓婚: ' + ThemeName);
+    end;
+  except
+    on E: Exception do
+    begin
+      FormHelper.AddDebugText(meoDebug, '搴旂敤涓婚澶辫触: ' + E.Message);
+    end;
+  end;
+end; 

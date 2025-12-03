@@ -1,11 +1,11 @@
-unit FrameFontEditor;
+﻿unit FrameFontEditor;
 
 interface
 
 uses
   System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
-  ConfigFrameBase, UtilsTypes;
+  ConfigFrameBase, UtilsTypes, JSONHelpers;
 
 type
   TFontEditorFrame = class(TBaseConfigFrame)
@@ -56,19 +56,18 @@ end;
 
 procedure TFontEditorFrame.CreateControls;
 begin
-  // 主面板
-  pnlMain := TPanel.Create(Self);
+  // 涓婚潰鏉?  pnlMain := TPanel.Create(Self);
   pnlMain.Parent := Self;
   pnlMain.Align := alClient;
   pnlMain.BevelOuter := bvNone;
   pnlMain.Padding.SetBounds(10, 10, 10, 10);
 
-  // 字体名称
+  // 瀛椾綋鍚嶇О
   lblName := TLabel.Create(Self);
   lblName.Parent := pnlMain;
   lblName.Top := 15;
   lblName.Left := 10;
-  lblName.Caption := '字体名称:';
+  lblName.Caption := '瀛椾綋鍚嶇О:';
 
   edtName := TEdit.Create(Self);
   edtName.Parent := pnlMain;
@@ -78,12 +77,12 @@ begin
   edtName.Text := 'Arial';
   edtName.OnChange := edtNameChange;
 
-  // 字体大小
+  // 瀛椾綋澶у皬
   lblSize := TLabel.Create(Self);
   lblSize.Parent := pnlMain;
   lblSize.Top := lblName.Top + 30;
   lblSize.Left := 10;
-  lblSize.Caption := '字体大小:';
+  lblSize.Caption := '瀛椾綋澶у皬:';
 
   edtSize := TEdit.Create(Self);
   edtSize.Parent := pnlMain;
@@ -93,12 +92,12 @@ begin
   edtSize.Text := '12';
   edtSize.OnChange := edtSizeChange;
 
-  // 字体颜色
+  // 瀛椾綋棰滆壊
   lblColor := TLabel.Create(Self);
   lblColor.Parent := pnlMain;
   lblColor.Top := lblSize.Top + 30;
   lblColor.Left := 10;
-  lblColor.Caption := '字体颜色:';
+  lblColor.Caption := '瀛椾綋棰滆壊:';
 
   pnlColor := TPanel.Create(Self);
   pnlColor.Parent := pnlMain;
@@ -114,39 +113,39 @@ begin
   btnSelectColor.Top := lblColor.Top;
   btnSelectColor.Left := pnlColor.Left + pnlColor.Width + 10;
   btnSelectColor.Width := 80;
-  btnSelectColor.Caption := '选择颜色';
+  btnSelectColor.Caption := '閫夋嫨棰滆壊';
   btnSelectColor.OnClick := btnSelectColorClick;
 
-  // 字体样式
+  // 瀛椾綋鏍峰紡
   chkBold := TCheckBox.Create(Self);
   chkBold.Parent := pnlMain;
   chkBold.Top := lblColor.Top + 30;
   chkBold.Left := 10;
-  chkBold.Caption := '粗体';
+  chkBold.Caption := '绮椾綋';
   chkBold.OnClick := chkStyleChange;
 
   chkItalic := TCheckBox.Create(Self);
   chkItalic.Parent := pnlMain;
   chkItalic.Top := chkBold.Top;
   chkItalic.Left := 100;
-  chkItalic.Caption := '斜体';
+  chkItalic.Caption := '鏂滀綋';
   chkItalic.OnClick := chkStyleChange;
 
   chkUnderline := TCheckBox.Create(Self);
   chkUnderline.Parent := pnlMain;
   chkUnderline.Top := chkBold.Top + 25;
   chkUnderline.Left := 10;
-  chkUnderline.Caption := '下划线';
+  chkUnderline.Caption := 'Underline';
   chkUnderline.OnClick := chkStyleChange;
 
   chkStrikeout := TCheckBox.Create(Self);
   chkStrikeout.Parent := pnlMain;
   chkStrikeout.Top := chkBold.Top + 25;
   chkStrikeout.Left := 100;
-  chkStrikeout.Caption := '删除线';
+  chkStrikeout.Caption := 'Strikeout';
   chkStrikeout.OnClick := chkStyleChange;
 
-  // 预览区域
+  // 棰勮鍖哄煙
   pnlPreview := TPanel.Create(Self);
   pnlPreview.Parent := pnlMain;
   pnlPreview.Top := chkStrikeout.Top + 40;
@@ -161,10 +160,9 @@ begin
   lblPreview.Align := alClient;
   lblPreview.Alignment := taCenter;
   lblPreview.Layout := tlCenter;
-  lblPreview.Caption := '示例文本 Sample Text 123';
+  lblPreview.Caption := 'Sample Text 123';
 
-  // 颜色对话框
-  dlgColor := TColorDialog.Create(Self);
+  // 棰滆壊瀵硅瘽妗?  dlgColor := TColorDialog.Create(Self);
   dlgColor.Color := clBlack;
   
   UpdatePreview;
@@ -177,28 +175,28 @@ begin
   if not Assigned(JSONObject) then
     Exit;
 
-  // 加载字体名称
+  // 鍔犺浇瀛椾綋鍚嶇О
   Value := JSONObject.GetValue('name');
   if Assigned(Value) and (Value is TJSONString) then
     edtName.Text := TJSONString(Value).Value
   else
     edtName.Text := 'Arial';
 
-  // 加载字体大小
+  // 鍔犺浇瀛椾綋澶у皬
   Value := JSONObject.GetValue('size');
   if Assigned(Value) and (Value is TJSONNumber) then
     edtSize.Text := TJSONNumber(Value).ToString
   else
     edtSize.Text := '12';
 
-  // 加载字体颜色
+  // 鍔犺浇瀛椾綋棰滆壊
   Value := JSONObject.GetValue('color');
   if Assigned(Value) and (Value is TJSONString) then
     SelectedColor := HTMLToColor(TJSONString(Value).Value)
   else
     SelectedColor := clBlack;
 
-  // 加载字体样式
+  // 鍔犺浇瀛椾綋鏍峰紡
   Value := JSONObject.GetValue('bold');
   if Assigned(Value) and (Value is TJSONBool) then
     chkBold.Checked := TJSONBool(Value).AsBoolean
@@ -223,7 +221,7 @@ begin
   else
     chkStrikeout.Checked := False;
 
-  // 更新预览
+  // 鏇存柊棰勮
   UpdatePreview;
 end;
 
@@ -232,27 +230,26 @@ begin
   if not Assigned(JSONObject) then
     Exit;
 
-  // 保存字体类型信息
+  // 淇濆瓨瀛椾綋绫诲瀷淇℃伅
   if JSONObject.GetValue('_type') = nil then
     JSONObject.AddPair('_type', ConfigTypeToString(ctFont));
 
-  // 保存所有字体属性
-  // 字体名称
+  // 淇濆瓨鎵€鏈夊瓧浣撳睘鎬?  // 瀛椾綋鍚嶇О
   if JSONObject.GetValue('name') <> nil then
     JSONObject.RemovePair('name');
   JSONObject.AddPair('name', edtName.Text);
 
-  // 字体大小
+  // 瀛椾綋澶у皬
   if JSONObject.GetValue('size') <> nil then
     JSONObject.RemovePair('size');
   JSONObject.AddPair('size', TJSONNumber.Create(StrToIntDef(edtSize.Text, 12)));
 
-  // 字体颜色
+  // 瀛椾綋棰滆壊
   if JSONObject.GetValue('color') <> nil then
     JSONObject.RemovePair('color');
   JSONObject.AddPair('color', ColorToHTML(FSelectedColor));
 
-  // 字体样式
+  // 瀛椾綋鏍峰紡
   if JSONObject.GetValue('bold') <> nil then
     JSONObject.RemovePair('bold');
   JSONObject.AddPair('bold', TJSONBool.Create(chkBold.Checked));
@@ -328,25 +325,22 @@ procedure TFontEditorFrame.UpdatePreview;
 var
   FontStyle: TFontStyles;
 begin
-  // 确保界面控件已创建
+  // Ensure interface controls are created
   if not Assigned(lblPreview) then
     Exit;
-
+    
   FontStyle := [];
-  if Assigned(chkBold) and chkBold.Checked then
+  if chkBold.Checked then
     FontStyle := FontStyle + [fsBold];
-  if Assigned(chkItalic) and chkItalic.Checked then
+  if chkItalic.Checked then
     FontStyle := FontStyle + [fsItalic];
-  if Assigned(chkUnderline) and chkUnderline.Checked then
+  if chkUnderline.Checked then
     FontStyle := FontStyle + [fsUnderline];
-  if Assigned(chkStrikeout) and chkStrikeout.Checked then
+  if chkStrikeout.Checked then
     FontStyle := FontStyle + [fsStrikeOut];
-
-  if Assigned(edtName) then
-    lblPreview.Font.Name := edtName.Text;
-  if Assigned(edtSize) then
-    lblPreview.Font.Size := StrToIntDef(edtSize.Text, 12);
-  
+    
+  lblPreview.Font.Name := edtName.Text;
+  lblPreview.Font.Size := StrToIntDef(edtSize.Text, 12);
   lblPreview.Font.Color := FSelectedColor;
   lblPreview.Font.Style := FontStyle;
 end;

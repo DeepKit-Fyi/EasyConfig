@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2025/03/21 15:59:24.000.033,=D:\Personal\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2025/03/21 15:59:57.000.370,D:\Personal\Documents\Embarcadero\Studio\Projects\Unit1.pas=D:\Personal\Documents\Embarcadero\Studio\Projects\ConfgiUnit.pas</Transaction>
+    <Transaction>2025/03/21 15:59:57.000.370,D:\Personal\Documents\Embarcadero\Studio\Projects\Unit1.dfm=D:\Personal\Documents\Embarcadero\Studio\Projects\ConfgiUnit.dfm</Transaction>
+    <Transaction>2025/03/21 16:00:12.000.262,D:\Personal\Documents\Embarcadero\Studio\Projects\Project1.dproj=D:\Personal\Documents\Embarcadero\Studio\Projects\ConfigManger.dproj</Transaction>
+    <Transaction>2025/03/21 16:01:06.000.120,D:\Personal\Documents\Embarcadero\Studio\Projects\ConfigManger.dproj=D:\SynologyDrive\Progs\_Delphi\ConfigEditor\ConfigManger.dproj</Transaction>
+    <Transaction>2025/03/21 16:01:21.000.162,D:\Personal\Documents\Embarcadero\Studio\Projects\ConfgiUnit.dfm=D:\SynologyDrive\Progs\_Delphi\ConfigEditor\ConfgiUnit.dfm</Transaction>
+    <Transaction>2025/03/21 16:01:21.000.162,D:\Personal\Documents\Embarcadero\Studio\Projects\ConfgiUnit.pas=D:\SynologyDrive\Progs\_Delphi\ConfigEditor\ConfgiUnit.pas</Transaction>
+  </Transactions>
+</BorlandProject>

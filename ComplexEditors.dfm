@@ -1,4 +1,4 @@
-object TComplexEditorFrame: TComplexEditorFrame
+﻿object TComplexEditorFrame: TComplexEditorFrame
   Left = 0
   Top = 0
   Width = 320
@@ -24,7 +24,7 @@ object TComplexEditorFrame: TComplexEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '保存'
+      Caption = '淇濆瓨'
       TabOrder = 0
       OnClick = btnSaveClick
     end
@@ -33,7 +33,7 @@ object TComplexEditorFrame: TComplexEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '取消'
+      Caption = '鍙栨秷'
       TabOrder = 1
       OnClick = btnCancelClick
     end
@@ -65,21 +65,21 @@ object TFontEditorFrame: TFontEditorFrame
       Top = 16
       Width = 48
       Height = 13
-      Caption = '字体名称'
+      Caption = '瀛椾綋鍚嶇О'
     end
     object lblFontSize: TLabel
       Left = 16
       Top = 48
       Width = 48
       Height = 13
-      Caption = '字体大小'
+      Caption = '瀛椾綋澶у皬'
     end
     object lblFontStyle: TLabel
       Left = 16
       Top = 80
       Width = 48
       Height = 13
-      Caption = '字体样式'
+      Caption = '瀛椾綋鏍峰紡'
     end
     object cmbFontName: TComboBox
       Left = 80
@@ -101,7 +101,7 @@ object TFontEditorFrame: TFontEditorFrame
       Top = 79
       Width = 97
       Height = 17
-      Caption = '粗体'
+      Caption = '绮椾綋'
       TabOrder = 2
     end
     object chkItalic: TCheckBox
@@ -109,7 +109,7 @@ object TFontEditorFrame: TFontEditorFrame
       Top = 79
       Width = 97
       Height = 17
-      Caption = '斜体'
+      Caption = '鏂滀綋'
       TabOrder = 3
     end
     object chkUnderline: TCheckBox
@@ -117,7 +117,7 @@ object TFontEditorFrame: TFontEditorFrame
       Top = 79
       Width = 97
       Height = 17
-      Caption = '下划线'
+      Caption = '涓嬪垝绾?
       TabOrder = 4
     end
   end
@@ -133,7 +133,7 @@ object TFontEditorFrame: TFontEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '保存'
+      Caption = '淇濆瓨'
       TabOrder = 0
       OnClick = btnSaveClick
     end
@@ -142,7 +142,7 @@ object TFontEditorFrame: TFontEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '取消'
+      Caption = '鍙栨秷'
       TabOrder = 1
       OnClick = btnCancelClick
     end
@@ -174,7 +174,7 @@ object TColorEditorFrame: TColorEditorFrame
       Top = 16
       Width = 48
       Height = 13
-      Caption = '颜色'
+      Caption = '棰滆壊'
     end
     object pnlColor: TPanel
       Left = 80
@@ -188,7 +188,7 @@ object TColorEditorFrame: TColorEditorFrame
       Top = 44
       Width = 225
       Height = 25
-      Caption = '选择颜色'
+      Caption = '閫夋嫨棰滆壊'
       TabOrder = 1
       OnClick = btnSelectColorClick
     end
@@ -205,7 +205,7 @@ object TColorEditorFrame: TColorEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '保存'
+      Caption = '淇濆瓨'
       TabOrder = 0
       OnClick = btnSaveClick
     end
@@ -214,7 +214,7 @@ object TColorEditorFrame: TColorEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '取消'
+      Caption = '鍙栨秷'
       TabOrder = 1
       OnClick = btnCancelClick
     end
@@ -250,35 +250,35 @@ object TDatabaseEditorFrame: TDatabaseEditorFrame
       Top = 16
       Width = 48
       Height = 13
-      Caption = '主机'
+      Caption = '涓绘満'
     end
     object lblPort: TLabel
       Left = 16
       Top = 48
       Width = 48
       Height = 13
-      Caption = '端口'
+      Caption = '绔彛'
     end
     object lblUsername: TLabel
       Left = 16
       Top = 80
       Width = 48
       Height = 13
-      Caption = '用户名'
+      Caption = '鐢ㄦ埛鍚?
     end
     object lblPassword: TLabel
       Left = 16
       Top = 112
       Width = 48
       Height = 13
-      Caption = '密码'
+      Caption = '瀵嗙爜'
     end
     object lblDatabase: TLabel
       Left = 16
       Top = 144
       Width = 48
       Height = 13
-      Caption = '数据库'
+      Caption = '鏁版嵁搴?
     end
     object edtHost: TEdit
       Left = 80
@@ -329,7 +329,7 @@ object TDatabaseEditorFrame: TDatabaseEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '保存'
+      Caption = '淇濆瓨'
       TabOrder = 0
       OnClick = btnSaveClick
     end
@@ -338,7 +338,7 @@ object TDatabaseEditorFrame: TDatabaseEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '取消'
+      Caption = '鍙栨秷'
       TabOrder = 1
       OnClick = btnCancelClick
     end
@@ -378,7 +378,7 @@ object TListEditorFrame: TListEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '添加'
+      Caption = '娣诲姞'
       TabOrder = 1
       OnClick = btnAddClick
     end
@@ -387,7 +387,7 @@ object TListEditorFrame: TListEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '删除'
+      Caption = '鍒犻櫎'
       TabOrder = 2
       OnClick = btnDeleteClick
     end
@@ -396,7 +396,7 @@ object TListEditorFrame: TListEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '编辑'
+      Caption = '缂栬緫'
       TabOrder = 3
       OnClick = btnEditClick
     end
@@ -413,7 +413,7 @@ object TListEditorFrame: TListEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '保存'
+      Caption = '淇濆瓨'
       TabOrder = 0
       OnClick = btnSaveClick
     end
@@ -422,7 +422,7 @@ object TListEditorFrame: TListEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '取消'
+      Caption = '鍙栨秷'
       TabOrder = 1
       OnClick = btnCancelClick
     end
@@ -462,7 +462,7 @@ object TObjectEditorFrame: TObjectEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '添加'
+      Caption = '娣诲姞'
       TabOrder = 1
       OnClick = btnAddClick
     end
@@ -471,7 +471,7 @@ object TObjectEditorFrame: TObjectEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '删除'
+      Caption = '鍒犻櫎'
       TabOrder = 2
       OnClick = btnDeleteClick
     end
@@ -480,7 +480,7 @@ object TObjectEditorFrame: TObjectEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '编辑'
+      Caption = '缂栬緫'
       TabOrder = 3
       OnClick = btnEditClick
     end
@@ -497,7 +497,7 @@ object TObjectEditorFrame: TObjectEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '保存'
+      Caption = '淇濆瓨'
       TabOrder = 0
       OnClick = btnSaveClick
     end
@@ -506,7 +506,7 @@ object TObjectEditorFrame: TObjectEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '取消'
+      Caption = '鍙栨秷'
       TabOrder = 1
       OnClick = btnCancelClick
     end
@@ -546,7 +546,7 @@ object TArrayEditorFrame: TArrayEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '添加'
+      Caption = '娣诲姞'
       TabOrder = 1
       OnClick = btnAddClick
     end
@@ -555,7 +555,7 @@ object TArrayEditorFrame: TArrayEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '删除'
+      Caption = '鍒犻櫎'
       TabOrder = 2
       OnClick = btnDeleteClick
     end
@@ -564,7 +564,7 @@ object TArrayEditorFrame: TArrayEditorFrame
       Top = 151
       Width = 75
       Height = 25
-      Caption = '编辑'
+      Caption = '缂栬緫'
       TabOrder = 3
       OnClick = btnEditClick
     end
@@ -581,7 +581,7 @@ object TArrayEditorFrame: TArrayEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '保存'
+      Caption = '淇濆瓨'
       TabOrder = 0
       OnClick = btnSaveClick
     end
@@ -590,7 +590,7 @@ object TArrayEditorFrame: TArrayEditorFrame
       Top = 8
       Width = 75
       Height = 25
-      Caption = '取消'
+      Caption = '鍙栨秷'
       TabOrder = 1
       OnClick = btnCancelClick
     end

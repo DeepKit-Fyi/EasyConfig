@@ -1,0 +1,322 @@
+object ViewMainFormFMX: TViewMainFormFMX
+  Left = 0
+  Top = 0
+  Caption = 'ConfigBuild'
+  ClientHeight = 600
+  ClientWidth = 900
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnCloseQuery = FormCloseQuery
+  DesignerMasterStyle = 0
+  object layMain: TLayout
+    Align = Client
+    Size.Width = 900.000000000000000000
+    Size.Height = 576.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object layLeft: TLayout
+      Align = Left
+      Size.Width = 280.000000000000000000
+      Size.Height = 576.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object tabLeft: TTabControl
+        Align = Client
+        Size.Width = 280.000000000000000000
+        Size.Height = 576.000000000000000000
+        Size.PlatformDefault = False
+        TabIndex = 0
+        TabOrder = 0
+        TabPosition = Top
+        object tabTree: TTabItem
+          CustomIcon = <
+            item
+            end>
+          IsSelected = True
+          Size.Width = 69.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = ''
+          TabOrder = 0
+          Text = #37197#32622#26641
+          ExplicitSize.cx = 50.000000000000000000
+          ExplicitSize.cy = 50.000000000000000000
+          object trvConfig: TTreeView
+            Align = Client
+            Size.Width = 280.000000000000000000
+            Size.Height = 548.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            OnChange = trvConfigChange
+            Viewport.Width = 276.000000000000000000
+            Viewport.Height = 544.000000000000000000
+          end
+        end
+        object tabProperties: TTabItem
+          CustomIcon = <
+            item
+            end>
+          IsSelected = False
+          Size.Width = 69.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = ''
+          TabOrder = 0
+          Text = #23646#24615#21015#34920
+          ExplicitSize.cx = 50.000000000000000000
+          ExplicitSize.cy = 50.000000000000000000
+          object lstProperties: TListBox
+            Align = Client
+            Size.Width = 280.000000000000000000
+            Size.Height = 548.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            OnDblClick = lstPropertiesDblClick
+            DisableFocusEffect = True
+            DefaultItemStyles.ItemStyle = ''
+            DefaultItemStyles.GroupHeaderStyle = ''
+            DefaultItemStyles.GroupFooterStyle = ''
+            Viewport.Width = 276.000000000000000000
+            Viewport.Height = 544.000000000000000000
+          end
+        end
+      end
+    end
+    object splMain: TSplitter
+      Align = Left
+      Cursor = crHSplit
+      MinSize = 200.000000000000000000
+      Position.X = 280.000000000000000000
+      Size.Width = 5.000000000000000000
+      Size.Height = 576.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object layRight: TLayout
+      Align = Client
+      Size.Width = 615.000000000000000000
+      Size.Height = 576.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object layEditor: TLayout
+        Align = Client
+        Size.Width = 615.000000000000000000
+        Size.Height = 576.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Visible = False
+        object layEditorHeader: TLayout
+          Align = Top
+          Size.Width = 615.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          object lblEditorTitle: TLabel
+            Align = Left
+            Margins.Left = 8.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Leading
+            Text = #23646#24615#21517#31216
+          end
+          object btnCancelEdit: TButton
+            Align = Right
+            Position.X = 535.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Text = #21462#28040
+            OnClick = btnCancelEditClick
+          end
+          object btnSaveProperty: TButton
+            Align = Right
+            Position.X = 447.000000000000000000
+            Margins.Right = 8.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            Text = #20445#23384
+            OnClick = btnSavePropertyClick
+          end
+        end
+        object layEditorContent: TLayout
+          Align = Client
+          Size.Width = 615.000000000000000000
+          Size.Height = 536.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+        end
+      end
+    end
+  end
+  object layStatusBar: TLayout
+    Align = Bottom
+    Position.Y = 576.000000000000000000
+    Size.Width = 900.000000000000000000
+    Size.Height = 24.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object lblStatusFile: TLabel
+      Align = Left
+      Margins.Left = 8.000000000000000000
+      Size.Width = 400.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Leading
+      Text = #26410#25171#24320#25991#20214
+    end
+    object lblStatusValidation: TLabel
+      Align = Left
+      Position.X = 408.000000000000000000
+      Margins.Left = 16.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Leading
+    end
+    object lblStatusOperation: TLabel
+      Align = Right
+      Position.X = 700.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Size.Width = 192.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Trailing
+    end
+  end
+  object mnuMain: TMainMenu
+    object mnuFile: TMenuItem
+      Text = #25991#20214'(&F)'
+      object mnuNew: TMenuItem
+        Action = actNew
+        Text = #26032#24314'(&N)'
+      end
+      object mnuOpen: TMenuItem
+        Action = actOpen
+        Text = #25171#24320'(&O)...'
+      end
+      object mnuSave: TMenuItem
+        Action = actSave
+        Text = #20445#23384'(&S)'
+      end
+      object mnuSaveAs: TMenuItem
+        Action = actSaveAs
+        Text = #21478#23384#20026'(&A)...'
+      end
+      object mnuSep1: TMenuItem
+        Text = '-'
+      end
+      object mnuExit: TMenuItem
+        Action = actExit
+        Text = #36864#20986'(&X)'
+      end
+    end
+    object mnuEdit: TMenuItem
+      Text = #32534#36753'(&E)'
+      object mnuUndo: TMenuItem
+        Action = actUndo
+        Text = #25764#38144'(&U)'
+      end
+      object mnuRedo: TMenuItem
+        Action = actRedo
+        Text = #37325#20570'(&R)'
+      end
+      object mnuSep2: TMenuItem
+        Text = '-'
+      end
+      object mnuAddProperty: TMenuItem
+        Action = actAddProperty
+        Text = #28155#21152#23646#24615'(&A)...'
+      end
+      object mnuDeleteProperty: TMenuItem
+        Action = actDeleteProperty
+        Text = #21024#38500#23646#24615'(&D)'
+      end
+    end
+    object mnuView: TMenuItem
+      Text = #35270#22270'(&V)'
+      object mnuRefresh: TMenuItem
+        Action = actRefresh
+        Text = #21047#26032'(&R)'
+      end
+    end
+    object mnuHelp: TMenuItem
+      Text = #24110#21161'(&H)'
+      object mnuAbout: TMenuItem
+        Action = actAbout
+        Text = #20851#20110'(&A)...'
+      end
+    end
+  end
+  object actList: TActionList
+    object actNew: TAction
+      Text = #26032#24314
+      ShortCut = 16462
+      OnExecute = actNewExecute
+    end
+    object actOpen: TAction
+      Text = #25171#24320
+      ShortCut = 16463
+      OnExecute = actOpenExecute
+    end
+    object actSave: TAction
+      Text = #20445#23384
+      ShortCut = 16467
+      OnExecute = actSaveExecute
+    end
+    object actSaveAs: TAction
+      Text = #21478#23384#20026
+      ShortCut = 24659
+      OnExecute = actSaveAsExecute
+    end
+    object actExit: TAction
+      Text = #36864#20986
+      ShortCut = 32883
+      OnExecute = actExitExecute
+    end
+    object actUndo: TAction
+      Text = #25764#38144
+      ShortCut = 16474
+    end
+    object actRedo: TAction
+      Text = #37325#20570
+      ShortCut = 16473
+    end
+    object actAddProperty: TAction
+      Text = #28155#21152#23646#24615
+      OnExecute = actAddPropertyExecute
+    end
+    object actDeleteProperty: TAction
+      Text = #21024#38500#23646#24615
+      ShortCut = 46
+      OnExecute = actDeletePropertyExecute
+    end
+    object actRefresh: TAction
+      Text = #21047#26032
+      ShortCut = 116
+      OnExecute = actRefreshExecute
+    end
+    object actAbout: TAction
+      Text = #20851#20110
+      OnExecute = actAboutExecute
+    end
+  end
+  object dlgOpen: TOpenDialog
+    Filter = 'JSON '#37197#32622#25991#20214' (*.json)|*.json|INI '#37197#32622#25991#20214' (*.ini)|*.ini|'#25152#26377#25991#20214' (*.*)|*.*'
+    Left = 488
+    Top = 8
+  end
+  object dlgSave: TSaveDialog
+    Filter = 'JSON '#37197#32622#25991#20214' (*.json)|*.json|INI '#37197#32622#25991#20214' (*.ini)|*.ini|'#25152#26377#25991#20214' (*.*)|*.*'
+    Left = 560
+    Top = 8
+  end
+end

@@ -1,0 +1,170 @@
+object FrameFontEditorFMX: TFrameFontEditorFMX
+  Size.Width = 400.000000000000000000
+  Size.Height = 300.000000000000000000
+  Size.PlatformDefault = False
+  object layMain: TLayout
+    Align = Client
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Size.Width = 384.000000000000000000
+    Size.Height = 284.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object layRow1: TLayout
+      Align = Top
+      Size.Width = 384.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object lblFontName: TLabel
+        Align = Left
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #23383#20307#21517#31216':'
+      end
+      object cboFontName: TComboBox
+        Align = Client
+        Size.Width = 304.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = cboFontNameChange
+      end
+    end
+    object layRow2: TLayout
+      Align = Top
+      Position.Y = 36.000000000000000000
+      Size.Width = 384.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object lblFontSize: TLabel
+        Align = Left
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #23383#20307#22823#23567':'
+      end
+      object spnFontSize: TSpinBox
+        Align = Left
+        Position.X = 80.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Max = 200.000000000000000000
+        Min = 6.000000000000000000
+        Value = 10.000000000000000000
+        OnChange = spnFontSizeChange
+      end
+    end
+    object layRow3: TLayout
+      Align = Top
+      Position.Y = 72.000000000000000000
+      Size.Width = 384.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object lblFontStyle: TLabel
+        Align = Left
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #23383#20307#26679#24335':'
+      end
+      object chkBold: TCheckBox
+        Align = Left
+        Position.X = 80.000000000000000000
+        Size.Width = 70.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = #31895#20307
+        OnChange = chkStyleChange
+      end
+      object chkItalic: TCheckBox
+        Align = Left
+        Position.X = 150.000000000000000000
+        Size.Width = 70.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = #26012#20307
+        OnChange = chkStyleChange
+      end
+      object chkUnderline: TCheckBox
+        Align = Left
+        Position.X = 220.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        Text = #19979#21010#32447
+        OnChange = chkStyleChange
+      end
+    end
+    object layRow4: TLayout
+      Align = Top
+      Position.Y = 108.000000000000000000
+      Size.Width = 384.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      object lblFontColor: TLabel
+        Align = Left
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #23383#20307#39068#33394':'
+      end
+      object clrFontColor: TColorComboBox
+        Align = Left
+        Position.X = 80.000000000000000000
+        Size.Width = 200.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Color = claBlack
+        OnChange = clrFontColorChange
+      end
+    end
+    object layPreview: TLayout
+      Align = Client
+      Margins.Top = 16.000000000000000000
+      Size.Width = 384.000000000000000000
+      Size.Height = 124.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 4
+      object lblPreview: TLabel
+        Align = Top
+        Size.Width = 384.000000000000000000
+        Size.Height = 20.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #39044#35272':'
+      end
+      object rectPreview: TRectangle
+        Align = Client
+        Fill.Color = claWhite
+        Size.Width = 384.000000000000000000
+        Size.Height = 104.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = claGray
+        object lblPreviewText: TLabel
+          Align = Center
+          Size.Width = 200.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'AaBbCc '#20013#25991#31034#20363
+        end
+      end
+    end
+  end
+end

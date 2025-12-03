@@ -1,4 +1,4 @@
-unit FrameVideoEditor;
+﻿unit FrameVideoEditor;
 
 interface
 
@@ -6,10 +6,20 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.ComCtrls, Vcl.Buttons, Vcl.ExtDlgs, System.JSON, System.Generics.Collections,
-  UtilsTypes;
+  ConfigFrameBase, UtilsTypes, System.UITypes, JSONHelpers;
 
 type
-  TFrameVideoEditor = class(TFrame)
+  TClipInfo = class
+  public
+    Name: string;
+    BackgroundPath: string;
+    Duration: Double;
+    AudioPath: string;
+    JsonData: TJSONObject;
+    constructor Create(const AName: string);
+  end;
+
+  TFrameVideoEditor = class(TBaseConfigFrame)
     pnlToolbar: TPanel;
     btnSave: TButton;
     pnlMain: TPanel;
@@ -82,12 +92,6 @@ type
     // 添加视频片段到列表
     procedure AddClipToList(Clip: TJSONObject);
     
-    // 在列表中插入视频片段
-    procedure InsertClipToList(Index: Integer; Clip: TJSONObject);
-    
-    // 更新列表中的视频片段
-    procedure UpdateClipInList(Index: Integer; Clip: TJSONObject);
-    
     // 清理资源
     procedure ClearClips;
     
@@ -96,20 +100,31 @@ type
     
     // 加载媒体设置
     procedure LoadMediaSettings(Settings: TJSONObject);
+  protected
+    procedure LoadFromJSON; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     
-    // 从JSON加载数据
-    procedure LoadFromJSON(JSON: TJSONObject);
-    
     // 保存数据到JSON
-    function SaveToJSON: TJSONObject;
+    procedure SaveToJSON; override;
   end;
 
 implementation
 
 {$R *.dfm}
+
+{ TClipInfo }
+
+constructor TClipInfo.Create(const AName: string);
+begin
+  inherited Create;
+  Name := AName;
+  BackgroundPath := '';
+  Duration := 5.0;
+  AudioPath := '';
+  JsonData := TJSONObject.Create;
+end;
 
 { TFrameVideoEditor }
 
@@ -135,7 +150,7 @@ end;
 
 procedure TFrameVideoEditor.InitializeControls;
 begin
-  // 设置ListVIew列
+  // 设置ListView列
   with lvClips.Columns.Add do
   begin
     Caption := '片段名称';
@@ -191,295 +206,350 @@ begin
   edtBitrate.Enabled := not chkAutoAdjustBitrate.Checked;
 end;
 
-procedure TFrameVideoEditor.LoadFromJSON(JSON: TJSONObject);
+procedure TFrameVideoEditor.LoadFromJSON;
 var
   ClipsArray: TJSONArray;
   SettingsObj: TJSONObject;
   I: Integer;
+  Value: string;
 begin
-  if JSON = nil then
+  if not Assigned(JSONObject) then
     Exit;
     
-  // 保存当前JSON
-  if Assigned(FCurrentJson) then
-    FCurrentJson.Free;
-    
-  FCurrentJson := TJSONObject(JSON.Clone);
-  
   // 清理现有片段
   ClearClips;
   
   // 加载基本属性
-  if JSON.GetValue('cover') <> nil then
-    edtCover.Text := JSON.GetValue<string>('cover');
+  Value := '';
+  if JSONObject.TryGetValue('cover', Value) then
+    edtCover.Text := Value
+  else
+    edtCover.Text := '';
     
-  if JSON.GetValue('ending') <> nil then
-    edtEnding.Text := JSON.GetValue<string>('ending');
+  Value := '';
+  if JSONObject.TryGetValue('ending', Value) then
+    edtEnding.Text := Value
+  else
+    edtEnding.Text := '';
     
-  if JSON.GetValue('bg_directory') <> nil then
-    edtBgDirectory.Text := JSON.GetValue<string>('bg_directory');
+  Value := '';
+  if JSONObject.TryGetValue('bg_directory', Value) then
+    edtBgDirectory.Text := Value
+  else
+    edtBgDirectory.Text := '';
     
-  if JSON.GetValue('audio_directory') <> nil then
-    edtAudioDirectory.Text := JSON.GetValue<string>('audio_directory');
+  Value := '';
+  if JSONObject.TryGetValue('audio_directory', Value) then
+    edtAudioDirectory.Text := Value
+  else
+    edtAudioDirectory.Text := '';
     
-  if JSON.GetValue('subtitle_file') <> nil then
-    edtSubtitleFile.Text := JSON.GetValue<string>('subtitle_file');
+  Value := '';
+  if JSONObject.TryGetValue('subtitle_file', Value) then
+    edtSubtitleFile.Text := Value
+  else
+    edtSubtitleFile.Text := '';
     
   // 加载媒体设置
-  if JSON.GetValue('media_settings') <> nil then
-    LoadMediaSettings(JSON.GetValue<TJSONObject>('media_settings'));
+  try
+    SettingsObj := JSONObject.GetValue('media_settings') as TJSONObject;
+    if Assigned(SettingsObj) then
+      LoadMediaSettings(SettingsObj);
+  except
+    // 忽略错误
+  end;
     
   // 加载片段
-  if JSON.GetValue('clips') <> nil then
-  begin
-    ClipsArray := JSON.GetValue<TJSONArray>('clips');
-    
-    for I := 0 to ClipsArray.Count - 1 do
+  try
+    ClipsArray := JSONObject.GetValue('clips') as TJSONArray;
+    if Assigned(ClipsArray) then
     begin
-      AddClipToList(TJSONObject(ClipsArray.Items[I].Clone));
+      for I := 0 to ClipsArray.Count - 1 do
+      begin
+        if ClipsArray.Items[I] is TJSONObject then
+          AddClipToList(TJSONObject(ClipsArray.Items[I].Clone));
+      end;
     end;
-    
-    UpdateClipList;
+  except
+    // 忽略错误
   end;
+  
+  // 更新UI
+  UpdateClipList;
 end;
 
-function TFrameVideoEditor.SaveToJSON: TJSONObject;
+procedure TFrameVideoEditor.SaveToJSON;
 var
   ClipsArray: TJSONArray;
   I: Integer;
 begin
-  Result := TJSONObject.Create;
-  
+  if not Assigned(JSONObject) then
+    Exit;
+    
   // 保存基本属性
-  Result.AddPair('_type', 'etVideo');
-  Result.AddPair('cover', edtCover.Text);
-  Result.AddPair('ending', edtEnding.Text);
-  Result.AddPair('bg_directory', edtBgDirectory.Text);
-  Result.AddPair('audio_directory', edtAudioDirectory.Text);
-  Result.AddPair('subtitle_file', edtSubtitleFile.Text);
+  JSONObject.RemovePair('cover');
+  JSONObject.AddPair('cover', edtCover.Text);
+  
+  JSONObject.RemovePair('ending');
+  JSONObject.AddPair('ending', edtEnding.Text);
+  
+  JSONObject.RemovePair('bg_directory');
+  JSONObject.AddPair('bg_directory', edtBgDirectory.Text);
+  
+  JSONObject.RemovePair('audio_directory');
+  JSONObject.AddPair('audio_directory', edtAudioDirectory.Text);
+  
+  JSONObject.RemovePair('subtitle_file');
+  JSONObject.AddPair('subtitle_file', edtSubtitleFile.Text);
   
   // 保存媒体设置
-  Result.AddPair('media_settings', CreateMediaSettingsJson);
+  JSONObject.RemovePair('media_settings');
+  JSONObject.AddPair('media_settings', CreateMediaSettingsJson);
   
   // 保存片段
   ClipsArray := TJSONArray.Create;
-  
   for I := 0 to FClips.Count - 1 do
   begin
     ClipsArray.Add(TJSONObject(FClips[I].Clone));
   end;
+    
+  JSONObject.RemovePair('clips');
+  JSONObject.AddPair('clips', ClipsArray);
   
-  Result.AddPair('clips', ClipsArray);
+  // 触发修改事件
+  Modified := True;
+end;
+
+procedure TFrameVideoEditor.AddClipToList(Clip: TJSONObject);
+var
+  Item: TListItem;
+  ClipName, Background, Audio, Duration: string;
+begin
+  // 添加到内部列表
+  FClips.Add(Clip);
+  
+  // 添加到ListView
+  Item := lvClips.Items.Add;
+  
+  // 尝试读取片段属性
+  if Clip.TryGetValue<string>('name', ClipName) then
+    Item.Caption := ClipName
+  else
+    Item.Caption := '未命名片段' + IntToStr(lvClips.Items.Count);
+    
+  if Clip.TryGetValue<string>('duration', Duration) then
+    Item.SubItems.Add(Duration + ' 秒')
+  else
+    Item.SubItems.Add('未知');
+    
+  if Clip.TryGetValue<string>('background', Background) then
+    Item.SubItems.Add(Background)
+  else
+    Item.SubItems.Add('未设置');
+    
+  if Clip.TryGetValue<string>('audio', Audio) then
+    Item.SubItems.Add(Audio)
+  else
+    Item.SubItems.Add('未设置');
+    
+  Item.Data := Clip;
+end;
+
+procedure TFrameVideoEditor.UpdateClipList;
+begin
+  lvClips.Items.BeginUpdate;
+  try
+    lvClips.Items.Clear;
+    
+    // 重新添加所有片段
+    for var I := 0 to FClips.Count - 1 do
+    begin
+      var Item := lvClips.Items.Add;
+      var Clip := FClips[I];
+      var ClipName, Background, Audio, Duration: string;
+      
+      if Clip.TryGetValue<string>('name', ClipName) then
+        Item.Caption := ClipName
+      else
+        Item.Caption := '未命名片段' + IntToStr(I + 1);
+        
+      if Clip.TryGetValue<string>('duration', Duration) then
+        Item.SubItems.Add(Duration + ' 秒')
+      else
+        Item.SubItems.Add('未知');
+        
+      if Clip.TryGetValue<string>('background', Background) then
+        Item.SubItems.Add(Background)
+      else
+        Item.SubItems.Add('未设置');
+        
+      if Clip.TryGetValue<string>('audio', Audio) then
+        Item.SubItems.Add(Audio)
+      else
+        Item.SubItems.Add('未设置');
+        
+      Item.Data := Clip;
+    end;
+  finally
+    lvClips.Items.EndUpdate;
+  end;
+  
+  // 更新按钮状态
+  btnEditClip.Enabled := lvClips.ItemIndex >= 0;
+  btnDeleteClip.Enabled := lvClips.ItemIndex >= 0;
+  btnMoveUp.Enabled := (lvClips.ItemIndex > 0);
+  btnMoveDown.Enabled := (lvClips.ItemIndex >= 0) and (lvClips.ItemIndex < lvClips.Items.Count - 1);
 end;
 
 procedure TFrameVideoEditor.ClearClips;
 begin
-  for var Clip in FClips do
-    Clip.Free;
+  // 释放所有片段
+  for var I := 0 to FClips.Count - 1 do
+  begin
+    FClips[I].Free;
+  end;
     
   FClips.Clear;
-end;
-
-procedure TFrameVideoEditor.UpdateClipList;
-var
-  I: Integer;
-  Item: TListItem;
-  Clip: TJSONObject;
-begin
   lvClips.Items.Clear;
-  
-  for I := 0 to FClips.Count - 1 do
-  begin
-    Clip := FClips[I];
-    Item := lvClips.Items.Add;
-    
-    if Clip.GetValue('_id') <> nil then
-      Item.Caption := Clip.GetValue('_id').Value
-    else
-      Item.Caption := '片段_' + IntToStr(I + 1);
-    
-    if Clip.GetValue('duration') <> nil then
-      Item.SubItems.Add(Clip.GetValue('duration').Value)
-    else
-      Item.SubItems.Add('');
-      
-    if Clip.GetValue('background') <> nil then
-      Item.SubItems.Add(Clip.GetValue('background').Value)
-    else
-      Item.SubItems.Add('');
-      
-    if Clip.GetValue('audio') <> nil then
-      Item.SubItems.Add(Clip.GetValue('audio').Value)
-    else
-      Item.SubItems.Add('');
-      
-    Item.Data := Clip;
-  end;
-end;
-
-procedure TFrameVideoEditor.AddClipToList(Clip: TJSONObject);
-begin
-  FClips.Add(Clip);
-  UpdateClipList;
-end;
-
-procedure TFrameVideoEditor.InsertClipToList(Index: Integer; Clip: TJSONObject);
-begin
-  if (Index >= 0) and (Index <= FClips.Count) then
-  begin
-    FClips.Insert(Index, Clip);
-    UpdateClipList;
-  end;
-end;
-
-procedure TFrameVideoEditor.UpdateClipInList(Index: Integer; Clip: TJSONObject);
-begin
-  if (Index >= 0) and (Index < FClips.Count) then
-  begin
-    FClips[Index].Free;
-    FClips[Index] := Clip;
-    UpdateClipList;
-  end;
 end;
 
 function TFrameVideoEditor.CreateMediaSettingsJson: TJSONObject;
-var
-  Resolution: string;
-  Width, Height: Integer;
 begin
   Result := TJSONObject.Create;
   
-  // 解析分辨率
+  // 添加分辨率
   case cmbResolution.ItemIndex of
-    0: begin // 1080p
-      Width := 1920;
-      Height := 1080;
-    end;
-    1: begin // 720p
-      Width := 1280;
-      Height := 720;
-    end;
-    2: begin // 480p
-      Width := 854;
-      Height := 480;
-    end;
-    3: begin // 360p
-      Width := 640;
-      Height := 360;
-    end;
-  else
-    Width := 1280;
-    Height := 720;
+    0: Result.AddPair('resolution', '1920x1080');
+    1: Result.AddPair('resolution', '1280x720');
+    2: Result.AddPair('resolution', '854x480');
+    3: Result.AddPair('resolution', '640x360');
+    else Result.AddPair('resolution', '1280x720');
   end;
   
-  // 添加基本设置
-  Result.AddPair('width', TJSONNumber.Create(Width));
-  Result.AddPair('height', TJSONNumber.Create(Height));
-  Result.AddPair('format', cmbFormat.Text);
+  // 添加格式
+  case cmbFormat.ItemIndex of
+    0: Result.AddPair('format', 'mp4');
+    1: Result.AddPair('format', 'webm');
+    2: Result.AddPair('format', 'avi');
+    3: Result.AddPair('format', 'mov');
+    else Result.AddPair('format', 'mp4');
+  end;
+  
+  // 添加质量
   Result.AddPair('quality', TJSONNumber.Create(trkQuality.Position));
+  
+  // 添加自动调整比特率
   Result.AddPair('auto_bitrate', TJSONBool.Create(chkAutoAdjustBitrate.Checked));
-  Result.AddPair('bitrate', edtBitrate.Text);
+  
+  // 添加比特率
+  try
+    Result.AddPair('bitrate', TJSONNumber.Create(StrToInt(edtBitrate.Text)));
+  except
+    Result.AddPair('bitrate', TJSONNumber.Create(5000));
+  end;
 end;
 
 procedure TFrameVideoEditor.LoadMediaSettings(Settings: TJSONObject);
 var
-  Width, Height: Integer;
+  Resolution, Format: string;
+  Quality, Bitrate: Integer;
+  AutoBitrate: Boolean;
 begin
-  if Settings = nil then
+  if not Assigned(Settings) then
     Exit;
     
   // 加载分辨率
-  if (Settings.GetValue('width') <> nil) and (Settings.GetValue('height') <> nil) then
+  Resolution := '';
+  if Settings.TryGetValue<string>('resolution', Resolution) then
   begin
-    Width := Settings.GetValue<Integer>('width');
-    Height := Settings.GetValue<Integer>('height');
-    
-    if (Width = 1920) and (Height = 1080) then
+    if Resolution = '1920x1080' then
       cmbResolution.ItemIndex := 0
-    else if (Width = 1280) and (Height = 720) then
+    else if Resolution = '1280x720' then
       cmbResolution.ItemIndex := 1
-    else if (Width = 854) and (Height = 480) then
+    else if Resolution = '854x480' then
       cmbResolution.ItemIndex := 2
-    else if (Width = 640) and (Height = 360) then
+    else if Resolution = '640x360' then
       cmbResolution.ItemIndex := 3
     else
-      cmbResolution.ItemIndex := 0;
+      cmbResolution.ItemIndex := 1; // 默认720p
   end;
   
   // 加载格式
-  if Settings.GetValue('format') <> nil then
+  Format := '';
+  if Settings.TryGetValue<string>('format', Format) then
   begin
-    var Format := Settings.GetValue<string>('format');
-    var Index := cmbFormat.Items.IndexOf(Format);
-    if Index >= 0 then
-      cmbFormat.ItemIndex := Index;
+    if Format = 'mp4' then
+      cmbFormat.ItemIndex := 0
+    else if Format = 'webm' then
+      cmbFormat.ItemIndex := 1
+    else if Format = 'avi' then
+      cmbFormat.ItemIndex := 2
+    else if Format = 'mov' then
+      cmbFormat.ItemIndex := 3
+    else
+      cmbFormat.ItemIndex := 0; // 默认mp4
   end;
   
   // 加载质量
-  if Settings.GetValue('quality') <> nil then
+  Quality := 80;
+  if Settings.TryGetValue<Integer>('quality', Quality) then
   begin
-    trkQuality.Position := Settings.GetValue<Integer>('quality');
-    lblQualityValue.Caption := IntToStr(trkQuality.Position) + '%';
+    trkQuality.Position := Quality;
+    lblQualityValue.Caption := IntToStr(Quality) + '%';
   end;
   
-  // 加载比特率设置
-  if Settings.GetValue('auto_bitrate') <> nil then
-    chkAutoAdjustBitrate.Checked := Settings.GetValue<Boolean>('auto_bitrate');
+  // 加载自动调整比特率
+  AutoBitrate := True;
+  if Settings.TryGetValue<Boolean>('auto_bitrate', AutoBitrate) then
+    chkAutoAdjustBitrate.Checked := AutoBitrate;
     
-  if Settings.GetValue('bitrate') <> nil then
-    edtBitrate.Text := Settings.GetValue<string>('bitrate');
+  // 加载比特率
+  Bitrate := 5000;
+  if Settings.TryGetValue<Integer>('bitrate', Bitrate) then
+    edtBitrate.Text := IntToStr(Bitrate);
     
+  // 更新比特率输入框启用状态
   edtBitrate.Enabled := not chkAutoAdjustBitrate.Checked;
-end;
-
-procedure TFrameVideoEditor.btnBrowseCoverClick(Sender: TObject);
-begin
-  if dlgOpenImage.Execute then
-  begin
-    edtCover.Text := dlgOpenImage.FileName;
-  end;
-end;
-
-procedure TFrameVideoEditor.btnBrowseEndingClick(Sender: TObject);
-begin
-  if dlgOpenImage.Execute then
-  begin
-    edtEnding.Text := dlgOpenImage.FileName;
-  end;
-end;
-
-procedure TFrameVideoEditor.btnBrowseBgDirClick(Sender: TObject);
-begin
-  if dlgSelectDir.Execute then
-  begin
-    edtBgDirectory.Text := dlgSelectDir.FileName;
-  end;
-end;
-
-procedure TFrameVideoEditor.btnBrowseAudioDirClick(Sender: TObject);
-begin
-  if dlgSelectDir.Execute then
-  begin
-    edtAudioDirectory.Text := dlgSelectDir.FileName;
-  end;
-end;
-
-procedure TFrameVideoEditor.btnBrowseSubtitleClick(Sender: TObject);
-begin
-  if dlgOpenSub.Execute then
-  begin
-    edtSubtitleFile.Text := dlgOpenSub.FileName;
-  end;
-end;
-
-procedure TFrameVideoEditor.btnSaveClick(Sender: TObject);
-begin
-  // 保存事件 - 在ControllerConfigs中处理
 end;
 
 procedure TFrameVideoEditor.trkQualityChange(Sender: TObject);
 begin
   lblQualityValue.Caption := IntToStr(trkQuality.Position) + '%';
+end;
+
+procedure TFrameVideoEditor.btnSaveClick(Sender: TObject);
+begin
+  SaveToJSON;
+end;
+
+procedure TFrameVideoEditor.btnBrowseCoverClick(Sender: TObject);
+begin
+  if dlgOpenImage.Execute then
+    edtCover.Text := dlgOpenImage.FileName;
+end;
+
+procedure TFrameVideoEditor.btnBrowseEndingClick(Sender: TObject);
+begin
+  if dlgOpenImage.Execute then
+    edtEnding.Text := dlgOpenImage.FileName;
+end;
+
+procedure TFrameVideoEditor.btnBrowseBgDirClick(Sender: TObject);
+begin
+  if dlgSelectDir.Execute then
+    edtBgDirectory.Text := dlgSelectDir.FileName;
+end;
+
+procedure TFrameVideoEditor.btnBrowseAudioDirClick(Sender: TObject);
+begin
+  if dlgSelectDir.Execute then
+    edtAudioDirectory.Text := dlgSelectDir.FileName;
+end;
+
+procedure TFrameVideoEditor.btnBrowseSubtitleClick(Sender: TObject);
+begin
+  if dlgOpenSub.Execute then
+    edtSubtitleFile.Text := dlgOpenSub.FileName;
 end;
 
 procedure TFrameVideoEditor.chkAutoAdjustBitrateClick(Sender: TObject);
@@ -490,74 +560,104 @@ end;
 procedure TFrameVideoEditor.btnAddClipClick(Sender: TObject);
 var
   ClipJson: TJSONObject;
+  ClipName: string;
 begin
-  // 创建一个简单的Clip JSON对象
+  // 获取片段名称
+  ClipName := '';
+  if not InputQuery('添加视频片段', '请输入片段名称', ClipName) then
+    Exit;
+    
+  if ClipName = '' then
+    ClipName := '新片段_' + IntToStr(FClips.Count + 1);
+    
+  // 创建片段JSON
   ClipJson := TJSONObject.Create;
-  ClipJson.AddPair('_type', 'etVideoClip');
-  ClipJson.AddPair('_id', 'etVideoClip.新片段_' + IntToStr(FClips.Count + 1));
+  ClipJson.AddPair('name', ClipName);
+  ClipJson.AddPair('duration', TJSONNumber.Create(5.0));
   ClipJson.AddPair('background', '');
-  ClipJson.AddPair('duration', '10.0');
-  ClipJson.AddPair('fps', '30');
   ClipJson.AddPair('audio', '');
-  ClipJson.AddPair('captions', TJSONArray.Create);
   
   // 添加到列表
   AddClipToList(ClipJson);
+  
+  // 选中新添加的项
+  lvClips.ItemIndex := lvClips.Items.Count - 1;
+  
+  // 更新按钮状态
+  btnEditClip.Enabled := True;
+  btnDeleteClip.Enabled := True;
+  btnMoveUp.Enabled := lvClips.ItemIndex > 0;
+  btnMoveDown.Enabled := lvClips.ItemIndex < lvClips.Items.Count - 1;
 end;
 
 procedure TFrameVideoEditor.btnEditClipClick(Sender: TObject);
 begin
-  if lvClips.Selected = nil then
-    Exit;
-    
-  // 这里应该调用视频片段编辑器
-  // 由于本框架不包含具体实现，此处只显示消息
-  ShowMessage('此功能需要在ControllerConfigs中实现，调用视频片段编辑器');
+  // TODO: 实现编辑视频片段的功能
+  ShowMessage('此功能尚未实现');
 end;
 
 procedure TFrameVideoEditor.btnDeleteClipClick(Sender: TObject);
+var
+  Index: Integer;
 begin
-  if lvClips.Selected = nil then
+  Index := lvClips.ItemIndex;
+  if (Index < 0) or (Index >= FClips.Count) then
     Exit;
     
-  var Index := lvClips.Selected.Index;
-  
-  if (Index >= 0) and (Index < FClips.Count) then
+  if MessageDlg('确定要删除"' + lvClips.Items[Index].Caption + '" 片段吗?',
+                mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
+    // 释放JSON对象
     FClips[Index].Free;
+    
+    // 从列表中移除
     FClips.Delete(Index);
+    
+    // 更新UI
     UpdateClipList;
   end;
 end;
 
 procedure TFrameVideoEditor.btnMoveUpClick(Sender: TObject);
+var
+  Index: Integer;
+  Temp: TJSONObject;
 begin
-  if lvClips.Selected = nil then
+  Index := lvClips.ItemIndex;
+  if (Index <= 0) or (Index >= FClips.Count) then
     Exit;
     
-  var Index := lvClips.Selected.Index;
+  // 交换位置
+  Temp := FClips[Index];
+  FClips[Index] := FClips[Index - 1];
+  FClips[Index - 1] := Temp;
   
-  if (Index > 0) and (Index < FClips.Count) then
-  begin
-    FClips.Exchange(Index, Index - 1);
-    UpdateClipList;
-    lvClips.Items[Index - 1].Selected := True;
-  end;
+  // 更新UI
+  UpdateClipList;
+  
+  // 重新选中
+  lvClips.ItemIndex := Index - 1;
 end;
 
 procedure TFrameVideoEditor.btnMoveDownClick(Sender: TObject);
+var
+  Index: Integer;
+  Temp: TJSONObject;
 begin
-  if lvClips.Selected = nil then
+  Index := lvClips.ItemIndex;
+  if (Index < 0) or (Index >= FClips.Count - 1) then
     Exit;
     
-  var Index := lvClips.Selected.Index;
+  // 交换位置
+  Temp := FClips[Index];
+  FClips[Index] := FClips[Index + 1];
+  FClips[Index + 1] := Temp;
   
-  if (Index >= 0) and (Index < FClips.Count - 1) then
-  begin
-    FClips.Exchange(Index, Index + 1);
-    UpdateClipList;
-    lvClips.Items[Index + 1].Selected := True;
-  end;
+  // 更新UI
+  UpdateClipList;
+  
+  // 重新选中
+  lvClips.ItemIndex := Index + 1;
 end;
 
 end. 

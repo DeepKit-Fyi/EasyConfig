@@ -1,0 +1,574 @@
+﻿unit ViewMain;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.ExtCtrls,
+  Vcl.Menus, Vcl.StdCtrls, Vcl.Buttons, Vcl.ToolWin, Vcl.ImgList, System.Skia, 
+  Vcl.Skia, Vcl.Grids, Vcl.ValEdit, System.UITypes, System.Types, Vcl.FileCtrl,
+  ControllerIntf, ViewIntf, System.ImageList;
+
+type
+  TViewMain = class(TForm, IMainForm)
+    pnlMain: TPanel;
+    pnlLeft: TPanel;
+    tvConfig: TTreeView;
+    pmTree: TPopupMenu;
+    pmEditor: TPopupMenu;
+    dlgOpen: TOpenDialog;
+    dlgSave: TSaveDialog;
+    ilIcons: TImageList;
+    mnuMain: TMainMenu;
+    mnuFile: TMenuItem;
+    mnuOpen: TMenuItem;
+    mnuSave: TMenuItem;
+    mnuSaveAs: TMenuItem;
+    mnuSep1: TMenuItem;
+    mnuExit: TMenuItem;
+    mnuEdit: TMenuItem;
+    mnuCut: TMenuItem;
+    mnuCopy: TMenuItem;
+    mnuPaste: TMenuItem;
+    mnuTools: TMenuItem;
+    mnuValidate: TMenuItem;
+    mnuToolsUTF8Converter: TMenuItem;
+    mnuHelp: TMenuItem;
+    mnuAbout: TMenuItem;
+    sbMain: TStatusBar;
+    splMain: TSplitter;
+    pnlClient: TPanel;
+    pcEditors: TPageControl;
+    meoDebug: TMemo;
+    FileListBox1: TFileListBox;
+    tsWelcome: TTabSheet;
+    Label1: TLabel;
+    Label2: TLabel;
+    pmTreeOpen: TMenuItem;
+    pmTreeNew: TMenuItem;
+    pmTreeDelete: TMenuItem;
+    pmTreeRename: TMenuItem;
+    pmEditorSave: TMenuItem;
+    pmEditorClose: TMenuItem;
+    pmEditorValidate: TMenuItem;
+    pnlTop: TPanel;
+    btnOpen: TButton;
+    btnSave: TButton;
+    btnNew: TButton;
+    btnDelete: TButton;
+    btnRefresh: TButton;
+    procedure tvConfigDblClick(Sender: TObject);
+    procedure tvConfigChange(Sender: TObject; Node: TTreeNode);
+    procedure btnSaveClick(Sender: TObject);
+    procedure btnReloadClick(Sender: TObject);
+    procedure btnValidateClick(Sender: TObject);
+    procedure mnuOpenClick(Sender: TObject);
+    procedure mnuSaveClick(Sender: TObject);
+    procedure mnuSaveAsClick(Sender: TObject);
+    procedure mnuExitClick(Sender: TObject);
+    procedure mnuAboutClick(Sender: TObject);
+    procedure pcEditorsChange(Sender: TObject);
+    procedure pmTreeOpenClick(Sender: TObject);
+    procedure pmTreeNewClick(Sender: TObject);
+    procedure pmTreeDeleteClick(Sender: TObject);
+    procedure pmTreeRenameClick(Sender: TObject);
+    procedure pmEditorSaveClick(Sender: TObject);
+    procedure pmEditorCloseClick(Sender: TObject);
+    procedure pmEditorValidateClick(Sender: TObject);
+    procedure btnSvgOpenClick(Sender: TObject);
+    procedure btnSvgSaveClick(Sender: TObject);
+    procedure btnSvgSaveAsClick(Sender: TObject);
+    procedure btnSvgDeleteClick(Sender: TObject);
+    procedure btnSvgNewNodeClick(Sender: TObject);
+    procedure btnSvgEditNodeClick(Sender: TObject);
+    procedure btnSvgRemoveNodeClick(Sender: TObject);
+    procedure btnSvgRefreshClick(Sender: TObject);
+    procedure btnSvgExitClick(Sender: TObject);
+    procedure FileListBox1DblClick(Sender: TObject);
+    procedure ValueListEditorDblClick(Sender: TObject);
+    procedure ValueListEditorValidate(Sender: TObject; ACol, ARow: Integer; const KeyName, KeyValue: string);
+    procedure AddValueItemClick(Sender: TObject);
+    procedure DeleteValueItemClick(Sender: TObject);
+    procedure SaveValueItemsClick(Sender: TObject);
+    procedure cbbThemeChange(Sender: TObject);
+    procedure RenameValueItemClick(Sender: TObject);
+    procedure AddSectionClick(Sender: TObject);
+    procedure ValueListEditorDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+    procedure mnuToolsUTF8ConverterClick(Sender: TObject);
+    procedure btnOpenClick(Sender: TObject);
+    procedure btnNewClick(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
+    procedure btnRefreshClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+   private
+    FBasicInfoTab: TTabSheet;         // 基础信息选项卡
+    FValueListEditor: TValueListEditor; // 值列表编辑器
+    FCurrentBasicConfigPath: string;   // 当前基础信息配置文件路径
+    FMainController: IMainController;  // 使用接口避免循环引用
+
+    procedure InitializeBasicInfoTab;
+    procedure InitializeComponents;
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    procedure UpdateStatusBar;
+    procedure AddDebugMessage(const Msg: string);
+    function GetDebugMemo: TMemo;
+    function GetTreeView: TTreeView;
+    function GetPageControl: TPageControl;
+    function GetStatusBar: TStatusBar;
+    
+    property MainController: IMainController read FMainController;
+  end;
+
+
+implementation
+
+uses
+  UtilsUTF8, HelperForm, ViewConfigEditor, HelperTree, ControllerMain;
+
+{$R *.dfm}
+
+constructor TViewMain.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  
+  // 不再需要动态创建界面元素，所有控件已在DFM中定义
+end;
+
+// 初始化组件
+procedure TViewMain.InitializeComponents;
+begin
+  // 初始化所有组件
+  try
+    // 添加一些默认文件夹到FileListBox
+    if SysUtils.DirectoryExists(ExtractFilePath(Application.ExeName) + 'Configs') then
+      FileListBox1.Directory := ExtractFilePath(Application.ExeName) + 'Configs';
+    
+    // 初始化状态栏
+    UpdateStatusBar;
+    
+    // 输出初始化完成信息
+    AddDebugMessage('组件初始化完成');
+  except
+    on E: Exception do
+      AddDebugMessage('初始化组件失败: ' + E.Message);
+  end;
+end;
+
+// 初始化基础信息选项卡
+procedure TViewMain.InitializeBasicInfoTab;
+begin
+  try
+    // 不再动态创建控件，使用DFM中已有的控件
+    // 找到已存在的基本属性选项卡
+    for var i := 0 to pcEditors.PageCount - 1 do
+    begin
+      if pcEditors.Pages[i].Caption = '基本属性' then
+      begin
+        FBasicInfoTab := pcEditors.Pages[i];
+        break;
+      end;
+    end;
+    
+    // 如果在现有选项卡中没找到，则创建一个
+    if FBasicInfoTab = nil then
+    begin
+      FBasicInfoTab := TTabSheet.Create(pcEditors);
+      FBasicInfoTab.PageControl := pcEditors;
+      FBasicInfoTab.Caption := '基本属性';
+      
+      // 创建值列表编辑器
+      FValueListEditor := TValueListEditor.Create(FBasicInfoTab);
+      FValueListEditor.Parent := FBasicInfoTab;
+      FValueListEditor.Align := alClient;
+      FValueListEditor.Options := FValueListEditor.Options + [goEditing, goAlwaysShowEditor];
+      FValueListEditor.OnDblClick := ValueListEditorDblClick;
+      FValueListEditor.OnDrawCell := ValueListEditorDrawCell;
+    end
+    else
+    begin
+      // 查找已存在的值列表编辑器
+      for var i := 0 to FBasicInfoTab.ControlCount - 1 do
+      begin
+        if FBasicInfoTab.Controls[i] is TValueListEditor then
+        begin
+          FValueListEditor := TValueListEditor(FBasicInfoTab.Controls[i]);
+          break;
+        end;
+      end;
+      
+      // 如果没找到，则创建一个
+      if FValueListEditor = nil then
+      begin
+        FValueListEditor := TValueListEditor.Create(FBasicInfoTab);
+        FValueListEditor.Parent := FBasicInfoTab;
+        FValueListEditor.Align := alClient;
+        FValueListEditor.Options := FValueListEditor.Options + [goEditing, goAlwaysShowEditor];
+        FValueListEditor.OnDblClick := ValueListEditorDblClick;
+        FValueListEditor.OnDrawCell := ValueListEditorDrawCell;
+      end;
+    end;
+    
+    // 添加初始化完成信息
+    AddDebugMessage('基本信息选项卡初始化完成');
+  except
+    on E: Exception do
+      AddDebugMessage('初始化基本信息选项卡失败: ' + E.Message);
+  end;
+end;
+
+// 窗体创建
+procedure TViewMain.FormCreate(Sender: TObject);
+begin
+  try
+    // 创建主控制器
+    FMainController := TMainController.Create(Self);
+    
+    // 初始化组件
+    InitializeComponents;
+    
+    // 初始化基础信息选项卡
+    InitializeBasicInfoTab;
+    
+    // 加载主题
+    if Assigned(FMainController) then 
+      FMainController.LoadAvailableThemes;
+    
+    // 添加启动信息
+    AddDebugMessage('配置编辑器启动 - ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', Now));
+    
+    // 初始化树视图
+    TMainController(FMainController).InitializeTree;
+    UpdateStatusBar;
+    
+    // 如果找到基本信息选项卡，设置为活动页
+    if Assigned(FBasicInfoTab) then
+      pcEditors.ActivePage := FBasicInfoTab
+    else if pcEditors.PageCount > 0 then
+      pcEditors.ActivePage := pcEditors.Pages[0];  // 使用第一个可用选项卡
+  except
+    on E: Exception do
+    begin
+      ShowMessage('初始化错误: ' + E.Message);
+    end;
+  end;
+end;
+
+// UI更新方法
+procedure TViewMain.UpdateStatusBar;
+begin
+  if Assigned(sbMain) then
+  begin
+    sbMain.Panels[0].Text := '配置编辑器就绪';
+    sbMain.Panels[1].Text := '当前版本: 1.0.0';
+    sbMain.Panels[2].Text := FormatDateTime('yyyy-mm-dd', Date);
+  end;
+end;
+
+// Getter方法 - 为控制器提供UI组件
+function TViewMain.GetDebugMemo: TMemo;
+begin
+  Result := meoDebug;
+end;
+
+function TViewMain.GetTreeView: TTreeView;
+begin
+  Result := tvConfig;
+end;
+
+function TViewMain.GetPageControl: TPageControl;
+begin
+  Result := pcEditors;
+end;
+
+function TViewMain.GetStatusBar: TStatusBar;
+begin
+  Result := sbMain;
+end;
+
+// 简单事件委托给控制器
+procedure TViewMain.tvConfigChange(Sender: TObject; Node: TTreeNode);
+begin
+  if Assigned(FMainController) and Assigned(Node) then
+    FMainController.HandleTreeNodeChange(Node);
+end;
+
+procedure TViewMain.tvConfigDblClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.HandleTreeNodeDoubleClick;
+end;
+
+procedure TViewMain.btnReloadClick(Sender: TObject);
+begin
+  TMainController(FMainController).ReloadCurrentConfig;
+end;
+
+procedure TViewMain.btnSaveClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.SaveCurrentConfig;
+end;
+
+procedure TViewMain.btnValidateClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.ValidateCurrentConfig;
+end;
+
+procedure TViewMain.btnSvgOpenClick(Sender: TObject);
+begin
+  mnuOpenClick(Sender);
+end;
+
+procedure TViewMain.btnSvgSaveClick(Sender: TObject);
+begin
+  mnuSaveClick(Sender);
+end;
+
+procedure TViewMain.btnSvgSaveAsClick(Sender: TObject);
+begin
+  mnuSaveAsClick(Sender);
+end;
+
+procedure TViewMain.btnSvgExitClick(Sender: TObject);
+begin
+  mnuExitClick(Sender);
+end;
+
+procedure TViewMain.btnSvgRefreshClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+  begin
+    FMainController.RefreshTreeView;
+    AddDebugMessage('已刷新配置树');
+  end;
+end;
+
+procedure TViewMain.btnSvgDeleteClick(Sender: TObject);
+begin
+  pmTreeDeleteClick(Sender);
+end;
+
+procedure TViewMain.btnSvgEditNodeClick(Sender: TObject);
+begin
+  pmTreeRenameClick(Sender);
+end;
+
+procedure TViewMain.btnSvgNewNodeClick(Sender: TObject);
+begin
+  pmTreeNewClick(Sender);
+end;
+
+procedure TViewMain.btnSvgRemoveNodeClick(Sender: TObject);
+begin
+  pmTreeDeleteClick(Sender);
+end;
+
+procedure TViewMain.mnuOpenClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.OpenConfigFile;
+end;
+
+procedure TViewMain.mnuSaveClick(Sender: TObject);
+begin
+  btnSaveClick(Sender);
+end;
+
+procedure TViewMain.mnuSaveAsClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.SaveConfigFileAs;
+end;
+
+procedure TViewMain.mnuExitClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TViewMain.mnuAboutClick(Sender: TObject);
+begin
+  ShowMessage('配置编辑器 v1.0.0'#13#10'Copyright © 2024');
+end;
+
+procedure TViewMain.mnuToolsUTF8ConverterClick(Sender: TObject);
+begin
+  UtilsUTF8.ShowUTF8Converter;
+end;
+
+procedure TViewMain.pmTreeOpenClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.OpenSelectedTreeNode;
+end;
+
+procedure TViewMain.pmTreeNewClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.CreateNewConfigObject;
+end;
+
+procedure TViewMain.pmTreeDeleteClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.DeleteSelectedTreeNode;
+end;
+
+procedure TViewMain.pmTreeRenameClick(Sender: TObject);
+begin
+  if Assigned(FMainController) and Assigned(tvConfig.Selected) then
+    tvConfig.Selected.EditText;
+end;
+
+procedure TViewMain.pmEditorSaveClick(Sender: TObject);
+begin
+  btnSaveClick(Sender);
+end;
+
+procedure TViewMain.pmEditorCloseClick(Sender: TObject);
+begin
+  if Assigned(FMainController) and (pcEditors.PageCount > 0) then
+    FMainController.CloseCurrentTab;
+end;
+
+procedure TViewMain.pmEditorValidateClick(Sender: TObject);
+begin
+  btnValidateClick(Sender);
+end;
+
+procedure TViewMain.pcEditorsChange(Sender: TObject);
+begin
+  TMainController(FMainController).HandleTabChange;
+end;
+
+procedure TViewMain.FileListBox1DblClick(Sender: TObject);
+begin
+  if FileListBox1.FileName <> '' then
+  begin
+    if Assigned(FMainController) then
+      FMainController.OpenSelectedFile(FileListBox1.FileName);
+  end;
+end;
+
+// 值列表编辑器相关事件
+procedure TViewMain.ValueListEditorDblClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.HandleValueListDoubleClick(FValueListEditor);
+end;
+
+procedure TViewMain.ValueListEditorValidate(Sender: TObject; ACol, ARow: Integer; const KeyName, KeyValue: string);
+begin
+  if Assigned(FMainController) then
+    FMainController.ValidateValueListEntry(ACol, ARow, KeyName, KeyValue);
+end;
+
+procedure TViewMain.ValueListEditorDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+begin
+  // 自定义绘制单元格
+  if (ARow > 0) and (ACol = 0) then
+  begin
+    // 对键列进行自定义绘制
+    if Pos('[', FValueListEditor.Cells[ACol, ARow]) = 1 then
+    begin
+      // 这是一个节名称，使用粗体绘制
+      FValueListEditor.Canvas.Font.Style := [fsBold];
+      FValueListEditor.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top + 2, FValueListEditor.Cells[ACol, ARow]);
+    end;
+  end;
+end;
+
+procedure TViewMain.AddValueItemClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.AddValueItem;
+end;
+
+procedure TViewMain.DeleteValueItemClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.DeleteValueItem;
+end;
+
+procedure TViewMain.SaveValueItemsClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.SaveValueItems;
+end;
+
+procedure TViewMain.RenameValueItemClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.RenameValueItem;
+end;
+
+procedure TViewMain.AddSectionClick(Sender: TObject);
+begin
+  if Assigned(FMainController) then
+    FMainController.AddSection;
+end;
+
+procedure TViewMain.cbbThemeChange(Sender: TObject);
+begin
+  if Assigned(FMainController) and (Sender is TComboBox) then
+    FMainController.ApplyTheme(TComboBox(Sender).Text);
+end;
+
+// 添加AddDebugMessage方法实现
+procedure TViewMain.AddDebugMessage(const Msg: string);
+begin
+  if Assigned(meoDebug) then
+  begin
+    meoDebug.Lines.Add(FormatDateTime('[yyyy-mm-dd hh:nn:ss] ', Now) + Msg);
+    meoDebug.SelStart := meoDebug.GetTextLen;
+    meoDebug.SelLength := 0;
+    SendMessage(meoDebug.Handle, EM_SCROLLCARET, 0, 0);
+  end;
+end;
+
+procedure TViewMain.btnOpenClick(Sender: TObject);
+begin
+  mnuOpenClick(Sender);
+end;
+
+procedure TViewMain.btnNewClick(Sender: TObject);
+begin
+  pmTreeNewClick(Sender);
+end;
+
+procedure TViewMain.btnDeleteClick(Sender: TObject);
+begin
+  pmTreeDeleteClick(Sender);
+end;
+
+procedure TViewMain.btnRefreshClick(Sender: TObject);
+begin
+  btnSvgRefreshClick(Sender);
+end;
+
+// 窗体销毁
+procedure TViewMain.FormDestroy(Sender: TObject);
+begin
+  // 保存应用程序设置
+  HelperForm.SaveApplicationSettings(Self, meoDebug);
+  
+  // 清理资源
+  TMainController(FMainController).Free;
+end;
+
+// 窗体显示
+procedure TViewMain.FormShow(Sender: TObject);
+begin
+  // 窗体显示时的初始化代码
+  if Assigned(meoDebug) then
+    meoDebug.Lines.Add('窗体显示完成 - ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', Now));
+  
+  // 确保控件正确加载
+  Application.ProcessMessages;
+end;
+
+end. 

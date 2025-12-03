@@ -1,12 +1,16 @@
-﻿﻿unit ConfigManager;
+﻿unit ConfigManager;
 
 interface
 
 uses
-  System.SysUtils, System.Classes, System.IniFiles, System.JSON, System.Generics.Collections,
-   INIConfig, JSONConfig;
+  System.SysUtils, System.Classes, System.IniFiles, System.JSON, JSONHelpers, 
+  System.Generics.Collections, System.IOUtils, System.DateUtils,
+  INIConfig, JSONConfig, UtilsTypesFMX;
 
 type
+  /// <summary>
+  /// 配置管理器 - 负责 INI + JSON 双文件配置的加载、保存和一致性维护
+  /// </summary>
   TConfigManager = class
   private
     FINIConfig: TLegacyINIConfig;
@@ -14,12 +18,38 @@ type
     FINIFilePath: string;
     FJSONFilePath: string;
     FIsModified: Boolean;
+    FOnModified: TNotifyEvent;
+    FOnProjectLoaded: TNotifyEvent;
+    FBackupDir: string;
     
     function GetJSONPathFromINI(const INIPath: string): string;
+    function ResolveJSONPath(const INIPath, JSONRelPath: string): string;
     procedure SetIsModified(const Value: Boolean);
+    procedure DoModified;
+    procedure DoProjectLoaded;
+    function CreateBackup(const FilePath: string): Boolean;
+    function SaveToTempAndRename(const FilePath, Content: string): Boolean;
+    function EnsureDirectoryExists(const DirPath: string): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
+    
+    // ========== 工程管理 ==========
+    /// <summary>打开配置工程，解析 INI 的 [json_file] 节并加载关联 JSON</summary>
+    function OpenProject(const AIniPath: string): Boolean;
+    /// <summary>保存配置工程，先写 JSON 再写 INI，生成备份</summary>
+    function SaveProject: Boolean;
+    /// <summary>另存为新文件</summary>
+    function SaveProjectAs(const ANewIniPath: string): Boolean;
+    /// <summary>新建工程，创建空白 INI+JSON 对</summary>
+    function NewProject(const AIniPath: string): Boolean;
+    /// <summary>关闭当前工程</summary>
+    procedure CloseProject;
+    
+    // ========== 状态查询 ==========
+    function GetCurrentIniPath: string;
+    function GetCurrentJsonPath: string;
+    function HasProject: Boolean;
     
     // 加载配置文件
     function LoadFromFile(const INIFilePath: string): Boolean;
@@ -64,9 +94,19 @@ type
     property IsModified: Boolean read FIsModified write SetIsModified;
     property INIConfig: TLegacyINIConfig read FINIConfig;
     property JSONConfig: TJSONConfig read FJSONConfig;
+    
+    // ========== 事件 ==========
+    property OnModified: TNotifyEvent read FOnModified write FOnModified;
+    property OnProjectLoaded: TNotifyEvent read FOnProjectLoaded write FOnProjectLoaded;
+    property BackupDir: string read FBackupDir write FBackupDir;
   end;
 
 implementation
+
+const
+  JSON_FILE_SECTION = 'json_file';
+  JSON_FILE_PATH_KEY = 'file_path';
+  DEFAULT_BACKUP_SUBDIR = 'backup';
 
 { TConfigManager }
 
@@ -76,6 +116,7 @@ begin
   FINIConfig := TLegacyINIConfig.Create;
   FJSONConfig := TJSONConfig.Create;
   FIsModified := False;
+  FBackupDir := '';
 end;
 
 destructor TConfigManager.Destroy;
@@ -83,6 +124,222 @@ begin
   FINIConfig.Free;
   FJSONConfig.Free;
   inherited;
+end;
+
+procedure TConfigManager.DoModified;
+begin
+  if Assigned(FOnModified) then
+    FOnModified(Self);
+end;
+
+procedure TConfigManager.DoProjectLoaded;
+begin
+  if Assigned(FOnProjectLoaded) then
+    FOnProjectLoaded(Self);
+end;
+
+function TConfigManager.GetCurrentIniPath: string;
+begin
+  Result := FINIFilePath;
+end;
+
+function TConfigManager.GetCurrentJsonPath: string;
+begin
+  Result := FJSONFilePath;
+end;
+
+function TConfigManager.HasProject: Boolean;
+begin
+  Result := (FINIFilePath <> '') and FileExists(FINIFilePath);
+end;
+
+function TConfigManager.ResolveJSONPath(const INIPath, JSONRelPath: string): string;
+var
+  NormalizedPath: string;
+begin
+  // 规范化路径分隔符
+  NormalizedPath := StringReplace(JSONRelPath, '/', PathDelim, [rfReplaceAll]);
+  
+  // 如果是绝对路径，直接返回
+  if TPath.IsPathRooted(NormalizedPath) then
+    Result := NormalizedPath
+  else
+    // 相对路径，基于 INI 文件所在目录解析
+    Result := TPath.Combine(ExtractFilePath(INIPath), NormalizedPath);
+end;
+
+function TConfigManager.EnsureDirectoryExists(const DirPath: string): Boolean;
+begin
+  Result := True;
+  if not TDirectory.Exists(DirPath) then
+  begin
+    try
+      TDirectory.CreateDirectory(DirPath);
+    except
+      Result := False;
+    end;
+  end;
+end;
+
+function TConfigManager.CreateBackup(const FilePath: string): Boolean;
+var
+  BackupPath, BackupFileName, ActualBackupDir: string;
+  TimeStamp: string;
+begin
+  Result := True;
+  if not FileExists(FilePath) then
+    Exit;
+    
+  try
+    // 确定备份目录
+    if FBackupDir <> '' then
+      ActualBackupDir := FBackupDir
+    else
+      ActualBackupDir := TPath.Combine(ExtractFilePath(FilePath), DEFAULT_BACKUP_SUBDIR);
+    
+    // 确保备份目录存在
+    if not EnsureDirectoryExists(ActualBackupDir) then
+      Exit(False);
+    
+    // 生成带时间戳的备份文件名
+    TimeStamp := FormatDateTime('yyyymmdd_hhnnss', Now);
+    BackupFileName := ChangeFileExt(ExtractFileName(FilePath), '') + 
+                      '_' + TimeStamp + ExtractFileExt(FilePath) + '.bak';
+    BackupPath := TPath.Combine(ActualBackupDir, BackupFileName);
+    
+    // 复制文件到备份
+    TFile.Copy(FilePath, BackupPath, True);
+  except
+    Result := False;
+  end;
+end;
+
+function TConfigManager.SaveToTempAndRename(const FilePath, Content: string): Boolean;
+var
+  TempPath: string;
+begin
+  Result := False;
+  TempPath := FilePath + '.tmp';
+  
+  try
+    // 写入临时文件
+    TFile.WriteAllText(TempPath, Content, TEncoding.UTF8);
+    
+    // 删除原文件（如果存在）
+    if FileExists(FilePath) then
+      TFile.Delete(FilePath);
+    
+    // 重命名临时文件
+    TFile.Move(TempPath, FilePath);
+    Result := True;
+  except
+    // 清理临时文件
+    if FileExists(TempPath) then
+      TFile.Delete(TempPath);
+  end;
+end;
+
+procedure TConfigManager.CloseProject;
+begin
+  FINIConfig.Clear;
+  FJSONConfig.Clear;
+  FINIFilePath := '';
+  FJSONFilePath := '';
+  FIsModified := False;
+end;
+
+function TConfigManager.OpenProject(const AIniPath: string): Boolean;
+var
+  JSONRelPath: string;
+begin
+  Result := False;
+  
+  if not FileExists(AIniPath) then
+    Exit;
+  
+  try
+    // 关闭当前工程
+    CloseProject;
+    
+    // 加载 INI 文件
+    FINIFilePath := AIniPath;
+    FINIConfig.LoadFromFile(FINIFilePath);
+    
+    // 从 INI 的 [json_file] 节读取 JSON 文件路径
+    JSONRelPath := FINIConfig.ReadString(JSON_FILE_SECTION, JSON_FILE_PATH_KEY, '');
+    
+    // 如果没有指定 JSON 路径，使用默认的同名 .json 文件
+    if JSONRelPath = '' then
+      JSONRelPath := ChangeFileExt(ExtractFileName(AIniPath), '.json');
+    
+    // 解析 JSON 文件的完整路径
+    FJSONFilePath := ResolveJSONPath(AIniPath, JSONRelPath);
+    
+    // 加载或创建 JSON 文件
+    if FileExists(FJSONFilePath) then
+      FJSONConfig.LoadFromFile(FJSONFilePath)
+    else
+    begin
+      // JSON 文件不存在，创建空的 JSON 对象
+      FJSONConfig.Clear;
+      // 保存空的 JSON 文件
+      TFile.WriteAllText(FJSONFilePath, '{}', TEncoding.UTF8);
+    end;
+    
+    FIsModified := False;
+    DoProjectLoaded;
+    Result := True;
+  except
+    on E: Exception do
+    begin
+      CloseProject;
+      Result := False;
+    end;
+  end;
+end;
+
+function TConfigManager.NewProject(const AIniPath: string): Boolean;
+var
+  JSONPath: string;
+  INIDir: string;
+begin
+  Result := False;
+  
+  try
+    // 关闭当前工程
+    CloseProject;
+    
+    // 确保目录存在
+    INIDir := ExtractFilePath(AIniPath);
+    if (INIDir <> '') and not EnsureDirectoryExists(INIDir) then
+      Exit;
+    
+    // 设置文件路径
+    FINIFilePath := AIniPath;
+    JSONPath := ChangeFileExt(AIniPath, '.json');
+    FJSONFilePath := JSONPath;
+    
+    // 创建空的 INI 配置
+    FINIConfig.Clear;
+    FINIConfig.WriteString(JSON_FILE_SECTION, JSON_FILE_PATH_KEY, ExtractFileName(JSONPath));
+    
+    // 创建空的 JSON 配置
+    FJSONConfig.Clear;
+    
+    // 保存文件
+    FINIConfig.SaveToFile(FINIFilePath);
+    TFile.WriteAllText(FJSONFilePath, '{}', TEncoding.UTF8);
+    
+    FIsModified := False;
+    DoProjectLoaded;
+    Result := True;
+  except
+    on E: Exception do
+    begin
+      CloseProject;
+      Result := False;
+    end;
+  end;
 end;
 
 procedure TConfigManager.AddINIConfigItem(const Section, Key, DefaultValue: string; ConfigType: TConfigType);
@@ -154,80 +411,80 @@ begin
   Result := FJSONConfig.GetRootKeys;
 end;
 
+// 保留旧方法名作为别名，保持向后兼容
 function TConfigManager.LoadFromFile(const INIFilePath: string): Boolean;
+begin
+  Result := OpenProject(INIFilePath);
+end;
+
+function TConfigManager.SaveProjectAs(const ANewIniPath: string): Boolean;
+var
+  NewJSONPath: string;
+  INIDir: string;
 begin
   Result := False;
   
-  if not FileExists(INIFilePath) then
+  try
+    // 确保目录存在
+    INIDir := ExtractFilePath(ANewIniPath);
+    if (INIDir <> '') and not EnsureDirectoryExists(INIDir) then
+      Exit;
+    
+    // 设置新的文件路径
+    FINIFilePath := ANewIniPath;
+    NewJSONPath := ChangeFileExt(ANewIniPath, '.json');
+    FJSONFilePath := NewJSONPath;
+    
+    // 更新 INI 文件中的 JSON 路径引用
+    FINIConfig.WriteString(JSON_FILE_SECTION, JSON_FILE_PATH_KEY, ExtractFileName(NewJSONPath));
+    
+    // 保存文件（不创建备份，因为是新文件）
+    FJSONConfig.SaveToFile(FJSONFilePath);
+    FINIConfig.SaveToFile(FINIFilePath);
+    
+    FIsModified := False;
+    Result := True;
+  except
+    on E: Exception do
+      Result := False;
+  end;
+end;
+
+function TConfigManager.SaveProject: Boolean;
+begin
+  Result := False;
+  
+  if FINIFilePath = '' then
     Exit;
   
   try
-    // 加载INI文件
-    FINIFilePath := INIFilePath;
-    FINIConfig.LoadFromFile(FINIFilePath);
+    // 1. 创建备份（如果文件已存在）
+    CreateBackup(FJSONFilePath);
+    CreateBackup(FINIFilePath);
     
-    // 根据INI文件获取JSON文件路径
-    FJSONFilePath := GetJSONPathFromINI(FINIFilePath);
+    // 2. 先保存 JSON 文件
+    FJSONConfig.SaveToFile(FJSONFilePath);
     
-    // 如果JSON路径不是绝对路径，则转换为相对于INI文件的绝对路径
-    if not IsPathDelimiter(FJSONFilePath, 1) and (ExtractFileDrive(FJSONFilePath) = '') then
-      FJSONFilePath := ExtractFilePath(FINIFilePath) + FJSONFilePath;
-    
-    // 加载JSON文件
-    if FileExists(FJSONFilePath) then
-      FJSONConfig.LoadFromFile(FJSONFilePath)
-    else
-      FJSONConfig.Clear; // 如果JSON文件不存在，创建一个空的
+    // 3. 再保存 INI 文件
+    FINIConfig.SaveToFile(FINIFilePath);
     
     FIsModified := False;
     Result := True;
   except
     on E: Exception do
-    begin
-      // 处理异常
       Result := False;
-    end;
   end;
+end;
+
+// 保留旧方法名作为别名，保持向后兼容
+function TConfigManager.SaveToFile: Boolean;
+begin
+  Result := SaveProject;
 end;
 
 function TConfigManager.SaveAsNewFile(const NewINIFilePath: string): Boolean;
-var
-  NewJSONFilePath: string;
 begin
-  // 设置新的INI文件路径
-  FINIFilePath := NewINIFilePath;
-  
-  // 确定新的JSON文件路径
-  NewJSONFilePath := ChangeFileExt(NewINIFilePath, '.json');
-  FJSONFilePath := NewJSONFilePath;
-  
-  // 更新INI文件中的JSON路径
-  FINIConfig.WriteString('json_file', 'file_path', ExtractFileName(NewJSONFilePath));
-  
-  // 保存文件
-  Result := SaveToFile;
-end;
-
-function TConfigManager.SaveToFile: Boolean;
-begin
-  Result := False;
-  
-  try
-    // 保存INI文件
-    FINIConfig.SaveToFile(FINIFilePath);
-    
-    // 保存JSON文件
-    FJSONConfig.SaveToFile(FJSONFilePath);
-    
-    FIsModified := False;
-    Result := True;
-  except
-    on E: Exception do
-    begin
-      // 处理异常
-      Result := False;
-    end;
-  end;
+  Result := SaveProjectAs(NewINIFilePath);
 end;
 
 procedure TConfigManager.SetINIValue(const Section, Key, Value: string);

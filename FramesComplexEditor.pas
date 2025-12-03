@@ -1,23 +1,23 @@
-﻿unit FramesComplexEditor;
+unit FramesComplexEditor;
 
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
+  System.SysUtils, System.Classes, JSONHelpers, Vcl.Controls, Vcl.Forms,
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
    ConfigFrameBase, FrameFontEditor, FrameAIAPIEditor,
   FrameDBEditor, FrameListEditor, FrameObjectEditor, FrameArrayEditor, UtilsTypes;
 
-// 前向声明
+// ǰ������
 type
   TTextEditorFrame = class(TFrame);
   TIntegerEditorFrame = class(TFrame);
   TFloatEditorFrame = class(TFrame);
   TBooleanEditorFrame = class(TFrame);
   TColorEditorFrame = class(TFrame);
-  // 数据库编辑器等类型不需要前向声明，因为已经在uses中引入
+  // ���ݿ�༭�������Ͳ���Ҫǰ����������Ϊ�Ѿ���uses������
 
-// 创建编辑器框架的工厂函数
+// �����༭����ܵĹ�������
 function CreateEditorFrame(AOwner: TComponent; EditorType: TConfigType): TFrame;
 
 implementation
@@ -43,4 +43,4 @@ begin
   end;
 end;
 
-end. 
+end.

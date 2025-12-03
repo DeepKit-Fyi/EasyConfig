@@ -1,361 +1,458 @@
 object FrameVideoEditor: TFrameVideoEditor
   Left = 0
   Top = 0
-  Width = 800
-  Height = 600
-  TabOrder = 0
-  object pnlToolbar: TPanel
+  Width = 640
+  Height = 480
+  object pgcMain: TPageControl
     Left = 0
     Top = 0
-    Width = 800
-    Height = 41
-    Align = alTop
-    TabOrder = 0
-    object btnSave: TButton
-      Left = 693
-      Top = 8
-      Width = 90
-      Height = 25
-      Anchors = [akTop, akRight]
-      Caption = #20445#23384
-      TabOrder = 0
-      OnClick = btnSaveClick
-    end
-  end
-  object pnlMain: TPanel
-    Left = 0
-    Top = 41
-    Width = 800
-    Height = 559
+    Width = 640
+    Height = 480
+    ActivePage = tsCover
     Align = alClient
-    TabOrder = 1
-    object pnlCover: TPanel
-      Left = 1
-      Top = 1
-      Width = 798
-      Height = 48
-      Align = alTop
-      TabOrder = 0
-      object lblCover: TLabel
-        Left = 16
-        Top = 16
-        Width = 52
-        Height = 15
-        Caption = #23553#38754#22270#29255
-      end
-      object edtCover: TEdit
-        Left = 88
-        Top = 13
-        Width = 577
-        Height = 23
+    TabOrder = 0
+    object tsCover: TTabSheet
+      Caption = '封面设置'
+      object pnlCover: TPanel
+        Left = 0
+        Top = 0
+        Width = 632
+        Height = 50
+        Align = alTop
+        BevelOuter = bvNone
         TabOrder = 0
-      end
-      object btnBrowseCover: TButton
-        Left = 683
-        Top = 12
-        Width = 98
-        Height = 25
-        Caption = #27983#35272'...'
-        TabOrder = 1
-        OnClick = btnBrowseCoverClick
-      end
-    end
-    object pnlEnding: TPanel
-      Left = 1
-      Top = 49
-      Width = 798
-      Height = 48
-      Align = alTop
-      TabOrder = 1
-      object lblEnding: TLabel
-        Left = 16
-        Top = 16
-        Width = 52
-        Height = 15
-        Caption = #32467#23614#22270#29255
-      end
-      object edtEnding: TEdit
-        Left = 88
-        Top = 13
-        Width = 577
-        Height = 23
-        TabOrder = 0
-      end
-      object btnBrowseEnding: TButton
-        Left = 683
-        Top = 12
-        Width = 98
-        Height = 25
-        Caption = #27983#35272'...'
-        TabOrder = 1
-        OnClick = btnBrowseEndingClick
-      end
-    end
-    object pnlDirectories: TPanel
-      Left = 1
-      Top = 97
-      Width = 798
-      Height = 96
-      Align = alTop
-      TabOrder = 2
-      object lblBgDirectory: TLabel
-        Left = 16
-        Top = 16
-        Width = 52
-        Height = 15
-        Caption = #32972#26223#30446#24405
-      end
-      object lblAudioDirectory: TLabel
-        Left = 16
-        Top = 56
-        Width = 52
-        Height = 15
-        Caption = #38899#39057#30446#24405
-      end
-      object edtBgDirectory: TEdit
-        Left = 88
-        Top = 13
-        Width = 577
-        Height = 23
-        TabOrder = 0
-      end
-      object btnBrowseBgDir: TButton
-        Left = 683
-        Top = 12
-        Width = 98
-        Height = 25
-        Caption = #27983#35272'...'
-        TabOrder = 1
-        OnClick = btnBrowseBgDirClick
-      end
-      object edtAudioDirectory: TEdit
-        Left = 88
-        Top = 53
-        Width = 577
-        Height = 23
-        TabOrder = 2
-      end
-      object btnBrowseAudioDir: TButton
-        Left = 683
-        Top = 52
-        Width = 98
-        Height = 25
-        Caption = #27983#35272'...'
-        TabOrder = 3
-        OnClick = btnBrowseAudioDirClick
-      end
-    end
-    object pnlSubtitle: TPanel
-      Left = 1
-      Top = 193
-      Width = 798
-      Height = 48
-      Align = alTop
-      TabOrder = 3
-      object lblSubtitleFile: TLabel
-        Left = 16
-        Top = 16
-        Width = 52
-        Height = 15
-        Caption = #23383#24149#25991#20214
-      end
-      object edtSubtitleFile: TEdit
-        Left = 88
-        Top = 13
-        Width = 577
-        Height = 23
-        TabOrder = 0
-      end
-      object btnBrowseSubtitle: TButton
-        Left = 683
-        Top = 12
-        Width = 98
-        Height = 25
-        Caption = #27983#35272'...'
-        TabOrder = 1
-        OnClick = btnBrowseSubtitleClick
-      end
-    end
-    object pgcMain: TPageControl
-      Left = 1
-      Top = 241
-      Width = 798
-      Height = 317
-      ActivePage = tabSettings
-      Align = alClient
-      TabOrder = 4
-      object tabSettings: TTabSheet
-        Caption = #23186#20307#35774#32622
-        object pnlSettings: TPanel
-          Left = 0
-          Top = 0
-          Width = 790
-          Height = 287
-          Align = alClient
+        object lblCover: TLabel
+          Left = 16
+          Top = 16
+          Width = 60
+          Height = 13
+          Caption = '封面图路径:'
+        end
+        object edtCover: TEdit
+          Left = 82
+          Top = 13
+          Width = 471
+          Height = 21
           TabOrder = 0
-          object lblResolution: TLabel
+          OnChange = EditModified
+        end
+        object btnBrowseCover: TButton
+          Left = 559
+          Top = 11
+          Width = 65
+          Height = 25
+          Caption = '浏览...'
+          TabOrder = 1
+          OnClick = btnBrowseCoverClick
+        end
+      end
+      object pnlEnding: TPanel
+        Left = 0
+        Top = 50
+        Width = 632
+        Height = 50
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 1
+        object lblEnding: TLabel
+          Left = 16
+          Top = 16
+          Width = 60
+          Height = 13
+          Caption = '结尾图路径:'
+        end
+        object edtEnding: TEdit
+          Left = 82
+          Top = 13
+          Width = 471
+          Height = 21
+          TabOrder = 0
+          OnChange = EditModified
+        end
+        object btnBrowseEnding: TButton
+          Left = 559
+          Top = 11
+          Width = 65
+          Height = 25
+          Caption = '浏览...'
+          TabOrder = 1
+          OnClick = btnBrowseEndingClick
+        end
+      end
+    end
+    object tsSettings: TTabSheet
+      Caption = '全局设置'
+      ImageIndex = 1
+      object pnlSettings: TPanel
+        Left = 0
+        Top = 0
+        Width = 632
+        Height = 452
+        Align = alClient
+        BevelOuter = bvNone
+        TabOrder = 0
+        object grpDirectories: TGroupBox
+          Left = 16
+          Top = 16
+          Width = 601
+          Height = 161
+          Caption = '资源目录'
+          TabOrder = 0
+          object lblBgDir: TLabel
             Left = 16
-            Top = 24
-            Width = 39
-            Height = 15
-            Caption = #20998#36776#29575
+            Top = 32
+            Width = 60
+            Height = 13
+            Caption = '背景目录:'
           end
-          object lblFormat: TLabel
+          object lblAudioDir: TLabel
             Left = 16
             Top = 72
-            Width = 26
-            Height = 15
-            Caption = #26684#24335
+            Width = 60
+            Height = 13
+            Caption = '音频目录:'
           end
-          object lblQuality: TLabel
+          object lblSubtitleFile: TLabel
             Left = 16
-            Top = 120
-            Width = 26
-            Height = 15
-            Caption = #36136#37327
+            Top = 112
+            Width = 60
+            Height = 13
+            Caption = '字幕文件:'
           end
-          object lblQualityValue: TLabel
-            Left = 336
-            Top = 120
-            Width = 22
-            Height = 15
-            Caption = '80%'
-          end
-          object lblBitrate: TLabel
-            Left = 16
-            Top = 216
-            Width = 52
-            Height = 15
-            Caption = #27604#29305#29575'(kbps)'
-          end
-          object cmbResolution: TComboBox
-            Left = 88
-            Top = 21
-            Width = 233
-            Height = 23
-            Style = csDropDownList
+          object edtBgDir: TEdit
+            Left = 82
+            Top = 29
+            Width = 431
+            Height = 21
             TabOrder = 0
+            OnChange = EditModified
           end
-          object cmbFormat: TComboBox
-            Left = 88
-            Top = 69
-            Width = 233
-            Height = 23
-            Style = csDropDownList
+          object btnBrowseBgDir: TButton
+            Left = 519
+            Top = 27
+            Width = 65
+            Height = 25
+            Caption = '浏览...'
             TabOrder = 1
+            OnClick = btnBrowseBgDirClick
           end
-          object trkQuality: TTrackBar
-            Left = 88
-            Top = 120
-            Width = 233
-            Height = 33
-            Max = 100
+          object edtAudioDir: TEdit
+            Left = 82
+            Top = 69
+            Width = 431
+            Height = 21
             TabOrder = 2
-            OnChange = trkQualityChange
+            OnChange = EditModified
           end
-          object chkAutoAdjustBitrate: TCheckBox
-            Left = 88
-            Top = 176
-            Width = 185
-            Height = 17
-            Caption = #33258#21160#35843#25972#27604#29305#29575
+          object btnBrowseAudioDir: TButton
+            Left = 519
+            Top = 67
+            Width = 65
+            Height = 25
+            Caption = '浏览...'
             TabOrder = 3
-            OnClick = chkAutoAdjustBitrateClick
+            OnClick = btnBrowseAudioDirClick
           end
-          object edtBitrate: TEdit
-            Left = 88
-            Top = 213
-            Width = 121
-            Height = 23
+          object edtSubtitleFile: TEdit
+            Left = 82
+            Top = 109
+            Width = 431
+            Height = 21
             TabOrder = 4
-            Text = '5000'
+            OnChange = EditModified
+          end
+          object btnBrowseSubtitle: TButton
+            Left = 519
+            Top = 107
+            Width = 65
+            Height = 25
+            Caption = '浏览...'
+            TabOrder = 5
+            OnClick = btnBrowseSubtitleClick
           end
         end
-      end
-      object tabClips: TTabSheet
-        Caption = #29255#27573#31649#29702
-        ImageIndex = 1
-        object pnlClips: TPanel
-          Left = 0
-          Top = 0
-          Width = 790
-          Height = 287
-          Align = alClient
-          TabOrder = 0
-          object lvClips: TListView
+        object grpMediaSettings: TGroupBox
+          Left = 16
+          Top = 192
+          Width = 601
+          Height = 137
+          Caption = '媒体设置'
+          TabOrder = 1
+          object lblVideoWidth: TLabel
             Left = 16
-            Top = 16
-            Width = 765
-            Height = 217
-            Columns = <>
-            GridLines = True
-            ReadOnly = True
-            RowSelect = True
+            Top = 32
+            Width = 60
+            Height = 13
+            Caption = '视频宽度:'
+          end
+          object lblVideoHeight: TLabel
+            Left = 16
+            Top = 72
+            Width = 60
+            Height = 13
+            Caption = '视频高度:'
+          end
+          object lblVideoFPS: TLabel
+            Left = 296
+            Top = 32
+            Width = 60
+            Height = 13
+            Caption = '视频帧率:'
+          end
+          object lblBitrate: TLabel
+            Left = 296
+            Top = 72
+            Width = 60
+            Height = 13
+            Caption = '比特率(kbps):'
+          end
+          object edtVideoWidth: TEdit
+            Left = 82
+            Top = 29
+            Width = 121
+            Height = 21
             TabOrder = 0
-            ViewStyle = vsReport
+            Text = '1920'
+            OnChange = EditModified
           end
-          object btnAddClip: TButton
-            Left = 16
-            Top = 248
-            Width = 97
-            Height = 25
-            Caption = #28155#21152#29255#27573
-            TabOrder = 1
-            OnClick = btnAddClipClick
-          end
-          object btnEditClip: TButton
-            Left = 128
-            Top = 248
-            Width = 97
-            Height = 25
-            Caption = #32534#36753#29255#27573
+          object edtVideoHeight: TEdit
+            Left = 82
+            Top = 69
+            Width = 121
+            Height = 21
             TabOrder = 2
-            OnClick = btnEditClipClick
+            Text = '1080'
+            OnChange = EditModified
           end
-          object btnDeleteClip: TButton
-            Left = 240
-            Top = 248
-            Width = 97
-            Height = 25
-            Caption = #21024#38500#29255#27573
+          object edtVideoFPS: TEdit
+            Left = 362
+            Top = 29
+            Width = 121
+            Height = 21
+            TabOrder = 1
+            Text = '30'
+            OnChange = EditModified
+          end
+          object edtBitrate: TEdit
+            Left = 362
+            Top = 69
+            Width = 121
+            Height = 21
             TabOrder = 3
-            OnClick = btnDeleteClipClick
+            Text = '8000'
+            OnChange = EditModified
           end
-          object btnMoveUp: TButton
-            Left = 576
-            Top = 248
+          object cbxHasAudio: TCheckBox
+            Left = 16
+            Top = 104
             Width = 97
-            Height = 25
-            Caption = #19978#31227
+            Height = 17
+            Caption = '包含音频'
+            Checked = True
+            State = cbChecked
             TabOrder = 4
-            OnClick = btnMoveUpClick
-          end
-          object btnMoveDown: TButton
-            Left = 688
-            Top = 248
-            Width = 97
-            Height = 25
-            Caption = #19979#31227
-            TabOrder = 5
-            OnClick = btnMoveDownClick
+            OnClick = EditModified
           end
         end
       end
     end
+    object tsClips: TTabSheet
+      Caption = '片段管理'
+      ImageIndex = 2
+      object lblClips: TLabel
+        Left = 16
+        Top = 16
+        Width = 60
+        Height = 13
+        Caption = '片段列表:'
+      end
+      object lstClips: TListBox
+        Left = 16
+        Top = 35
+        Width = 217
+        Height = 389
+        ItemHeight = 13
+        TabOrder = 0
+        OnClick = lstClipsClick
+      end
+      object pnlClipButtons: TPanel
+        Left = 239
+        Top = 35
+        Width = 98
+        Height = 389
+        BevelOuter = bvNone
+        TabOrder = 1
+        object btnAddClip: TButton
+          Left = 0
+          Top = 0
+          Width = 98
+          Height = 25
+          Caption = '添加片段'
+          TabOrder = 0
+          OnClick = btnAddClipClick
+        end
+        object btnEditClip: TButton
+          Left = 0
+          Top = 31
+          Width = 98
+          Height = 25
+          Caption = '编辑片段'
+          Enabled = False
+          TabOrder = 1
+          OnClick = btnEditClipClick
+        end
+        object btnDeleteClip: TButton
+          Left = 0
+          Top = 62
+          Width = 98
+          Height = 25
+          Caption = '删除片段'
+          Enabled = False
+          TabOrder = 2
+          OnClick = btnDeleteClipClick
+        end
+        object btnMoveUp: TButton
+          Left = 0
+          Top = 124
+          Width = 98
+          Height = 25
+          Caption = '上移'
+          Enabled = False
+          TabOrder = 3
+          OnClick = btnMoveUpClick
+        end
+        object btnMoveDown: TButton
+          Left = 0
+          Top = 155
+          Width = 98
+          Height = 25
+          Caption = '下移'
+          Enabled = False
+          TabOrder = 4
+          OnClick = btnMoveDownClick
+        end
+      end
+      object pnlClipDetails: TPanel
+        Left = 343
+        Top = 35
+        Width = 281
+        Height = 389
+        BevelOuter = bvNone
+        TabOrder = 2
+        Visible = False
+        object lblClipName: TLabel
+          Left = 16
+          Top = 16
+          Width = 60
+          Height = 13
+          Caption = '片段名称:'
+        end
+        object lblClipBackground: TLabel
+          Left = 16
+          Top = 64
+          Width = 60
+          Height = 13
+          Caption = '背景路径:'
+        end
+        object lblClipDuration: TLabel
+          Left = 16
+          Top = 112
+          Width = 60
+          Height = 13
+          Caption = '时长(秒):'
+        end
+        object lblClipAudio: TLabel
+          Left = 16
+          Top = 160
+          Width = 60
+          Height = 13
+          Caption = '音频路径:'
+        end
+        object edtClipName: TEdit
+          Left = 82
+          Top = 13
+          Width = 185
+          Height = 21
+          TabOrder = 0
+        end
+        object edtClipBackground: TEdit
+          Left = 16
+          Top = 83
+          Width = 251
+          Height = 21
+          TabOrder = 1
+        end
+        object btnBrowseClipBg: TButton
+          Left = 192
+          Top = 58
+          Width = 75
+          Height = 21
+          Caption = '浏览...'
+          TabOrder = 2
+          OnClick = btnBrowseClipBgClick
+        end
+        object edtClipDuration: TEdit
+          Left = 82
+          Top = 109
+          Width = 121
+          Height = 21
+          TabOrder = 3
+          Text = '10.0'
+        end
+        object edtClipAudio: TEdit
+          Left = 16
+          Top = 179
+          Width = 251
+          Height = 21
+          TabOrder = 4
+        end
+        object btnBrowseClipAudio: TButton
+          Left = 192
+          Top = 156
+          Width = 75
+          Height = 21
+          Caption = '浏览...'
+          TabOrder = 5
+          OnClick = btnBrowseClipAudioClick
+        end
+        object btnSaveClip: TButton
+          Left = 98
+          Top = 264
+          Width = 75
+          Height = 25
+          Caption = '保存'
+          TabOrder = 6
+          OnClick = btnSaveClipClick
+        end
+        object btnCancelClip: TButton
+          Left = 192
+          Top = 264
+          Width = 75
+          Height = 25
+          Caption = '取消'
+          TabOrder = 7
+          OnClick = btnCancelClipClick
+        end
+      end
+    end
   end
-  object dlgOpenImage: TOpenPictureDialog
-    Left = 408
-    Top = 8
-  end
-  object dlgOpenSub: TOpenDialog
+  object dlgOpenImage: TOpenDialog
     Left = 472
-    Top = 8
+    Top = 64
+  end
+  object dlgOpenAudio: TOpenDialog
+    Left = 392
+    Top = 64
+  end
+  object dlgOpenSubtitle: TOpenDialog
+    Left = 312
+    Top = 64
   end
   object dlgSelectDir: TFileOpenDialog
     FavoriteLinks = <>
     FileTypes = <>
     Options = []
-    Left = 536
-    Top = 8
+    Left = 552
+    Top = 64
   end
 end 

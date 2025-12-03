@@ -1,145 +1,115 @@
-# ConfigBuild 项目 Bug 修复记录
+# 易配 (EasyConfig) Bug修复记录
 
-## 1. ViewBuildConfig.pas 中嵌套过程问题
+---
+
+## 2025-12-02 - FMX 版本适配
+
+### 解决的问题
+
+**1. VCL 依赖问题**
+- 问题: `UtilsTypes.pas` 使用 `Vcl.Graphics` 的 `TColor` 类型，无法在 FMX 中使用
+- 解决: 创建 `UtilsTypesFMX.pas`，使用 `System.UITypes.TAlphaColor` 替代
+
+**2. ConfigManager API 适配**
+- 问题: ViewMainFormFMX 调用了不存在的方法 (`IsLoaded`, `GetSections`, `GetKeys`, `GetValue`, `GetJSONValue`, `Clear`)
+- 解决: 修改为 ConfigManager 实际 API (`GetINISections`, `GetINIKeys`, `GetINIValue`, `FindReferenceObject`, `SaveAsNewFile`)
+
+**3. 缺少函数**
+- 问题: ControllerConfigsFMX 调用了 `GetComplexPropertyTypeName`，ViewMainFormFMX 调用了 `DetectComplexPropertyType`，但这些函数未定义
+- 解决: 在 `UtilsTypesFMX.pas` 中添加这两个函数
+
+**4. TComplexPropertyType 枚举不完整**
+- 问题: 原枚举缺少 cptTextOnBg, cptImageOnBg, cptCaptionOnBg, cptDateTimeRange 等类型
+- 解决: 扩展枚举添加 9 种新类型
+
+**5. JSONHelpers 未加入项目**
+- 问题: ConfigManager/INIConfig/JSONConfig 依赖 JSONHelpers，但未加入 dpr
+- 解决: 在 ConfigBuildFMX.dpr 中添加 JSONHelpers
+
+**6. dproj 缺失 Frame 引用**
+- 问题: `ConfigBuildFMX.dproj` 缺失 FrameSimpleEditorFMX、FrameBgDrawEditorFMX、FrameVideoClipEditorFMX 引用
+- 解决: 在 dproj 文件中添加缺失的 DCCReference 条目
+
+**7. ControllerConfigsFMX 基类名称错误**
+- 问题: 使用了 `TConfigFrameBaseFMX` 但实际基类名为 `TBaseConfigFrameFMX`
+- 解决: 在 ConfigFrameBaseFMX.pas 中添加类型别名 `TConfigFrameBaseFMX = TBaseConfigFrameFMX`
+
+**8. Frame 方法签名不匹配**
+- 问题: Frames 的 `LoadFromJSON(AJSON)` 和 `SaveToJSON: TJSONObject` 签名与基类不匹配
+- 解决: 在基类中添加重载方法支持两种签名
+
+**9. 缺少 BeginUpdate/EndUpdate 方法**
+- 问题: Frame 实现使用了 `BeginUpdate`/`EndUpdate` 但基类未定义
+- 解决: 在 TBaseConfigFrameFMX 中添加这些方法
+
+**10. 缺少全局 JSON 帮助函数**
+- 问题: Frames 使用 `GetJSONString(JSONObj, Key, Default)` 3 参数版本，但未定义
+- 解决: 在 ConfigFrameBaseFMX.pas 中添加全局帮助函数
+
+**11. FrameBgDrawEditorFMX 缺少导入**
+- 问题: 使用了 `StringToAlphaColor`/`AlphaColorToString` 但未导入 UtilsTypesFMX
+- 解决: 添加 UtilsTypesFMX 到 uses 子句
+
+**12. INIConfig 缺少 TConfigType 定义**
+- 问题: `INIConfig.pas` 使用 TConfigType 但未导入任何类型定义模块
+- 解决: 添加 UtilsTypesFMX 到 INIConfig.pas 的 uses 子句
+
+---
+
+## 历史修复记录
+
+### 1. ViewBuildConfig.pas 中嵌套过程问题
 - **问题描述**：嵌套过程 `HandleDBSave` 和 `HandleDBCancel` 导致代码结构不清晰
 - **修复方案**：
-  - 移除嵌套过程，改为创建独立的 `OnDBSave` 和 `OnDBCancel` 方法
-  - 更新 `btnAddDatabaseClick` 方法，将新的事件处理程序链接到 `DBEditor` 实例
-  - 这种修改使代码结构更加清晰，并避免潜在的嵌套过程问题
+  - 将嵌套过程提取为类的私有方法
+  - 添加 `OnDBSave` 和 `OnDBCancel` 事件属性
+  - 更新 `btnAddDatabaseClick` 中的 DBEditor 初始化代码
 
-## 2. ViewMainConfig.pas 中的重复单元导入
-- **问题描述**：在 `uses` 子句中存在重复的单元名称以及拼写错误
-  ```pascal
-  uses
-    ... ViewBuildConfig, ViewBuildConifg;
+### 2. ViewMainConfig.pas 中的重复 uses 问题
+- **问题描述**：`uses` 子句中存在重复且拼写错误的单元引用
+- **修复方案**：删除重复的 `ViewBuildConifg` 引用，保留正确的 `ViewBuildConfig`
+
+### 3. 运行时错误 217 "非法组件注册"
+- **问题描述**：程序启动时出现运行时错误 217
+- **修复方案**：
+  - 将 `Register` 过程限定在设计时使用（`{$IFDEF DESIGNTIME}`）
+  - 移除 `initialization` 节中的 `Register` 调用
+
+### 4. 编译错误：缺少 DesignIntf 单元
+- **问题描述**：编译时提示找不到 `DesignIntf` 单元
+- **修复方案**：将 `Register` 过程限定为设计时编译，避免运行时依赖设计时单元
+
+### 5. ConfigBuild.exe 文件锁定
+- **问题描述**：编译时提示 `Fatal: F2039 Could not create output file 'ConfigBuild.exe'`
+- **修复方案**：使用 PowerShell 命令强制终止进程
+  ```powershell
+  Stop-Process -Name ConfigBuild -Force -ErrorAction SilentlyContinue
   ```
+
+### 6. 结构调整：从 Frame 升级为 Form
+- **问题描述**：ViewBuildConfig 作为 Frame 使用时存在生命周期管理问题
 - **修复方案**：
-  - 删除重复的单元引用
-  - 修正拼写错误，确保只包含正确的单元名称
+  - 将 `TFrame` 更改为 `TForm`
+  - 添加 `FormCreate` 和 `FormDestroy` 事件处理
+  - 更新 `ConfigBuild.dpr` 中的窗体创建代码
+  - 移除 `ViewMainConfig.pas` 相关引用
+
+### 7. 2024-07-11 启动时访问冲突
+- **问题描述**：`Exception EAccessViolation in module ConfigBuild.exe at 00261326 ... Read of address 0000330`
+- **根本原因**：`ViewBuildConfig.pas` 中的 `ClearAllData` 方法在控件初始化前访问 `tvJSON`
+- **修复方案**：
   ```pascal
-  uses
-    ... ViewBuildConfig;
-  ```
-
-## 3. 运行时错误 217（Invalid component registration）
-- **问题描述**：
-  - 程序运行时出现错误 217，表示在运行时尝试注册组件
-  - 问题源于 `ViewBuildConfig.pas` 和 `FrameConfigEditor.pas` 中 `Register` 过程在 `initialization` 部分被调用
-
-- **修复方案**：
-  - 在两个文件中使用条件编译指令，确保 `Register` 过程只在设计时执行：
-    ```pascal
-    {$IFDEF DESIGNTIME}
-    procedure Register;
-    begin
-      RegisterComponents('Custom', [TViewBuildConfigFrame]);
-    end;
-    {$ENDIF}
-    ```
-  - 移除了 `ViewBuildConfig.pas` 中在 `initialization` 部分调用 `Register` 的代码：
-    ```pascal
-    initialization
-      Register; // 移除此行
-    ```
-  - 确保 `FrameConfigEditor.pas` 中的 `Register` 过程也只在设计时可用
-
-## 4. 编译错误：找不到 DesignIntf 单元
-- **问题描述**：
-  - 编译时报错找不到 `DesignIntf` 单元
-  - `FrameConfigEditor.pas` 文件仍然引用了这个设计时单元
-
-- **修复方案**：
-  - 将 `Register` 过程包装在条件编译指令中，仅在设计时包含
-  - 确保运行时不需要使用设计时库
-
-## 5. ConfigBuild.exe 锁定问题
-- **问题描述**：
-  - 编译时出现 `Fatal: F2039 Could not create output file 'ConfigBuild.exe'` 错误
-  - 程序文件被锁定，无法被覆盖
-
-- **修复方案**：
-  - 使用 `Stop-Process -Name ConfigBuild -Force -ErrorAction SilentlyContinue` 命令在编译前强制终止程序
-  - 确保在重新编译前释放文件锁定
-
-## 6. 架构变更: 将 ViewBuildConfig 从 Frame 升级为主窗体
-- **变更描述**：
-  - 原先的架构中 `ViewBuildConfig` 是一个 Frame，被嵌入到 `ViewMainConfig` 中
-  - 这种架构增加了复杂性，并导致一些运行时问题
-
-- **实施方案**：
-  - 将 `TViewBuildConfigFrame` 类改为 `TViewBuildConfig`，并从 `TFrame` 改为继承 `TForm`
-  - 添加 `FormCreate` 和 `FormDestroy` 事件处理方法，替代原来在构造函数中的初始化
-  - 修改 `ConfigBuild.dpr` 项目文件，使用 `TViewBuildConfig` 作为主窗体
-  - 删除了 `ViewMainConfig.pas` 文件，简化了项目结构
-  - 更新了类型注册代码，使其适应新的类名
-
-- **优势**：
-  - 简化了项目架构，减少了组件之间的依赖
-  - 删除了多余的包装层，使代码更加直观和易于维护
-  - 减少了潜在的运行时错误来源
-
-## 2024-07-11 访问违规修复
-
-### 问题描述
-程序启动时出现访问违规错误：
-```
-Exception EAccessViolation in module ConfigBuild.exe at 00261326.
-Access violation at address 00C71326 in module 'ConfigBuild.exe' (offset 261326). Read of address 0000330.
-```
-
-### 原因分析
-通过代码审查确定问题出现在 `ViewBuildConfig.pas` 文件中的 `ClearAllData` 方法。当 `tvJSON` 组件未初始化或其 `Items.Count` 为零时，程序尝试访问 `tvJSON.Items[i]` 会导致访问违规。
-
-这种情况通常在以下场景中发生：
-1. 程序启动过程中，在 `tvJSON` 完全初始化之前调用了 `ClearAllData`
-2. 程序关闭时，在 `tvJSON` 已经被部分销毁后调用了 `ClearAllData`
-3. 当 `tvJSON.Items` 为空但程序仍尝试遍历其项目时
-
-### 修复方法
-在 `ClearAllData` 方法中添加了安全检查，在访问 TreeView 节点之前先验证 `tvJSON` 是否已分配以及是否有节点：
-
-```pascal
-procedure TFrmBuildConfig.ClearAllData;
-var
-  i: Integer;
-  Node: TTreeNode;
-  PropItem: PConfigPropertyItem;
-begin
-  // 添加安全检查
   if not Assigned(tvJSON) or (tvJSON.Items.Count = 0) then Exit;
+  ```
+  清理节点数据后再清空树
 
-  // 首先释放TreeView中所有节点的对象数据
-  for i := 0 to tvJSON.Items.Count - 1 do
-  begin
-    Node := tvJSON.Items[i];
-    if Assigned(Node.Data) then
-    begin
-      PropItem := PConfigPropertyItem(Node.Data);
-      Dispose(PropItem); // 释放对象
-      Node.Data := nil;  // 防止悬挂指针
-    end;
-  end;
+### 8. 2024-07-11 FrameVideoEditor.pas 编译错误
+- **问题描述**：
+  - `[dcc32 Error] FrameVideoEditor.pas(318): E2014 Statement expected, but expression of type 'Boolean' found`
+  - `[dcc32 Fatal Error] ControllerConfigs.pas(86): F2063 Could not compile used unit 'FrameVideoEditor.pas'`
+- **根本原因**：for 循环中缺少 `begin`/`end` 块
+- **修复方案**：在 `SaveToJSON` 和 `ClearClips` 的 for 循环中添加 `begin`/`end`
 
-  // 然后清除所有数据
-  sgINI.RowCount := 1;
-  tvJSON.Items.Clear;
-  Memo1.Clear;
-  Memo2.Clear;
-end;
-```
+---
 
-### 验证结果
-修复后程序可以正常启动和运行，不再出现访问违规错误。
-
-### 附加说明
-建议在程序的其他部分也添加类似的防御性编程，特别是在处理可能为空的对象或集合时，应该始终检查它们是否已经初始化。
-
-## 总结
-通过以上修复，我们解决了程序的主要问题：
-1. 改进了代码结构，消除了嵌套过程
-2. 修正了错误的单元引用
-3. 解决了运行时错误 217，确保组件注册只在设计时执行
-4. 处理了文件锁定问题，确保编译过程顺利完成
-5. 通过重构应用程序架构，简化了项目结构，提高了代码可维护性
-
-这些修复使得程序能够正常编译和运行，不再出现运行时错误。 
+*最后更新: 2025-12-02 23:25*

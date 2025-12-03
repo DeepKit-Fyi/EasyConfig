@@ -1,4 +1,4 @@
-unit FrameBgDrawEditor;
+﻿unit FrameBgDrawEditor;
 
 interface
 
@@ -6,10 +6,10 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.ComCtrls, Vcl.Buttons, Vcl.ExtDlgs, System.JSON, System.Generics.Collections,
-  UtilsTypes;
+  UtilsTypes, System.UITypes, ConfigFrameBase, JSONHelpers;
 
 type
-  // 绘制元素基类
+  // 缁樺埗鍏冪礌鍩虹被
   TDrawElement = class
   private
     FName: string;
@@ -20,19 +20,19 @@ type
   public
     constructor Create; virtual;
     
-    // 绘制元素
+    // 缁樺埗鍏冪礌
     procedure Draw(Canvas: TCanvas); virtual; abstract;
     
-    // 判断点是否在元素内
+    // 鍒ゆ柇鐐规槸鍚﹀湪鍏冪礌鍐?
     function ContainsPoint(X, Y: Integer): Boolean; virtual; abstract;
     
-    // 移动元素
+    // 绉诲姩鍏冪礌
     procedure Move(DX, DY: Integer); virtual;
     
-    // 从JSON加载属性
+    // 浠嶫SON鍔犺浇灞炴€?
     procedure LoadFromJSON(JSON: TJSONObject); virtual;
     
-    // 保存属性到JSON
+    // 淇濆瓨灞炴€у埌JSON
     function SaveToJSON: TJSONObject; virtual;
     
     property Name: string read FName write FName;
@@ -42,7 +42,7 @@ type
     property Selected: Boolean read FSelected write FSelected;
   end;
 
-  // 文本元素
+  // 鏂囨湰鍏冪礌
   TTextElement = class(TDrawElement)
   private
     FText: string;
@@ -61,7 +61,7 @@ type
     property Font: TFont read FFont;
   end;
 
-  // 图片元素
+  // 鍥剧墖鍏冪礌
   TImageElement = class(TDrawElement)
   private
     FImagePath: string;
@@ -87,11 +87,11 @@ type
     property Scale: Double read FScale write FScale;
   end;
 
-  // 字幕元素
+  // 瀛楀箷鍏冪礌
   TCaptionElement = class(TTextElement)
   private
-    FDuration: Double; // 显示时长（秒）
-    FStartTime: Double; // 开始时间点（秒）
+    FDuration: Double; // 鏄剧ず鏃堕暱锛堢锛?
+    FStartTime: Double; // 寮€濮嬫椂闂寸偣锛堢锛?
   public
     constructor Create; override;
     
@@ -102,7 +102,7 @@ type
     property StartTime: Double read FStartTime write FStartTime;
   end;
 
-  // 背景画布组件
+  // 鑳屾櫙鐢诲竷缁勪欢
   TBackgroundCanvas = class(TCustomControl)
   private
     FBackground: TBitmap;
@@ -127,33 +127,33 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     
-    // 添加文本元素
+    // 娣诲姞鏂囨湰鍏冪礌
     function AddTextElement(const Text: string; X, Y: Integer): TTextElement;
     
-    // 添加图片元素
+    // 娣诲姞鍥剧墖鍏冪礌
     function AddImageElement(const ImagePath: string; X, Y: Integer): TImageElement;
     
-    // 添加字幕元素
+    // 娣诲姞瀛楀箷鍏冪礌
     function AddCaptionElement(const Text: string; X, Y: Integer; Duration: Double): TCaptionElement;
     
-    // 删除选中的元素
+    // 鍒犻櫎閫変腑鐨勫厓绱?
     procedure DeleteSelectedElement;
     
-    // 从JSON加载
+    // 浠嶫SON鍔犺浇
     procedure LoadFromJSON(JSON: TJSONObject);
     
-    // 保存到JSON
+    // 淇濆瓨鍒癑SON
     function SaveToJSON: TJSONObject;
     
-    // 设置背景图片
+    // 璁剧疆鑳屾櫙鍥剧墖
     procedure SetBackground(const ImagePath: string);
     
     property BackgroundPath: string read FBackgroundPath;
     property SelectedElement: TDrawElement read FSelectedElement;
   end;
 
-  // 背景图绘制编辑器Frame
-  TFrameBgDrawEditor = class(TFrame)
+  // 鑳屾櫙鍥剧粯鍒剁紪杈戝櫒Frame
+  TFrameBgDrawEditor = class(TBaseConfigFrame)
     pnlToolbar: TPanel;
     btnAddText: TButton;
     btnAddImage: TButton;
@@ -210,25 +210,25 @@ type
     procedure edtStartTimeChange(Sender: TObject);
   private
     FCanvas: TBackgroundCanvas;
-    FCurrentJson: TJSONObject;
-    
-    // 更新界面上的属性控件
+
+    // 鏇存柊鐣岄潰涓婄殑灞炴€ф帶浠?
     procedure UpdatePropertyControls;
-    
-    // 从属性控件更新当前选中的元素
+
+    // 浠庡睘鎬ф帶浠舵洿鏂板綋鍓嶉€変腑鐨勫厓绱?
     procedure UpdateSelectedElement;
-    
-    // 切换属性页面
+
+    // 鍒囨崲灞炴€ч〉闈?
     procedure ShowPropertyPage(ElementType: TClass);
+    
+    procedure CreateControls; override;
+  protected
+    procedure LoadFromJSON; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    
-    // 从JSON加载数据
-    procedure LoadFromJSON(JSON: TJSONObject);
-    
-    // 保存数据到JSON
-    function SaveToJSON: TJSONObject;
+
+    // 淇濆瓨鏁版嵁鍒癑SON
+    procedure SaveToJSON; override;
   end;
 
 implementation
@@ -320,7 +320,7 @@ function TTextElement.ContainsPoint(X, Y: Integer): Boolean;
 var
   TextWidth, TextHeight: Integer;
 begin
-  // 创建临时画布以获取文本尺寸
+  // 鍒涘缓涓存椂鐢诲竷浠ヨ幏鍙栨枃鏈昂瀵?
   var Bitmap := TBitmap.Create;
   try
     Bitmap.Canvas.Font.Assign(FFont);
@@ -441,7 +441,7 @@ begin
       FWidth := 50;
       FHeight := 50;
       
-      // 绘制一个错误标记
+      // 缁樺埗涓€涓敊璇爣璁?
       FImage.Canvas.Brush.Color := clRed;
       FImage.Canvas.FillRect(Rect(0, 0, 50, 50));
       FImage.Canvas.Pen.Color := clBlack;
@@ -573,10 +573,10 @@ procedure TBackgroundCanvas.Paint;
 begin
   inherited;
   
-  // 绘制背景
+  // 缁樺埗鑳屾櫙
   Canvas.Draw(0, 0, FBackground);
   
-  // 绘制元素
+  // 缁樺埗鍏冪礌
   for var Element in FElements do
     Element.Draw(Canvas);
 end;
@@ -646,7 +646,7 @@ begin
   try
     FBackground.LoadFromFile(FBackgroundPath);
     
-    // 调整控件大小以适应背景图片
+    // 璋冩暣鎺т欢澶у皬浠ラ€傚簲鑳屾櫙鍥剧墖
     if not (csDesigning in ComponentState) then
     begin
       Width := FBackground.Width;
@@ -661,7 +661,7 @@ begin
       FBackground.Canvas.FillRect(Rect(0, 0, Width, Height));
       
       FBackground.Canvas.Font.Color := clRed;
-      FBackground.Canvas.TextOut(10, 10, '无法加载背景图片: ' + E.Message);
+      FBackground.Canvas.TextOut(10, 10, '鏃犳硶鍔犺浇鑳屾櫙鍥剧墖: ' + E.Message);
     end;
   end;
 end;
@@ -683,7 +683,7 @@ function TBackgroundCanvas.FindElementAt(X, Y: Integer): TDrawElement;
 begin
   Result := nil;
   
-  // 从后向前遍历（显示顺序从上到下）
+  // 浠庡悗鍚戝墠閬嶅巻锛堟樉绀洪『搴忎粠涓婂埌涓嬶級
   for var I := FElements.Count - 1 downto 0 do
   begin
     var Element := FElements[I];
@@ -702,7 +702,7 @@ begin
   Result.Text := Text;
   Result.X := X;
   Result.Y := Y;
-  Result.Name := '文本_' + IntToStr(FElements.Count + 1);
+  Result.Name := '鏂囨湰_' + IntToStr(FElements.Count + 1);
   
   AddElement(Result);
 end;
@@ -713,7 +713,7 @@ begin
   Result.ImagePath := ImagePath;
   Result.X := X;
   Result.Y := Y;
-  Result.Name := '图片_' + IntToStr(FElements.Count + 1);
+  Result.Name := '鍥剧墖_' + IntToStr(FElements.Count + 1);
   
   AddElement(Result);
 end;
@@ -725,7 +725,7 @@ begin
   Result.X := X;
   Result.Y := Y;
   Result.Duration := Duration;
-  Result.Name := '字幕_' + IntToStr(FElements.Count + 1);
+  Result.Name := '瀛楀箷_' + IntToStr(FElements.Count + 1);
   
   AddElement(Result);
 end;
@@ -749,7 +749,7 @@ var
   Element: TDrawElement;
   ElementType: string;
 begin
-  // 清除现有元素
+  // 娓呴櫎鐜版湁鍏冪礌
   for var E in FElements do
     E.Free;
     
@@ -759,14 +759,14 @@ begin
   if JSON = nil then
     Exit;
     
-  // 加载背景
+  // 鍔犺浇鑳屾櫙
   if JSON.GetValue('background') <> nil then
   begin
     FBackgroundPath := JSON.GetValue<string>('background');
     LoadBackground;
   end;
   
-  // 加载元素
+  // 鍔犺浇鍏冪礌
   if JSON.GetValue('elements') <> nil then
   begin
     ElementsArray := JSON.GetValue<TJSONArray>('elements');
@@ -786,7 +786,7 @@ begin
       else if ElementType = 'caption' then
         Element := TCaptionElement.Create
       else
-        Continue; // 跳过未知元素类型
+        Continue; // 璺宠繃鏈煡鍏冪礌绫诲瀷
         
       Element.LoadFromJSON(ElementObj);
       FElements.Add(Element);
@@ -802,10 +802,10 @@ var
 begin
   Result := TJSONObject.Create;
   
-  // 保存背景
+  // 淇濆瓨鑳屾櫙
   Result.AddPair('background', FBackgroundPath);
   
-  // 保存元素
+  // 淇濆瓨鍏冪礌
   ElementsArray := TJSONArray.Create;
   
   for var Element in FElements do
@@ -826,48 +826,49 @@ end;
 constructor TFrameBgDrawEditor.Create(AOwner: TComponent);
 begin
   inherited;
-  
-  // 创建画布控件
-  FCanvas := TBackgroundCanvas.Create(Self);
-  FCanvas.Parent := pnlCanvas;
-  FCanvas.Align := alClient;
-  
-  // 初始化属性页
-  pgProperties.ActivePage := tsGeneral;
-  
-  // 初始化对话框
-  dlgOpenImage.Filter := '图片文件(*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp';
+  CreateControls;
 end;
 
 destructor TFrameBgDrawEditor.Destroy;
 begin
-  if Assigned(FCurrentJson) then
-    FCurrentJson.Free;
+  if Assigned(JSONObject) then
+    JSONObject.Free;
     
   inherited;
 end;
 
-procedure TFrameBgDrawEditor.LoadFromJSON(JSON: TJSONObject);
+procedure TFrameBgDrawEditor.LoadFromJSON;
 begin
-  if JSON = nil then
+  if JSONObject = nil then
     Exit;
-    
-  // 保存当前JSON
-  if Assigned(FCurrentJson) then
-    FCurrentJson.Free;
-    
-  FCurrentJson := TJSONObject(JSON.Clone);
-  
+
   // 加载到画布
-  FCanvas.LoadFromJSON(JSON);
-  
+  FCanvas.LoadFromJSON(JSONObject);
+
   // 更新界面
   UpdatePropertyControls;
 end;
 
-function TFrameBgDrawEditor.SaveToJSON: TJSONObject;
+procedure TFrameBgDrawEditor.SaveToJSON;
 begin
-  Result := FCanvas.SaveToJSON;
+  if Assigned(JSONObject) then
+    JSONObject.Free;
+    
+  JSONObject := FCanvas.SaveToJSON;
+end;
+
+procedure TFrameBgDrawEditor.CreateControls;
+begin
+  // 创建画布控件
+  FCanvas := TBackgroundCanvas.Create(Self);
+  FCanvas.Parent := pnlCanvas;
+  FCanvas.Align := alClient;
+
+  // 初始化属性页
+  pgProperties.ActivePage := tsGeneral;
+
+  // 初始化对话框
+  dlgOpenImage.Filter := '图片文件(*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp';
 end;
 
 procedure TFrameBgDrawEditor.UpdatePropertyControls;
@@ -879,23 +880,23 @@ begin
   if Element = nil then
   begin
     pgProperties.Visible := False;
-    lblElementProperties.Caption := '未选中元素';
+    lblElementProperties.Caption := '鏈€変腑鍏冪礌';
     Exit;
   end;
   
   pgProperties.Visible := True;
-  lblElementProperties.Caption := '正在编辑: ' + Element.Name;
+  lblElementProperties.Caption := '姝ｅ湪缂栬緫: ' + Element.Name;
   
-  // 更新通用属性
+  // 鏇存柊閫氱敤灞炴€?
   edtElementName.Text := Element.Name;
   edtPositionX.Text := IntToStr(Element.X);
   edtPositionY.Text := IntToStr(Element.Y);
   chkVisible.Checked := Element.Visible;
   
-  // 根据元素类型显示特定属性页
+  // 鏍规嵁鍏冪礌绫诲瀷鏄剧ず鐗瑰畾灞炴€ч〉
   ShowPropertyPage(Element.ClassType);
   
-  // 更新特定属性
+  // 鏇存柊鐗瑰畾灞炴€?
   if Element is TTextElement then
   begin
     var TextElement := TTextElement(Element);
@@ -925,24 +926,24 @@ begin
   if Element = nil then
     Exit;
     
-  // 更新通用属性
+  // 鏇存柊閫氱敤灞炴€?
   Element.Name := edtElementName.Text;
   
   try
     Element.X := StrToInt(edtPositionX.Text);
   except
-    // 忽略无效输入
+    // 蹇界暐鏃犳晥杈撳叆
   end;
   
   try
     Element.Y := StrToInt(edtPositionY.Text);
   except
-    // 忽略无效输入
+    // 蹇界暐鏃犳晥杈撳叆
   end;
   
   Element.Visible := chkVisible.Checked;
   
-  // 更新特定属性
+  // 鏇存柊鐗瑰畾灞炴€?
   if Element is TTextElement then
   begin
     var TextElement := TTextElement(Element);
@@ -955,7 +956,7 @@ begin
     try
       ImageElement.Scale := StrToFloat(edtScale.Text);
     except
-      // 忽略无效输入
+      // 蹇界暐鏃犳晥杈撳叆
     end;
   end;
   
@@ -966,13 +967,13 @@ begin
     try
       CaptionElement.Duration := StrToFloat(edtDuration.Text);
     except
-      // 忽略无效输入
+      // 蹇界暐鏃犳晥杈撳叆
     end;
     
     try
       CaptionElement.StartTime := StrToFloat(edtStartTime.Text);
     except
-      // 忽略无效输入
+      // 蹇界暐鏃犳晥杈撳叆
     end;
   end;
   
@@ -981,15 +982,15 @@ end;
 
 procedure TFrameBgDrawEditor.ShowPropertyPage(ElementType: TClass);
 begin
-  // 先显示通用属性页
+  // 鍏堟樉绀洪€氱敤灞炴€ч〉
   tsGeneral.TabVisible := True;
   
-  // 根据元素类型显示特定属性页
+  // 鏍规嵁鍏冪礌绫诲瀷鏄剧ず鐗瑰畾灞炴€ч〉
   tsTextProps.TabVisible := ElementType.InheritsFrom(TTextElement);
   tsImageProps.TabVisible := ElementType = TImageElement;
   tsCaptionProps.TabVisible := ElementType = TCaptionElement;
   
-  // 设置活动页
+  // 璁剧疆娲诲姩椤?
   if tsTextProps.TabVisible then
     pgProperties.ActivePage := tsTextProps
   else if tsImageProps.TabVisible then
@@ -1037,7 +1038,7 @@ end;
 
 procedure TFrameBgDrawEditor.btnSaveClick(Sender: TObject);
 begin
-  // 保存属性
+  // 淇濆瓨灞炴€?
   UpdateSelectedElement;
 end;
 

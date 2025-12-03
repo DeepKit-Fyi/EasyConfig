@@ -8,11 +8,24 @@ uses
   Vcl.ComCtrls, Vcl.Grids, Vcl.Menus, System.UITypes, System.StrUtils,
   System.JSON, System.IniFiles, Vcl.Buttons, Vcl.ExtDlgs, System.Types,
   System.DateUtils, System.Generics.Collections, ControllerIntf, ModelConfig,
-  ConfigValidator, ValidationDialog, FrameDBEditor, FrameListEditor, FrameObjectEditor,
-  FrameArrayEditor, System.IOUtils, ConfigTypes, FrameFontEditor, FrameAIAPIEditor,
-  UtilsTypes;
+  ValidationDialog, FrameDBEditor, FrameListEditor,
+  FrameArrayEditor, System.IOUtils, FrameFontEditor, FrameAIAPIEditor,
+  UtilsTypes, ControllerConfigs, JSONHelpers;
 
 type
+  TSimplePropertyType = (
+    sptText,     // 文本
+    sptNumber,   // 数字
+    sptRelPath,  // 相对路径
+    sptBoolean,  // 真/假
+    sptDate,     // 日期
+    sptColor,    // 颜色
+    sptTime,     // 时间
+    sptFileName, // 文件名
+    sptFilePath, // 目录+文件
+    sptAbsPath,  // 绝对路径
+    sptIPAddress // IP地址
+  );
 
   TFrmBuildConfig = class(TForm)
     Splitter1: TSplitter;
@@ -21,6 +34,8 @@ type
     Splitter4: TSplitter;
     pnlIni: TPanel;
     pnlJson: TPanel;
+    flpIni: TFlowPanel;
+    flpJson: TFlowPanel;
     pnlLeft: TPanel;
     pnlRigth: TPanel;
     pnlContent: TPanel;
@@ -28,26 +43,21 @@ type
     tsINI: TTabSheet;
     tsJSON: TTabSheet;
     tsEditor: TTabSheet;
-    Panel1: TPanel;
-    sgINI: TStringGrid;
-    Panel2: TPanel;
-    Panel3: TPanel;
-    Splitter5: TSplitter;
-    tvJSON: TTreeView;
+    pnlattribute: TPanel;
     pnlEditing: TPanel;
     edtEditing: TEdit;
     btnUpdate: TButton;
-    Memo1: TMemo;
-    Memo2: TMemo;
+    MeoINI: TMemo;
+    MeoJSON: TMemo;
     Panel4: TPanel;
     btnSave: TButton;
     pnlBottom: TPanel;
-    edtFileName: TEdit;
     btnClose: TButton;
     btnOpenConfig: TButton;
+    btnValidate: TButton;
     btnAddText: TButton;
     btnAddNumber: TButton;
-    btnAddPath: TButton;
+    btnRootPath: TButton;
     btnAddBoolean: TButton;
     btnAddDate: TButton;
     btnAddColor: TButton;
@@ -57,6 +67,11 @@ type
     btnAddList: TButton;
     btnAddObject: TButton;
     btnAddArray: TButton;
+    btnAddAPI: TButton;
+    btnAddRootNode: TButton;
+    btnAddJsonSecurity: TButton;
+    btnAddJsonAI: TButton;
+    btnAddJsonModule: TButton;
     dlgOpenFile: TOpenDialog;
     dlgBrowseDir: TFileOpenDialog;
     dlgSelectColor: TColorDialog;
@@ -83,6 +98,45 @@ type
     MenuItem12: TMenuItem;
     MenuItem13: TMenuItem;
     pnlEditorContent: TPanel;
+    btnAbsPath: TButton;
+    btnSection: TButton;
+    btnEmptyLine: TButton;
+    pcAttribute: TPageControl;
+    tsINIGrid: TTabSheet;
+    sgINI: TStringGrid;
+    tsJSONTree: TTabSheet;
+    Splitter5: TSplitter;
+    tvJSON: TTreeView;
+    btnRePath: TButton;
+    btnSaveConfig: TButton;
+    cbFileName: TComboBox;
+    btnDeleteConfig: TButton;
+    btnNewConfig: TButton;
+    btnList: TButton;
+    btnKey: TButton;
+    btnReg: TButton;
+    btnEMail: TButton;
+    btnUrl: TButton;
+    btnAddDateTimeRange: TButton;
+    btnAddKeyValueDict: TButton;
+    btnAddUrlConfig: TButton;
+    btnAddPermission: TButton;
+    btnAddNetConfig: TButton;
+    btnAddEncrypt: TButton;
+    btnAddGeoLocation: TButton;
+    btnAddMediaSettings: TButton;
+    btnAddChartConfig: TButton;
+    btnAddWorkflow: TButton;
+    btnAddSchedule: TButton;
+    btnAddI18n: TButton;
+    btnAddUnitConversion: TButton;
+    btnAddVersionControl: TButton;
+    btnAddBgDraw: TButton;
+    btnAddTextOnBg: TButton;
+    btnAddImageOnBg: TButton;
+    btnAddCaptionOnBg: TButton;
+    btnAddVideoClip: TButton;
+    btnAddVideo: TButton;
     procedure btnAddTextClick(Sender: TObject);
     procedure btnAddNumberClick(Sender: TObject);
     procedure btnAddPathClick(Sender: TObject);
@@ -105,6 +159,7 @@ type
     procedure btnSaveClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure btnOpenConfigClick(Sender: TObject);
+    procedure btnValidateClick(Sender: TObject);
     procedure sgINIDblClick(Sender: TObject);
     procedure tvJSONDblClick(Sender: TObject);
     procedure tvJSONChange(Sender: TObject; Node: TTreeNode);
@@ -125,6 +180,36 @@ type
     procedure btnAddJsonSecurityClick(Sender: TObject);
     procedure btnAddJsonAIClick(Sender: TObject);
     procedure btnAddJsonModuleClick(Sender: TObject);
+    // 添加分节名事件处理程序
+    procedure btnAddSectionClick(Sender: TObject);
+    // 添加空行事件处理程序
+    procedure btnAddEmptyLineClick(Sender: TObject);
+    // 添加项目根目录按钮事件处理程序
+    procedure btnRootPathClick(Sender: TObject);
+    // 添加根目录文件名按钮事件处理程序
+    procedure btnFileNameClick(Sender: TObject);
+    // 添加绝对路径按钮事件处理程序
+    procedure btnAbsPathClick(Sender: TObject);
+    // 添加根目录相对目录按钮事件处理程序
+    procedure btnRePathClick(Sender: TObject);
+    // 在interface部分的procedures声明区域添加以下声明
+    procedure pcAttributeChange(Sender: TObject);
+    procedure btnEmptyLineClick(Sender: TObject);
+    procedure btnReFileNameClick(Sender: TObject);
+    procedure btnAbsFilenameClick(Sender: TObject);
+    procedure btnSectionClick(Sender: TObject);
+    // 添加新的事件处理程序声明
+    procedure btnSaveConfigClick(Sender: TObject);
+    procedure btnNewConfigClick(Sender: TObject);
+    procedure btnDeleteConfigClick(Sender: TObject);
+    procedure cbFileNameChange(Sender: TObject);
+    procedure btnListClick(Sender: TObject);
+    // 添加新的事件处理程序声明
+    procedure btnKeyClick(Sender: TObject);
+    procedure btnRegClick(Sender: TObject);
+    procedure btnEMailClick(Sender: TObject);
+    procedure btnUrlClick(Sender: TObject);
+    procedure showConfigByTag(Sender: TObject);
   private
     FCurrentIniFile: string;
     FCurrentJsonFile: string;
@@ -132,14 +217,20 @@ type
     FCurrentJsonNode: TTreeNode;
     FCurrentEditNode: TTreeNode; // 当前正在编辑的JSON节点
     FCurrentEditor: TFrame;      // 当前使用的编辑器Frame
+    FConfigListFile: string;     // 配置列表文件路径
+
+    // 安全访问StringGrid单元格的辅助方法
+    function GetGridCell(ACol, ARow: Integer): string;
+    procedure SetGridCell(ACol, ARow: Integer; const Value: string);
+    function IsGridCellEmpty(ACol, ARow: Integer): Boolean;
 
     procedure InitializeFrame;
-    procedure InitializeGridColumns;
     procedure InitializeButtons;
     procedure InitializePopupMenus;
     procedure InitializeDragDrop;
+    procedure ReorganizeButtons;
 
-    procedure AddPropertyToGrid(const Section, PropertyName, PropertyValue: string);
+    procedure AddPropertyToGrid(const PropertyName, PropertyType, PropertyValue: string);
     function AddPropertyToTree(const PropertyName, PropertyType, PropertyValue: string;
       EditorType: TEditorType; ParentNode: TTreeNode = nil): TTreeNode;
 
@@ -162,6 +253,10 @@ type
     function GetPathValue: string;
     function BuildPropertyPath(Node: TTreeNode): string;
 
+    function ValidateConfig: Boolean;
+    function ValidateINIProperty(const Section, Key, Value: string): Boolean;
+    procedure ShowValidationResults;
+
     // 数据库编辑器事件处理
     procedure OnDBSave(Sender: TObject);
     procedure OnDBCancel(Sender: TObject);
@@ -171,208 +266,157 @@ type
     procedure EditorCancelClick(Sender: TObject);
     procedure LoadNodeDataToEditor(Node: TTreeNode; EditorFrame: TFrame);
     procedure SaveEditorDataToNode;
+
+    // 保存和加载配置文件列表
+    procedure SaveConfigList;
+    procedure LoadConfigList;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     procedure LoadConfigFiles(const IniFileName, JsonFileName: string);
     procedure SaveConfigFiles;
+    procedure InitializeGridColumns;
   end;
 
 var
-  MainForm: TFrmBuildConfig;
+  FrmBuildConfig: TFrmBuildConfig;
 
 implementation
 
 {$R *.dfm}
-end;
-
-function ConfigTypeToEditorType(ConfigType: TConfigType): TEditorType;
-begin
-  case ConfigType of
-    ctPlain: Result := etPlain;
-    ctFont: Result := etFont;
-    ctColor: Result := etColor;
-    ctDatabase: Result := etDatabase;
-    ctList: Result := etList;
-    ctObject: Result := etObject;
-    ctArray: Result := etArray;
-    ctAIAPI: Result := etObject; // 映射为对象类型
-  else
-    Result := etPlain; // 默认值
-  end;
-end;
-
-procedure TFrmBuildConfig.tvJSONChange(Sender: TObject; Node: TTreeNode);
-begin
-  if Node <> nil then
-  begin
-    // 更新弹出菜单项状态
-    if Assigned(popupJSON) then
-    begin
-      if Assigned(MenuItem2) then MenuItem2.Enabled := True;  // 编辑属性
-      if Assigned(MenuItem3) then MenuItem3.Enabled := True;  // 重命名属性
-      if Assigned(MenuItem4) then MenuItem4.Enabled := True;  // 删除属性
-    end;
-
-    // 显示属性编辑器
-    ShowPropertyEditor(Node);
-  end
-  else
-  begin
-    // 禁用弹出菜单项
-    if Assigned(popupJSON) then
-    begin
-      if Assigned(MenuItem2) then MenuItem2.Enabled := False;
-      if Assigned(MenuItem3) then MenuItem3.Enabled := False;
-      if Assigned(MenuItem4) then MenuItem4.Enabled := False;
-    end;
-
-    // 隐藏属性编辑器
-    HidePropertyEditor;
-  end;
-end;
-
-procedure TFrmBuildConfig.sgINISelectCell(Sender: TObject; ACol, ARow: Integer;
-  var CanSelect: Boolean);
-begin
-  // 更新按钮状态可用性（通过弹出菜单项实现）
-  var canEdit := (ARow > 0) and (sgINI.Cells[0, ARow] <> '');
-  
-  // 如果菜单项存在，更新其状态
-  if Assigned(popupINI) then
-  begin
-    if Assigned(N2) then N2.Enabled := canEdit;  // 编辑属性
-    if Assigned(N3) then N3.Enabled := canEdit;  // 重命名属性
-    if Assigned(N4) then N4.Enabled := canEdit;  // 删除属性
-  end;
-end;
-
-procedure TFrmBuildConfig.sgINIDragDrop(Sender, Source: TObject; X, Y: Integer);
-var
-  SourceRow, TargetRow: Integer;
-  TempSection, TempKey, TempValue: string;
-  Cell: TGridCoord;
-begin
-  if Source = Sender then
-  begin
-    SourceRow := sgINI.Row;
-    Cell := sgINI.MouseCoord(X, Y);
-    TargetRow := Cell.Y;
-
-    if (SourceRow > 0) and (TargetRow > 0) and (SourceRow <> TargetRow) then
-    begin
-      // 保存源行数据
-      TempSection := sgINI.Cells[0, SourceRow];
-      TempKey := sgINI.Cells[1, SourceRow];
-      TempValue := sgINI.Cells[2, SourceRow];
-
-      // 移动行
-      for var i := SourceRow downto TargetRow + 1 do
-      begin
-        sgINI.Cells[0, i] := sgINI.Cells[0, i - 1];
-        sgINI.Cells[1, i] := sgINI.Cells[1, i - 1];
-        sgINI.Cells[2, i] := sgINI.Cells[2, i - 1];
-        sgINI.Objects[0, i] := sgINI.Objects[0, i - 1];
-      end;
-
-      // 恢复数据到目标行
-      sgINI.Cells[0, TargetRow] := TempSection;
-      sgINI.Cells[1, TargetRow] := TempKey;
-      sgINI.Cells[2, TargetRow] := TempValue;
-
-      UpdateIniMemo;
-    end;
-  end;
-end;
-
-procedure TFrmBuildConfig.sgINIDragOver(Sender, Source: TObject; X, Y: Integer;
-  State: TDragState; var Accept: Boolean);
-begin
-  Accept := Source = Sender;
-end;
-
-procedure TFrmBuildConfig.tvJSONDragDrop(Sender, Source: TObject; X, Y: Integer);
-var
-  SourceNode, TargetNode: TTreeNode;
-  PropItem: PConfigPropertyItem;
-begin
-  if Source = Sender then
-  begin
-    SourceNode := tvJSON.Selected;
-    TargetNode := tvJSON.GetNodeAt(X, Y);
-
-    if (SourceNode <> nil) and (TargetNode <> nil) and (SourceNode <> TargetNode) then
-    begin
-      // 获取源节点数据
-      PropItem := PConfigPropertyItem(SourceNode.Data);
-
-      // 移动节点
-      SourceNode.MoveTo(TargetNode, naAddChild);
-
-      // 更新属性路径
-      if PropItem <> nil then
-      begin
-        PropItem^.PropertyPath := BuildPropertyPath(SourceNode);
-      end;
-
-      UpdateJsonMemo;
-    end;
-  end;
-end;
-
-procedure TFrmBuildConfig.tvJSONDragOver(Sender, Source: TObject; X, Y: Integer;
-  State: TDragState; var Accept: Boolean);
-begin
-  Accept := Source = Sender;
-end;
-
-function TFrmBuildConfig.BuildPropertyPath(Node: TTreeNode): string;
-var
-  Path: string;
-  CurrentNode: TTreeNode;
-begin
-  Path := '';
-  CurrentNode := Node;
-
-  while CurrentNode <> nil do
-  begin
-    if Path <> '' then
-      Path := '.' + Path;
-    Path := CurrentNode.Text + Path;
-    CurrentNode := CurrentNode.Parent;
-  end;
-
-  Result := Path;
-end;
 
 constructor TFrmBuildConfig.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   InitializeFrame;
-  InitializeButtons;
-  InitializePopupMenus;
-  InitializeDragDrop;
+  InitializeValidator;
 end;
 
 destructor TFrmBuildConfig.Destroy;
 begin
   ClearAllData;
+  if Assigned(FValidator) then
+    FValidator.Free;
   inherited;
 end;
 
 procedure TFrmBuildConfig.FormCreate(Sender: TObject);
 begin
-  // 初始化表单
+  // 初始化框架和控件
   InitializeFrame;
-  InitializeButtons;
-  InitializePopupMenus;
-  InitializeDragDrop;
+
+  // 为按钮设置Hint提示
+  btnAddText.Hint := '添加文本类型的属性';
+  btnAddNumber.Hint := '添加数字类型的属性';
+  btnRootPath.Hint := '添加项目根目录路径';
+  btnAddBoolean.Hint := '添加布尔类型(真/假)的属性';
+  btnAddDate.Hint := '添加日期类型的属性';
+  btnAddColor.Hint := '添加颜色类型的属性';
+  btnAddFont.Hint := '添加字体类型的属性';
+  btnAddColorComplex.Hint := '添加复杂颜色类型的属性';
+  btnAddDatabase.Hint := '添加数据库连接配置';
+  btnAddList.Hint := '添加列表类型的属性';
+  btnAddObject.Hint := '添加对象类型的属性';
+  btnAddArray.Hint := '添加数组类型的属性';
+  btnAbsPath.Hint := '添加绝对路径类型的属性';
+  btnRePath.Hint := '添加相对路径类型的属性';
+  btnSection.Hint := '添加分节名，用于分组显示配置项';
+  btnEmptyLine.Hint := '添加空行，用于分隔配置项';
+  btnSaveConfig.Hint := '保存当前配置到选定的文件';
+  btnNewConfig.Hint := '创建新的配置文件';
+  btnDeleteConfig.Hint := '删除当前选定的配置文件';
+
+  // 为新添加的简单属性按钮设置提示信息
+  btnKey.Hint := '添加密码类型的属性，用于存储敏感信息';
+  btnReg.Hint := '添加正则表达式类型的属性，用于验证规则和文本过滤';
+  btnEMail.Hint := '添加邮箱地址类型的属性，用于保存电子邮件联系人';
+  btnUrl.Hint := '添加URL类型的属性，用于保存网络地址和API端点';
+  btnList.Hint := '添加列表类型的属性，用于存储多个相关值';
+
+  // 设置复杂属性按钮的Tag属性
+  btnAddFont.Tag := Integer(cptFont);
+  btnAddColorComplex.Tag := Integer(cptColor);
+  btnAddDatabase.Tag := Integer(cptDatabase);
+  btnAddList.Tag := Integer(cptList);
+  btnAddObject.Tag := Integer(cptObject);
+  btnAddArray.Tag := Integer(cptArray);
+  btnAddAPI.Tag := Integer(cptAPI);
+  btnAddRootNode.Tag := Integer(cptRootNode);
+  btnAddJsonSecurity.Tag := Integer(cptSecurity);
+  btnAddJsonAI.Tag := Integer(cptAI);
+  btnAddJsonModule.Tag := Integer(cptModule);
+
+  // 设置新添加的复杂属性按钮的Tag属性
+  btnAddDateTimeRange.Tag := Integer(cptDateTimeRange);
+  btnAddKeyValueDict.Tag := Integer(cptKeyValueDict);
+  btnAddUrlConfig.Tag := Integer(cptUrlConfig);
+  btnAddPermission.Tag := Integer(cptPermission);
+  btnAddNetConfig.Tag := Integer(cptNetConfig);
+  btnAddEncrypt.Tag := Integer(cptEncrypt);
+  btnAddGeoLocation.Tag := Integer(cptGeoLocation);
+  btnAddMediaSettings.Tag := Integer(cptMediaSettings);
+  btnAddChartConfig.Tag := Integer(cptChartConfig);
+  btnAddWorkflow.Tag := Integer(cptWorkflow);
+  btnAddSchedule.Tag := Integer(cptSchedule);
+  btnAddI18n.Tag := Integer(cptI18n);
+  btnAddUnitConversion.Tag := Integer(cptUnitConversion);
+  btnAddVersionControl.Tag := Integer(cptVersionControl);
+
+  // 设置优先实现的复杂属性按钮的Tag属性
+  btnAddBgDraw.Tag := Integer(cptBgDraw);
+  btnAddTextOnBg.Tag := Integer(cptTextOnBg);
+  btnAddImageOnBg.Tag := Integer(cptImageOnBg);
+  btnAddCaptionOnBg.Tag := Integer(cptCaptionOnBg);
+  btnAddVideoClip.Tag := Integer(cptVideoClip);
+  btnAddVideo.Tag := Integer(cptVideo);
+
+  // 为所有复杂属性按钮添加提示信息
+  btnAddDateTimeRange.Hint := '添加日期时间范围属性，用于设置时间段';
+  btnAddKeyValueDict.Hint := '添加键值对字典，用于存储动态键值集合';
+  btnAddUrlConfig.Hint := '添加URL配置，包含路径、参数等';
+  btnAddPermission.Hint := '添加权限控制设置';
+  btnAddNetConfig.Hint := '添加网络配置属性';
+  btnAddEncrypt.Hint := '添加加密和安全设置';
+  btnAddGeoLocation.Hint := '添加地理位置数据';
+  btnAddMediaSettings.Hint := '添加多媒体设置';
+  btnAddChartConfig.Hint := '添加图表配置';
+  btnAddWorkflow.Hint := '添加工作流定义';
+  btnAddSchedule.Hint := '添加定时任务调度';
+  btnAddI18n.Hint := '添加国际化设置';
+  btnAddUnitConversion.Hint := '添加单位转换配置';
+  btnAddVersionControl.Hint := '添加版本控制设置';
+
+  // 创建验证按钮
+  btnValidate := TButton.Create(Self);
+  btnValidate.Parent := pnlButtons;
+  btnValidate.Left := btnSave.Left + btnSave.Width + 10;
+  btnValidate.Top := btnSave.Top;
+  btnValidate.Width := 75;
+  btnValidate.Height := 25;
+  btnValidate.Caption := '验证';
+  btnValidate.Hint := '验证配置是否符合规则';
+  btnValidate.OnClick := btnValidateClick;
+
+  // 为优先实现的复杂属性按钮添加详细提示
+  btnAddBgDraw.Hint := '在背景图上绘制多种元素';
+  btnAddTextOnBg.Hint := '在背景图上添加文字元素';
+  btnAddImageOnBg.Hint := '在背景图上添加图片元素';
+  btnAddCaptionOnBg.Hint := '在背景图上添加字幕元素';
+  btnAddVideoClip.Hint := '创建视频片段，包含背景、时长、帧率等';
+  btnAddVideo.Hint := '创建完整视频，包含多个片段和全局设置';
+
+  // 加载配置文件列表
+  FConfigListFile := ExtractFilePath(Application.ExeName) + 'ConfigList.ini';
+  LoadConfigList;
 end;
 
 procedure TFrmBuildConfig.FormDestroy(Sender: TObject);
 begin
-  // 清理资源
+  // 保存配置文件列表
+  SaveConfigList;
+
+  // 释放树视图中的所有节点的对象数据
   ClearAllData;
 end;
 
@@ -384,17 +428,43 @@ end;
 
 procedure TFrmBuildConfig.InitializeGridColumns;
 begin
-  // 表格列已在设计时设置
+  // 确保网格正确初始化
+  if not Assigned(sgINI) then Exit;
+
+  try
+    // 初始化StringGrid
+    if sgINI.ColCount < 3 then sgINI.ColCount := 3;
+    if sgINI.RowCount < 2 then sgINI.RowCount := 2;
+
+    // 设置列标题 - 按照需求修改列标题
+    SetGridCell(0, 0, '属性名');
+    SetGridCell(1, 0, '类型');
+    SetGridCell(2, 0, '属性值');
+
+    // 初始化第一行为Json文件名
+    SetGridCell(0, 1, 'Json文件名');
+    SetGridCell(1, 1, '文本');
+    SetGridCell(2, 1, '');
+
+    // 设置列宽度
+    sgINI.ColWidths[0] := 150;
+    sgINI.ColWidths[1] := 60;
+    sgINI.ColWidths[2] := 280;
+  except
+    on E: Exception do
+      OutputDebugString(PChar('Error in InitializeGridColumns: ' + E.Message));
+  end;
 end;
 
 procedure TFrmBuildConfig.InitializeButtons;
 begin
-  // 按钮属性已在设计时设置
+  // 按钮属性和事件已在设计时设置，不需要运行时初始化
 end;
 
 procedure TFrmBuildConfig.InitializePopupMenus;
 begin
-  // 弹出菜单已在设计时设置
+  // 弹出菜单事件处理程序可以在设计时通过Object Inspector设置
+  // 以下是仍需运行时设置的事件处理程序（如果有）
 end;
 
 procedure TFrmBuildConfig.InitializeDragDrop;
@@ -402,15 +472,93 @@ begin
   // 拖放功能已在设计时设置
 end;
 
-procedure TFrmBuildConfig.AddPropertyToGrid(const Section, PropertyName, PropertyValue: string);
+procedure TFrmBuildConfig.ReorganizeButtons;
+begin
+  // 设置各按钮的事件处理程序
+  // 简单属性类型按钮
+  btnAddText.OnClick := btnAddTextClick;
+  btnAddNumber.OnClick := btnAddNumberClick;
+  btnRootPath.OnClick := btnRootPathClick;
+  btnAddBoolean.OnClick := btnAddBooleanClick;
+  btnAddDate.OnClick := btnAddDateClick;
+  btnAddColor.OnClick := btnAddColorClick;
+
+  // 复杂属性类型按钮
+  btnAddFont.OnClick := btnAddFontClick;
+  btnAddColorComplex.OnClick := btnAddColorComplexClick;
+  btnAddDatabase.OnClick := btnAddDatabaseClick;
+  btnAddList.OnClick := btnAddListClick;
+  btnAddObject.OnClick := btnAddObjectClick;
+  btnAddArray.OnClick := btnAddArrayClick;
+
+  // 路径相关按钮
+  btnAbsPath.OnClick := btnAbsPathClick;
+  btnRePath.OnClick := btnRePathClick;
+
+  // 结构控制按钮
+  btnSection.OnClick := btnSectionClick;
+  btnEmptyLine.OnClick := btnEmptyLineClick;
+
+  // 文件操作按钮
+  btnSaveConfig.OnClick := btnSaveConfigClick;
+  btnNewConfig.OnClick := btnNewConfigClick;
+  btnDeleteConfig.OnClick := btnDeleteConfigClick;
+
+  // 新增加的按钮
+  btnKey.OnClick := btnKeyClick;
+  btnReg.OnClick := btnRegClick;
+  btnEMail.OnClick := btnEMailClick;
+  btnUrl.OnClick := btnUrlClick;
+  btnList.OnClick := btnListClick;
+end;
+
+procedure TFrmBuildConfig.AddPropertyToGrid(const PropertyName, PropertyType, PropertyValue: string);
 var
   Row: Integer;
 begin
-  Row := sgINI.RowCount;
-  sgINI.RowCount := Row + 1;
-  sgINI.Cells[0, Row] := Section;
-  sgINI.Cells[1, Row] := PropertyName;
-  sgINI.Cells[2, Row] := PropertyValue;
+  // 确保第一行保留为"Json文件名"
+  if sgINI.RowCount <= 1 then
+  begin
+    sgINI.RowCount := 2; // 确保至少有一行数据行
+  end;
+
+  // 第一行固定为Json文件名
+  SetGridCell(0, 1, 'Json文件名');
+  SetGridCell(1, 1, '文本');
+
+  // 检查是否已有该属性名(从第二行开始检查)
+  var found := False;
+  var foundRow := -1;
+
+  for var i := 2 to sgINI.RowCount - 1 do
+  begin
+    if GetGridCell(0, i) = PropertyName then
+    begin
+      foundRow := i;
+      found := True;
+      break;
+    end;
+  end;
+
+  if found then
+  begin
+    // 如果找到同名属性，更新它
+    Row := foundRow;
+  end
+  else
+  begin
+    // 否则添加新行
+    Row := sgINI.RowCount;
+    sgINI.RowCount := Row + 1;
+  end;
+
+  // 设置单元格值
+  SetGridCell(0, Row, PropertyName);
+  SetGridCell(1, Row, PropertyType);
+  SetGridCell(2, Row, PropertyValue);
+
+  // 更新INI内容显示
+  UpdateIniMemo;
 end;
 
 function TFrmBuildConfig.AddPropertyToTree(const PropertyName, PropertyType, PropertyValue: string;
@@ -460,10 +608,10 @@ begin
   FCurrentIniFile := FileName;
 
   // 清除现有数据
-  sgINI.RowCount := 2;  // 修改为 2，保留固定行和一个空数据行
-  sgINI.Cells[0, 1] := '';
-  sgINI.Cells[1, 1] := '';
-  sgINI.Cells[2, 1] := '';
+  SetGridCell(0, 1, '');
+  SetGridCell(1, 1, '');
+  SetGridCell(2, 1, '');
+  sgINI.RowCount := 2; // 保持初始状态
 
   // 加载INI文件
   IniFile := TIniFile.Create(FileName);
@@ -474,27 +622,30 @@ begin
     // 获取所有节点
     IniFile.ReadSections(Sections);
 
-    // 如果有数据，则清除初始化的空行
+    // 如果有数据则添加到表格
     if Sections.Count > 0 then
+    begin
+      // 清除表格内容，但保留表头和结构
       sgINI.RowCount := 1;
 
-    // 遍历每个节点
-    for i := 0 to Sections.Count - 1 do
-    begin
-      Section := Sections[i];
-      Keys.Clear;
-
-      // 获取节点下的所有键
-      IniFile.ReadSection(Section, Keys);
-
-      // 遍历每个键
-      for j := 0 to Keys.Count - 1 do
+      // 遍历每个节点
+      for i := 0 to Sections.Count - 1 do
       begin
-        Key := Keys[j];
-        Value := IniFile.ReadString(Section, Key, '');
+        Section := Sections[i];
+        Keys.Clear;
 
-        // 添加到网格
-        AddPropertyToGrid(Section, Key, Value);
+        // 获取节点下的所有键
+        IniFile.ReadSection(Section, Keys);
+
+        // 遍历每个键
+        for j := 0 to Keys.Count - 1 do
+        begin
+          Key := Keys[j];
+          Value := IniFile.ReadString(Section, Key, '');
+
+          // 添加到网格
+          AddPropertyToGrid(Section, Key, Value);
+        end;
       end;
     end;
 
@@ -527,11 +678,11 @@ begin
     // 遍历网格中的所有行
     for i := 1 to sgINI.RowCount - 1 do
     begin
-      if (sgINI.Cells[0, i] <> '') and (sgINI.Cells[1, i] <> '') then
+      if not IsGridCellEmpty(0, i) and not IsGridCellEmpty(1, i) then
       begin
-        Section := sgINI.Cells[0, i];
-        Key := sgINI.Cells[1, i];
-        Value := sgINI.Cells[2, i];
+        Section := GetGridCell(0, i);
+        Key := GetGridCell(1, i);
+        Value := GetGridCell(2, i);
 
         // 写入INI文件
         IniFile.WriteString(Section, Key, Value);
@@ -720,11 +871,16 @@ end;
 procedure TFrmBuildConfig.UpdateIniMemo;
 begin
   // 更新INI备忘录的逻辑
-  Memo1.Lines.Clear;
+  MeoINI.Lines.Clear;
+
+  // 添加配置文件头信息
+  MeoINI.Lines.Add('[Config]');
+
+  // 遍历网格中的所有行
   for var i := 1 to sgINI.RowCount - 1 do
   begin
-    if (sgINI.Cells[0, i] <> '') and (sgINI.Cells[1, i] <> '') then
-      Memo1.Lines.Add(Format('%s.%s=%s', [sgINI.Cells[0, i], sgINI.Cells[1, i], sgINI.Cells[2, i]]));
+    if not IsGridCellEmpty(0, i) then
+      MeoINI.Lines.Add(Format('%s=%s', [GetGridCell(0, i), GetGridCell(2, i)]));
   end;
 end;
 
@@ -749,7 +905,7 @@ procedure TFrmBuildConfig.UpdateJsonMemo;
     begin
       // 对象开始
       NodeText := IndentStr + '"' + Node.Text + '": {';
-      Memo2.Lines.Add(NodeText);
+      MeoJSON.Lines.Add(NodeText);
 
       // 处理子节点
       ChildNode := Node.getFirstChild;
@@ -759,19 +915,19 @@ procedure TFrmBuildConfig.UpdateJsonMemo;
 
         // 如果不是最后一个子节点，添加逗号
         if ChildNode.getNextSibling <> nil then
-          Memo2.Lines[Memo2.Lines.Count - 1] := Memo2.Lines[Memo2.Lines.Count - 1] + ',';
+          MeoJSON.Lines[MeoJSON.Lines.Count - 1] := MeoJSON.Lines[MeoJSON.Lines.Count - 1] + ',';
 
         ChildNode := ChildNode.getNextSibling;
       end;
 
       // 对象结束
-      Memo2.Lines.Add(IndentStr + '}');
+      MeoJSON.Lines.Add(IndentStr + '}');
     end
     else if PropItem^.EditorType = etArray then
     begin
       // 数组开始
       NodeText := IndentStr + '"' + Node.Text + '": [';
-      Memo2.Lines.Add(NodeText);
+      MeoJSON.Lines.Add(NodeText);
 
       // 处理子节点
       ChildNode := Node.getFirstChild;
@@ -781,19 +937,19 @@ procedure TFrmBuildConfig.UpdateJsonMemo;
 
         // 如果不是最后一个子节点，添加逗号
         if ChildNode.getNextSibling <> nil then
-          Memo2.Lines[Memo2.Lines.Count - 1] := Memo2.Lines[Memo2.Lines.Count - 1] + ',';
+          MeoJSON.Lines[MeoJSON.Lines.Count - 1] := MeoJSON.Lines[MeoJSON.Lines.Count - 1] + ',';
 
         ChildNode := ChildNode.getNextSibling;
       end;
 
       // 数组结束
-      Memo2.Lines.Add(IndentStr + ']');
+      MeoJSON.Lines.Add(IndentStr + ']');
     end
     else
     begin
       // 简单类型
       NodeText := IndentStr + '"' + Node.Text + '": "' + PropItem^.PropertyValue + '"';
-      Memo2.Lines.Add(NodeText);
+      MeoJSON.Lines.Add(NodeText);
     end;
   end;
 
@@ -801,10 +957,10 @@ var
   RootNode: TTreeNode;
 begin
   // 清除备忘录
-  Memo2.Lines.Clear;
+  MeoJSON.Lines.Clear;
 
   // 添加JSON开始标记
-  Memo2.Lines.Add('{');
+  MeoJSON.Lines.Add('{');
 
   // 遍历树的根节点
   RootNode := tvJSON.Items.GetFirstNode;
@@ -814,22 +970,46 @@ begin
 
     // 如果不是最后一个根节点，添加逗号
     if RootNode.getNextSibling <> nil then
-      Memo2.Lines[Memo2.Lines.Count - 1] := Memo2.Lines[Memo2.Lines.Count - 1] + ',';
+      MeoJSON.Lines[MeoJSON.Lines.Count - 1] := MeoJSON.Lines[MeoJSON.Lines.Count - 1] + ',';
 
     RootNode := RootNode.getNextSibling;
   end;
 
   // 添加JSON结束标记
-  Memo2.Lines.Add('}');
+  MeoJSON.Lines.Add('}');
 end;
 
 procedure TFrmBuildConfig.ClearAllData;
+var
+  i: Integer;
+  Node: TTreeNode;
+  PropItem: PConfigPropertyItem;
 begin
-  // 清除所有数据的逻辑
-  sgINI.RowCount := 1;
+  // 首先释放TreeView中所有节点的对象数据
+  // 添加安全检查
+  if not Assigned(tvJSON) or (tvJSON.Items.Count = 0) then Exit;
+
+  for i := 0 to tvJSON.Items.Count - 1 do
+  begin
+    Node := tvJSON.Items[i];
+    if Assigned(Node.Data) then
+    begin
+      PropItem := PConfigPropertyItem(Node.Data);
+      Dispose(PropItem); // 释放对象
+      Node.Data := nil;  // 防止悬挂指针
+    end;
+  end;
+
+  // 然后清除所有数据
+  // 保持初始行数为2（表头+一行空数据），只清除内容
+  sgINI.RowCount := 2;
+  SetGridCell(0, 1, '');
+  SetGridCell(1, 1, '');
+  SetGridCell(2, 1, '');
+
   tvJSON.Items.Clear;
-  Memo1.Clear;
-  Memo2.Clear;
+  MeoINI.Clear;
+  MeoJSON.Clear;
 end;
 
 function TFrmBuildConfig.GetPropertyInputFromUser(const Caption, Prompt: string; var Value: string): Boolean;
@@ -838,7 +1018,7 @@ begin
   Result := InputQuery(Caption, Prompt, Value);
 end;
 
-function TFrmBuildConfig.GetNewPropertyName(const DefaultName: string): string;
+function TFrmBuildConfig.GetNewPropertyName(const DefaultName: string = ''): string;
 var
   NewName: string;
 begin
@@ -885,7 +1065,6 @@ end;
 procedure TFrmBuildConfig.btnAddTextClick(Sender: TObject);
 var
   PropertyName, PropertyValue: string;
-  Section: string;
 begin
   // 添加文本属性的逻辑
   PropertyName := GetNewPropertyName('Text');
@@ -894,23 +1073,18 @@ begin
   PropertyValue := '';
   if not GetPropertyInputFromUser('文本属性', '请输入文本值:', PropertyValue) then Exit;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'General';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctPlain.' + PropertyName, PropertyValue);
+  AddPropertyToGrid(PropertyName, '文本', PropertyValue);
+end;
 
-  // 更新INI内容显示
-  UpdateIniMemo;
+procedure TFrmBuildConfig.showConfigByTag(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag((Sender as TControl).tag);
 end;
 
 procedure TFrmBuildConfig.btnAddNumberClick(Sender: TObject);
 var
   PropertyName, PropertyValue: string;
-  Section: string;
   Value: Double;
 begin
   // 添加数字属性的逻辑
@@ -931,24 +1105,14 @@ begin
     end;
   end;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'General';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctPlain.' + PropertyName, PropertyValue);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, '数字', PropertyValue);
 end;
 
 procedure TFrmBuildConfig.btnAddPathClick(Sender: TObject);
 var
   PropertyName: string;
   PathValue: string;
-  Section: string;
 begin
   // 添加路径属性的逻辑
   PropertyName := GetNewPropertyName('Path');
@@ -958,61 +1122,30 @@ begin
   PathValue := GetPathValue;
   if PathValue = '' then Exit;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'General';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctPlain.' + PropertyName, PathValue);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, '绝对路径', PathValue);
 end;
 
 procedure TFrmBuildConfig.btnAddBooleanClick(Sender: TObject);
 var
   PropertyName: string;
-  BoolValue: Boolean;
-  Section: string;
   BoolStr: string;
 begin
   // 添加布尔属性的逻辑
   PropertyName := GetNewPropertyName('Boolean');
   if PropertyName = '' then Exit;
 
-  // 默认为False
-  BoolValue := False;
-
-  // 显示选择对话框
-  if MessageDlg('请选择布尔值', mtConfirmation, mbYesNo, 0) = mrYes then
-    BoolValue := True;
-
-  // 转换为字符串
-  if BoolValue then
-    BoolStr := 'True'
-  else
-    BoolStr := 'False';
-
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'General';
+  // 根据需求，用户只能选择真值
+  BoolStr := 'True';
 
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctPlain.' + PropertyName, BoolStr);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, '真/假', BoolStr);
 end;
 
 procedure TFrmBuildConfig.btnAddDateClick(Sender: TObject);
 var
   PropertyName: string;
   DateValue: TDateTime;
-  Section: string;
   DateStr: string;
   DateForm: TForm;
   DatePicker: TDateTimePicker;
@@ -1062,17 +1195,8 @@ begin
       DateValue := DatePicker.Date;
       DateStr := FormatDateTime('yyyy-mm-dd', DateValue);
 
-      // 获取当前选中的节点作为Section
-      if sgINI.RowCount > 1 then
-        Section := sgINI.Cells[0, 1]
-      else
-        Section := 'General';
-
       // 添加到网格
-      AddPropertyToGrid(Section, 'ctPlain.' + PropertyName, DateStr);
-
-      // 更新INI内容显示
-      UpdateIniMemo;
+      AddPropertyToGrid(PropertyName, '日期', DateStr);
     end;
   finally
     DateForm.Free;
@@ -1083,7 +1207,6 @@ procedure TFrmBuildConfig.btnAddColorClick(Sender: TObject);
 var
   PropertyName: string;
   ColorValue: string;
-  Section: string;
 begin
   // 添加颜色属性的逻辑
   PropertyName := GetNewPropertyName('Color');
@@ -1093,23 +1216,13 @@ begin
   ColorValue := GetColorValue;
   if ColorValue = '' then Exit;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'General';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctColor.' + PropertyName, ColorValue);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, '颜色', ColorValue);
 end;
 
 procedure TFrmBuildConfig.btnAddFontClick(Sender: TObject);
 var
   PropertyName: string;
-  Section: string;
   FontDialog: TFontDialog;
   FontStr: string;
 begin
@@ -1138,17 +1251,8 @@ begin
         ColorToString(FontDialog.Font.Color)
       ]);
 
-      // 获取当前选中的节点作为Section
-      if sgINI.RowCount > 1 then
-        Section := sgINI.Cells[0, 1]
-      else
-        Section := 'General';
-
       // 添加到网格
-      AddPropertyToGrid(Section, 'ctFont.' + PropertyName, FontStr);
-
-      // 更新INI内容显示
-      UpdateIniMemo;
+      AddPropertyToGrid(PropertyName, '字体', FontStr);
     end;
   finally
     FontDialog.Free;
@@ -1171,20 +1275,20 @@ begin
 
   // 创建新节点并添加到树中
   Node := AddPropertyToTree(PropertyName, 'TJSONObject', '{"ConnectionString":""}', etDatabase);
-  
+
   // 确保节点被选中
   tvJSON.Selected := Node;
-  
+
   // 切换到编辑器页面并创建编辑器
   PageControl1.ActivePage := tsEditor;
-  
+
   // 清除编辑器内容面板中的所有控件
   while pnlEditorContent.ControlCount > 0 do
     pnlEditorContent.Controls[0].Free;
-  
+
   // 显示编辑器
   ShowEditorForNode(Node);
-  
+
   // 更新JSON视图
   UpdateJsonMemo;
 end;
@@ -1258,7 +1362,7 @@ begin
 
       // 获取当前选中的节点作为Section
       if sgINI.RowCount > 1 then
-        Section := sgINI.Cells[0, 1]
+        Section := GetGridCell(0, 1)
       else
         Section := 'General';
 
@@ -1277,8 +1381,8 @@ begin
         end;
       end;
 
-      // 添加到网格
-      AddPropertyToGrid(Section, 'ctList.' + PropertyName, ListStr);
+      // 添加到网格 - 修正类型转换问题
+      AddPropertyToGrid(Section, 'ConfigType=' + IntToStr(Ord(EditorTypeToConfigType(etList))) + '.' + PropertyName, ListStr);
 
       // 更新INI内容显示
       UpdateIniMemo;
@@ -1293,10 +1397,16 @@ procedure TFrmBuildConfig.btnAddObjectClick(Sender: TObject);
 var
   PropertyName: string;
   Section: string;
-  ObjectEditor: TFrameObjectEditor;
+  // ObjectEditor: TFrameObjectEditor;
   ObjectForm: TForm;
   JSONObj: TJSONObject;
 begin
+  // 由于暂时移除了FrameObjectEditor单元，此功能暂不可用
+  ShowMessage('对象编辑器功能暂时不可用，正在维护中');
+  Exit;
+  
+  // 以下代码暂时注释掉
+  {
   // 添加对象属性的逻辑
   PropertyName := GetNewPropertyName('Object');
   if PropertyName = '' then Exit;
@@ -1355,12 +1465,12 @@ begin
 
       // 获取当前选中的节点作为Section
       if sgINI.RowCount > 1 then
-        Section := sgINI.Cells[0, 1]
+        Section := GetGridCell(0, 1)
       else
         Section := 'General';
 
-      // 添加到网格
-      AddPropertyToGrid(Section, 'ctObject.' + PropertyName, JSONObj.ToString);
+      // 添加到网格 - 修正类型转换问题
+      AddPropertyToGrid(Section, 'ConfigType=' + IntToStr(Ord(EditorTypeToConfigType(etObject))) + '.' + PropertyName, JSONObj.ToString);
 
       // 更新INI内容显示
       UpdateIniMemo;
@@ -1369,6 +1479,7 @@ begin
     JSONObj.Free;
     ObjectForm.Free;
   end;
+  }
 end;
 
 procedure TFrmBuildConfig.btnAddArrayClick(Sender: TObject);
@@ -1439,12 +1550,12 @@ begin
 
       // 获取当前选中的节点作为Section
       if sgINI.RowCount > 1 then
-        Section := sgINI.Cells[0, 1]
+        Section := GetGridCell(0, 1)
       else
         Section := 'General';
 
-      // 添加到网格
-      AddPropertyToGrid(Section, 'ctArray.' + PropertyName, JSONObj.ToString);
+      // 添加到网格 - 修正类型转换问题
+      AddPropertyToGrid(Section, 'ConfigType=' + IntToStr(Ord(EditorTypeToConfigType(etArray))) + '.' + PropertyName, JSONObj.ToString);
 
       // 更新INI内容显示
       UpdateIniMemo;
@@ -1467,9 +1578,9 @@ begin
   if (Row < 1) or (Row >= sgINI.RowCount) then Exit;
 
   // 获取属性类型和值
-  Section := sgINI.Cells[0, Row];
-  Key := sgINI.Cells[1, Row];
-  PropertyValue := sgINI.Cells[2, Row];
+  Section := GetGridCell(0, Row);
+  Key := GetGridCell(1, Row);
+  PropertyValue := GetGridCell(2, Row);
 
   // 根据属性类型显示不同的编辑器
   if Key.StartsWith('ctFont.') then
@@ -1511,7 +1622,7 @@ begin
         ]);
 
         // 更新网格
-        sgINI.Cells[2, Row] := NewValue;
+        SetGridCell(2, Row, NewValue);
 
         // 更新INI内容显示
         UpdateIniMemo;
@@ -1539,7 +1650,7 @@ begin
         NewValue := ColorToString(ColorDialog.Color);
 
         // 更新网格
-        sgINI.Cells[2, Row] := NewValue;
+        SetGridCell(2, Row, NewValue);
 
         // 更新INI内容显示
         UpdateIniMemo;
@@ -1555,7 +1666,7 @@ begin
     if GetPropertyInputFromUser('编辑属性', '请输入新值:', NewValue) then
     begin
       // 更新网格
-      sgINI.Cells[2, Row] := NewValue;
+      SetGridCell(2, Row, NewValue);
 
       // 更新INI内容显示
       UpdateIniMemo;
@@ -1574,16 +1685,16 @@ begin
   if (Row < 1) or (Row >= sgINI.RowCount) then Exit;
 
   // 获取属性信息
-  Section := sgINI.Cells[0, Row];
-  Key := sgINI.Cells[1, Row];
-  Value := sgINI.Cells[2, Row];
+  Section := GetGridCell(0, Row);
+  Key := GetGridCell(1, Row);
+  Value := GetGridCell(2, Row);
 
   // 获取新的键名
   NewKey := Key;
   if GetPropertyInputFromUser('重命名属性', '请输入新的属性名:', NewKey) then
   begin
     // 更新网格
-    sgINI.Cells[1, Row] := NewKey;
+    SetGridCell(1, Row, NewKey);
 
     // 更新INI内容显示
     UpdateIniMemo;
@@ -1593,35 +1704,53 @@ end;
 procedure TFrmBuildConfig.DeleteINIPropertyClick(Sender: TObject);
 var
   RowIndex, i: Integer;
+  PropertyType, PropertyName: string;
 begin
   // 获取当前选中的行
   RowIndex := sgINI.Row;
-  if (RowIndex <= 0) or (RowIndex >= sgINI.RowCount) then
+
+  // 安全检查
+  if (RowIndex <= 1) or (RowIndex >= sgINI.RowCount) then
     Exit;
-  
+
+  // 获取属性类型和名称
+  PropertyType := GetGridCell(1, RowIndex);
+  PropertyName := GetGridCell(0, RowIndex);
+
+  // 如果是分节名，不允许删除
+  if PropertyType = '分节名' then
+  begin
+    ShowMessage('分节名不允许删除');
+    Exit;
+  end;
+
   // 确认删除
-  if MessageDlg('您确定要删除这个属性吗？', mtConfirmation, mbYesNo, 0) = mrYes then
+  if MessageDlg('您确定要删除属性 "' + PropertyName + '" 吗？', mtConfirmation, mbYesNo, 0) = mrYes then
   begin
     // 手动删除行
     for i := RowIndex to sgINI.RowCount - 2 do
     begin
-      sgINI.Cells[0, i] := sgINI.Cells[0, i + 1];
-      sgINI.Cells[1, i] := sgINI.Cells[1, i + 1];
-      sgINI.Cells[2, i] := sgINI.Cells[2, i + 1];
+      SetGridCell(0, i, GetGridCell(0, i + 1));
+      SetGridCell(1, i, GetGridCell(1, i + 1));
+      SetGridCell(2, i, GetGridCell(2, i + 1));
       sgINI.Objects[0, i] := sgINI.Objects[0, i + 1];
     end;
-    
-    // 减少行数
+
+    // 最后一行清空
     if sgINI.RowCount > 2 then
-      sgINI.RowCount := sgINI.RowCount - 1
-    else
     begin
-      // 如果只有一行，清空它
-      sgINI.Cells[0, 1] := '';
-      sgINI.Cells[1, 1] := '';
-      sgINI.Cells[2, 1] := '';
+      SetGridCell(0, sgINI.RowCount - 1, '');
+      SetGridCell(1, sgINI.RowCount - 1, '');
+      SetGridCell(2, sgINI.RowCount - 1, '');
+
+      // 减少行数
+      sgINI.RowCount := sgINI.RowCount - 1;
     end;
-    
+
+    // 确保选择有效行
+    if RowIndex >= sgINI.RowCount then
+      sgINI.Row := sgINI.RowCount - 1;
+
     // 更新INI内容显示
     UpdateIniMemo;
   end;
@@ -1820,7 +1949,7 @@ var
   IniFileName, JsonFileName: string;
 begin
   // 保存按钮点击事件的逻辑
-  if (FCurrentIniFile = '') and (edtFileName.Text = '') then
+  if (FCurrentIniFile = '') and (cbFileName.Text = '') then
   begin
     // 如果没有指定文件名，显示保存对话框
     dlgOpenFile.Filter := 'INI文件 (*.ini)|*.ini|All files (*.*)|*.*';
@@ -1839,7 +1968,13 @@ begin
       // 更新当前文件名
       FCurrentIniFile := IniFileName;
       FCurrentJsonFile := JsonFileName;
-      edtFileName.Text := IniFileName;
+
+      // 添加到ComboBox
+      if cbFileName.Items.IndexOf(IniFileName) < 0 then
+      begin
+        cbFileName.Items.Add(IniFileName);
+        cbFileName.ItemIndex := cbFileName.Items.Count - 1;
+      end;
 
       ShowMessage('配置文件已保存');
     end;
@@ -1848,7 +1983,7 @@ begin
   begin
     // 使用当前文件名保存
     if FCurrentIniFile = '' then
-      FCurrentIniFile := edtFileName.Text;
+      FCurrentIniFile := cbFileName.Text;
 
     JsonFileName := ChangeFileExt(FCurrentIniFile, '.json');
 
@@ -1858,6 +1993,59 @@ begin
 
     ShowMessage('配置文件已保存');
   end;
+end;
+
+procedure TFrmBuildConfig.btnSectionClick(Sender: TObject);
+var
+  CurrentRow: Integer;
+  SectionName: string;
+  i: Integer;
+begin
+  // 获取当前选中的行
+  CurrentRow := sgINI.Row;
+
+  // 如果未选中行或选中第一行，则在最后添加
+  if (CurrentRow <= 1) then
+    CurrentRow := sgINI.RowCount;
+
+  // 获取分节名
+  SectionName := '';
+  if not GetPropertyInputFromUser('分节名', '请输入分节名:', SectionName) then
+    Exit;
+
+  if SectionName = '' then
+  begin
+    ShowMessage('分节名不能为空');
+    Exit;
+  end;
+
+  // 增加一行
+  if CurrentRow >= sgINI.RowCount then
+    sgINI.RowCount := sgINI.RowCount + 1
+  else
+  begin
+    // 增加行数
+    sgINI.RowCount := sgINI.RowCount + 1;
+
+    // 将当前行及以下的所有行下移
+    for i := sgINI.RowCount - 2 downto CurrentRow do
+    begin
+      SetGridCell(0, i + 1, GetGridCell(0, i));
+      SetGridCell(1, i + 1, GetGridCell(1, i));
+      SetGridCell(2, i + 1, GetGridCell(2, i));
+    end;
+  end;
+
+  // 在当前行设置分节名
+  SetGridCell(0, CurrentRow, SectionName);
+  SetGridCell(1, CurrentRow, '分节名');
+  SetGridCell(2, CurrentRow, '--分节--');
+
+  // 选择当前行
+  sgINI.Row := CurrentRow;
+
+  // 更新INI内容显示
+  UpdateIniMemo;
 end;
 
 procedure TFrmBuildConfig.btnCloseClick(Sender: TObject);
@@ -1881,8 +2069,16 @@ begin
     // 加载配置文件
     LoadConfigFiles(IniFileName, JsonFileName);
 
-    // 更新文件名显示
-    edtFileName.Text := IniFileName;
+    // 更新文件名并添加到ComboBox
+    if cbFileName.Items.IndexOf(IniFileName) < 0 then
+    begin
+      cbFileName.Items.Add(IniFileName);
+      SaveConfigList; // 保存配置列表
+    end;
+
+    cbFileName.ItemIndex := cbFileName.Items.IndexOf(IniFileName);
+    FCurrentIniFile := IniFileName;
+    FCurrentJsonFile := JsonFileName;
   end;
 end;
 
@@ -1896,24 +2092,27 @@ procedure TFrmBuildConfig.tvJSONDblClick(Sender: TObject);
 var
   Node: TTreeNode;
   PropItem: PConfigPropertyItem;
+  ConfigType: TConfigType;
 begin
   // 获取当前选中的节点
   Node := tvJSON.Selected;
   if Node = nil then Exit;
-  
+
   PropItem := PConfigPropertyItem(Node.Data);
   if PropItem = nil then Exit;
-  
+
   // 对于复杂类型，切换到编辑器页
-  if PropItem^.EditorType in [etObject, etArray, etDatabase, etList, etAIAPI] then
+  ConfigType := EditorTypeToConfigType(PropItem^.EditorType);
+  if (PropItem^.EditorType in [etObject, etArray, etDatabase, etList]) or
+     (ConfigType = ctAIAPI) then
   begin
     // 切换到编辑器标签页
     PageControl1.ActivePage := tsEditor;
-    
+
     // 清除编辑器内容面板中的所有控件
     while pnlEditorContent.ControlCount > 0 do
       pnlEditorContent.Controls[0].Free;
-    
+
     // 创建并显示相应的编辑器
     ShowEditorForNode(Node);
   end
@@ -1933,7 +2132,7 @@ begin
     var DBForm := DBEditor.Parent;
     while Assigned(DBForm) and not (DBForm is TForm) do
       DBForm := DBForm.Parent;
-      
+
     if DBForm is TForm then
       TForm(DBForm).ModalResult := mrOK;
   end;
@@ -1947,7 +2146,7 @@ begin
     var DBForm := DBEditor.Parent;
     while Assigned(DBForm) and not (DBForm is TForm) do
       DBForm := DBForm.Parent;
-      
+
     if DBForm is TForm then
       TForm(DBForm).ModalResult := mrCancel;
   end;
@@ -1960,48 +2159,38 @@ var
 begin
   // 添加根节点
   PropertyName := '所有属性';
-  
+
   // 添加到树中
   RootNode := AddPropertyToTree(PropertyName, 'TJSONObject', '{}', etObject);
-  
+
   // 展开节点
   if Assigned(RootNode) then
     RootNode.Expand(False);
-    
+
   // 更新JSON内容显示
   UpdateJsonMemo;
 end;
 
 procedure TFrmBuildConfig.btnAddININetworkClick(Sender: TObject);
 var
-  PropertyName, PropertyValue: string;
-  Section: string;
+  PropertyName: string;
+  PropertyValue: string;
 begin
   // 添加网络属性的逻辑
-  PropertyName := GetNewPropertyName('Network');
+  PropertyName := GetNewPropertyName('IP地址');
   if PropertyName = '' then Exit;
 
   PropertyValue := '127.0.0.1';
   if not GetPropertyInputFromUser('网络属性', '请输入IP地址:', PropertyValue) then Exit;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'Network';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctNetwork.' + PropertyName, PropertyValue);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, 'IP地址', PropertyValue);
 end;
 
 procedure TFrmBuildConfig.btnAddINITimeClick(Sender: TObject);
 var
   PropertyName: string;
   PropertyValue: string;
-  Section: string;
 begin
   // 添加时间属性的逻辑
   PropertyName := GetNewPropertyName('Time');
@@ -2010,17 +2199,8 @@ begin
   PropertyValue := FormatDateTime('hh:mm:ss', Now);
   if not GetPropertyInputFromUser('时间属性', '请输入时间 (hh:mm:ss):', PropertyValue) then Exit;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'Time';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctTime.' + PropertyName, PropertyValue);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, '时间', PropertyValue);
 end;
 
 procedure TFrmBuildConfig.btnAddINITemplateClick(Sender: TObject);
@@ -2038,12 +2218,12 @@ begin
 
   // 获取当前选中的节点作为Section
   if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
+    Section := GetGridCell(0, 1)
   else
     Section := 'Template';
 
-  // 添加到网格
-  AddPropertyToGrid(Section, 'ctTemplate.' + PropertyName, PropertyValue);
+  // 添加到网格 - 修正类型转换问题
+  AddPropertyToGrid(Section, 'ConfigType=' + IntToStr(Ord(EditorTypeToConfigType(etPlain))) + '.' + PropertyName, PropertyValue);
 
   // 更新INI内容显示
   UpdateIniMemo;
@@ -2053,7 +2233,6 @@ procedure TFrmBuildConfig.btnAddINIPluginClick(Sender: TObject);
 var
   PropertyName: string;
   PropertyValue: string;
-  Section: string;
 begin
   // 添加插件属性的逻辑
   PropertyName := GetNewPropertyName('Plugin');
@@ -2062,24 +2241,14 @@ begin
   PropertyValue := 'plugins/example.dll';
   if not GetPropertyInputFromUser('插件属性', '请输入插件路径:', PropertyValue) then Exit;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'Plugins';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctPlugin.' + PropertyName, PropertyValue);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, '文件名', PropertyValue);
 end;
 
 procedure TFrmBuildConfig.btnAddINILogClick(Sender: TObject);
 var
   PropertyName: string;
   PropertyValue: string;
-  Section: string;
 begin
   // 添加日志属性的逻辑
   PropertyName := GetNewPropertyName('Log');
@@ -2088,17 +2257,8 @@ begin
   PropertyValue := 'logs/app.log';
   if not GetPropertyInputFromUser('日志属性', '请输入日志路径:', PropertyValue) then Exit;
 
-  // 获取当前选中的节点作为Section
-  if sgINI.RowCount > 1 then
-    Section := sgINI.Cells[0, 1]
-  else
-    Section := 'Logging';
-
   // 添加到网格
-  AddPropertyToGrid(Section, 'ctLog.' + PropertyName, PropertyValue);
-
-  // 更新INI内容显示
-  UpdateIniMemo;
+  AddPropertyToGrid(PropertyName, '相对路径', PropertyValue);
 end;
 
 procedure TFrmBuildConfig.btnAddAPIClick(Sender: TObject);
@@ -2163,7 +2323,7 @@ begin
       // 获取当前选中的节点
       var Node := tvJSON.Selected;
       var PropItem: PConfigPropertyItem;
-      
+
       if Node = nil then
       begin
         // 如果没有选中节点，添加到根
@@ -2180,7 +2340,7 @@ begin
           // 添加到选中节点的同级
           Node := AddPropertyToTree(PropertyName, 'TJSONObject', JSONObj.ToString, etObject, Node.Parent);
       end;
-      
+
       // 更新JSON内容显示
       UpdateJsonMemo;
     end;
@@ -2209,7 +2369,7 @@ begin
 
     // 获取当前选中的节点
     Node := tvJSON.Selected;
-    
+
     if Node = nil then
     begin
       // 如果没有选中节点，添加到根
@@ -2226,7 +2386,7 @@ begin
         // 添加到选中节点的同级
         Node := AddPropertyToTree(PropertyName, 'TJSONObject', SecJSON.ToString, etObject, Node.Parent);
     end;
-    
+
     // 更新JSON内容显示
     UpdateJsonMemo;
   finally
@@ -2253,7 +2413,7 @@ begin
 
     // 获取当前选中的节点
     Node := tvJSON.Selected;
-    
+
     if Node = nil then
     begin
       // 如果没有选中节点，添加到根
@@ -2270,7 +2430,7 @@ begin
         // 添加到选中节点的同级
         Node := AddPropertyToTree(PropertyName, 'TJSONObject', AIJSON.ToString, etObject, Node.Parent);
     end;
-    
+
     // 更新JSON内容显示
     UpdateJsonMemo;
   finally
@@ -2294,7 +2454,7 @@ begin
     ModJSON.AddPair('name', PropertyName);
     ModJSON.AddPair('enabled', TJSONBool.Create(True));
     ModJSON.AddPair('version', '1.0.0');
-    
+
     // 添加依赖数组
     var DepsArray := TJSONArray.Create;
     DepsArray.Add('core');
@@ -2303,7 +2463,7 @@ begin
 
     // 获取当前选中的节点
     Node := tvJSON.Selected;
-    
+
     if Node = nil then
     begin
       // 如果没有选中节点，添加到根
@@ -2320,11 +2480,286 @@ begin
         // 添加到选中节点的同级
         Node := AddPropertyToTree(PropertyName, 'TJSONObject', ModJSON.ToString, etObject, Node.Parent);
     end;
-    
+
     // 更新JSON内容显示
     UpdateJsonMemo;
   finally
     ModJSON.Free;
+  end;
+end;
+
+// 添加分节名事件处理程序
+procedure TFrmBuildConfig.btnAddSectionClick(Sender: TObject);
+begin
+  // 调用已实现的方法，避免代码重复
+  btnSectionClick(Sender);
+end;
+
+// 添加空行事件处理程序
+procedure TFrmBuildConfig.btnAddEmptyLineClick(Sender: TObject);
+var
+  CurrentRow: Integer;
+  EmptyName: string;
+  i: Integer;
+begin
+  // 获取当前选中的行
+  CurrentRow := sgINI.Row;
+
+  // 如果未选中行或选中第一行，则在最后添加
+  if (CurrentRow <= 1) then
+    CurrentRow := sgINI.RowCount;
+
+  // 获取空行名称（可选，也可以自动生成）
+  EmptyName := 'Empty_' + IntToStr(sgINI.RowCount);
+
+  // 增加一行
+  if CurrentRow >= sgINI.RowCount then
+    sgINI.RowCount := sgINI.RowCount + 1
+  else
+  begin
+    // 增加行数
+    sgINI.RowCount := sgINI.RowCount + 1;
+
+    // 将当前行及以下的所有行下移
+    for i := sgINI.RowCount - 2 downto CurrentRow do
+    begin
+      SetGridCell(0, i + 1, GetGridCell(0, i));
+      SetGridCell(1, i + 1, GetGridCell(1, i));
+      SetGridCell(2, i + 1, GetGridCell(2, i));
+    end;
+  end;
+
+  // 在当前行设置空行
+  SetGridCell(0, CurrentRow, EmptyName);
+  SetGridCell(1, CurrentRow, '空行');
+  SetGridCell(2, CurrentRow, '');
+
+  // 选择当前行
+  sgINI.Row := CurrentRow;
+
+  // 更新INI内容显示
+  UpdateIniMemo;
+end;
+
+// 添加项目根目录按钮事件处理程序
+procedure TFrmBuildConfig.btnRootPathClick(Sender: TObject);
+var
+  PropertyName: string;
+  DirValue: string;
+begin
+  // 添加项目根目录属性
+  PropertyName := GetNewPropertyName('RootPath');
+  if PropertyName = '' then Exit;
+
+  // 获取目录
+  DirValue := '';
+
+  // 显示目录选择对话框
+  dlgBrowseDir.Title := '选择项目根目录';
+  dlgBrowseDir.Options := [fdoPickFolders];
+
+  if dlgBrowseDir.Execute then
+  begin
+    DirValue := dlgBrowseDir.FileName;
+    if DirValue <> '' then
+      AddPropertyToGrid(PropertyName, '项目根目录', DirValue);
+  end;
+end;
+
+// 添加根目录文件名按钮事件处理程序
+procedure TFrmBuildConfig.btnFileNameClick(Sender: TObject);
+var
+  PropertyName: string;
+  RootDir, FileName, FullPath: string;
+begin
+  // 添加根目录文件名属性
+  PropertyName := GetNewPropertyName('FileName');
+  if PropertyName = '' then Exit;
+
+  // 获取根目录（如果已经设置）
+  RootDir := '';
+  for var i := 2 to sgINI.RowCount - 1 do
+  begin
+    if GetGridCell(1, i) = '项目根目录' then
+    begin
+      RootDir := GetGridCell(2, i);
+      break;
+    end;
+  end;
+
+  // 如果根目录尚未设置，让用户选择
+  if RootDir = '' then
+  begin
+    dlgBrowseDir.Title := '选择项目根目录';
+    dlgBrowseDir.Options := [fdoPickFolders];
+
+    if dlgBrowseDir.Execute then
+      RootDir := dlgBrowseDir.FileName
+    else
+      Exit;
+  end;
+
+  // 选择文件
+  dlgOpenFile.Title := '选择文件';
+  if RootDir <> '' then
+    dlgOpenFile.DefaultExt := RootDir; // 使用DefaultExt设置初始目录
+  dlgOpenFile.Filter := '所有文件 (*.*)|*.*';
+
+  if dlgOpenFile.Execute then
+  begin
+    FullPath := dlgOpenFile.FileName;
+    FileName := ExtractFileName(FullPath);
+
+    // 添加到网格
+    AddPropertyToGrid(PropertyName, '根目录文件名', FileName);
+  end;
+end;
+
+procedure TFrmBuildConfig.btnListClick(Sender: TObject);
+var
+  PropertyName, PropertyValue: string;
+begin
+  // 添加列表属性的逻辑
+  PropertyName := GetNewPropertyName('List');
+  if PropertyName = '' then Exit;
+
+  PropertyValue := '';
+  if not GetPropertyInputFromUser('列表属性', '请输入列表值（用逗号分隔）:', PropertyValue) then Exit;
+
+  // 添加到网格
+  AddPropertyToGrid(PropertyName, '列表', PropertyValue);
+end;
+
+// 添加绝对路径按钮事件处理程序
+procedure TFrmBuildConfig.btnAbsFilenameClick(Sender: TObject);
+var
+  PropertyName: string;
+  FilePath: string;
+begin
+  // 添加带绝对路径的文件名属性
+  PropertyName := GetNewPropertyName('AbsFileName');
+  if PropertyName = '' then Exit;
+
+  // 选择文件
+  dlgOpenFile.Title := '选择文件';
+  dlgOpenFile.Filter := '所有文件 (*.*)|*.*';
+
+  if dlgOpenFile.Execute then
+  begin
+    FilePath := dlgOpenFile.FileName;
+    if FilePath <> '' then
+      AddPropertyToGrid(PropertyName, '文件路径', FilePath);
+  end;
+end;
+
+procedure TFrmBuildConfig.btnAbsPathClick(Sender: TObject);
+var
+  PropertyName: string;
+  FilePath: string;
+begin
+  // 添加绝对路径属性
+  PropertyName := GetNewPropertyName('AbsPath');
+  if PropertyName = '' then Exit;
+
+  // 选择文件或目录
+  dlgBrowseDir.Title := '选择文件或目录';
+  dlgBrowseDir.Options := []; // 允许选择文件和目录
+
+  if dlgBrowseDir.Execute then
+  begin
+    FilePath := dlgBrowseDir.FileName;
+    if FilePath <> '' then
+      AddPropertyToGrid(PropertyName, '绝对路径', FilePath);
+  end;
+end;
+
+// 添加根目录相对目录按钮事件处理程序
+procedure TFrmBuildConfig.btnReFileNameClick(Sender: TObject);
+var
+  PropertyName: string;
+  FilePath, FileName: string;
+begin
+  // 添加不带路径的文件名属性
+  PropertyName := GetNewPropertyName('FileName');
+  if PropertyName = '' then Exit;
+
+  // 选择文件
+  dlgOpenFile.Title := '选择文件';
+  dlgOpenFile.Filter := '所有文件 (*.*)|*.*';
+
+  if dlgOpenFile.Execute then
+  begin
+    FilePath := dlgOpenFile.FileName;
+    if FilePath <> '' then
+    begin
+      // 提取文件名（不含路径）
+      FileName := ExtractFileName(FilePath);
+
+      // 添加到网格
+      AddPropertyToGrid(PropertyName, '文件名', FileName);
+    end;
+  end;
+end;
+
+procedure TFrmBuildConfig.btnRePathClick(Sender: TObject);
+var
+  PropertyName: string;
+  RootDir, SubDir, RelativePath: string;
+begin
+  // 添加相对目录属性
+  PropertyName := GetNewPropertyName('RePath');
+  if PropertyName = '' then Exit;
+
+  // 获取根目录（如果已经设置）
+  RootDir := '';
+  for var i := 2 to sgINI.RowCount - 1 do
+  begin
+    if GetGridCell(1, i) = '项目根目录' then
+    begin
+      RootDir := GetGridCell(2, i);
+      break;
+    end;
+  end;
+
+  // 如果根目录尚未设置，让用户选择
+  if RootDir = '' then
+  begin
+    dlgBrowseDir.Title := '选择项目根目录';
+    dlgBrowseDir.Options := [fdoPickFolders];
+
+    if dlgBrowseDir.Execute then
+      RootDir := dlgBrowseDir.FileName
+    else
+      Exit;
+
+    // 添加根目录记录
+    AddPropertyToGrid('RootDir', '项目根目录', RootDir);
+  end;
+
+  // 选择子目录
+  dlgBrowseDir.Title := '选择子目录';
+  dlgBrowseDir.Options := [fdoPickFolders];
+  dlgBrowseDir.DefaultFolder := RootDir; // 使用DefaultFolder代替InitialDir
+
+  if dlgBrowseDir.Execute then
+  begin
+    SubDir := dlgBrowseDir.FileName;
+
+    // 计算相对路径
+    if SubDir.StartsWith(RootDir) then
+    begin
+      RelativePath := Copy(SubDir, Length(RootDir) + 1, Length(SubDir));
+      // 去除开头的斜杠或反斜杠
+      if (RelativePath <> '') and ((RelativePath[1] = '/') or (RelativePath[1] = '\')) then
+        RelativePath := Copy(RelativePath, 2, Length(RelativePath));
+
+      // 添加到网格
+      AddPropertyToGrid(PropertyName, '相对目录', RelativePath);
+    end
+    else
+    begin
+      ShowMessage('选择的目录不是项目根目录的子目录！');
+    end;
   end;
 end;
 
@@ -2347,13 +2782,14 @@ var
   EditorFrame: TFrame;
   ButtonPanel: TPanel;
   SaveBtn, CancelBtn: TButton;
+  ConfigType: TConfigType;
 begin
   if Node = nil then Exit;
-  
+
   PropItem := PConfigPropertyItem(Node.Data);
   if PropItem = nil then Exit;
-  
-  // 根据节点类型创建相应的编辑器
+
+  // 根据节点类型创建相应的编辑器 - 修正类型转换问题
   case PropItem^.EditorType of
     etDatabase:
       begin
@@ -2367,27 +2803,34 @@ begin
       end;
     etObject:
       begin
-        EditorFrame := TFrameObjectEditor.Create(Self);
+        // 暂时注释掉，因为FrameObjectEditor单元有编码问题
+        // EditorFrame := TFrameObjectEditor.Create(Self);
+        // 代替措施：显示消息并退出
+        ShowMessage('对象编辑器功能暂时不可用，正在维护中');
+        Exit;
       end;
     etArray:
       begin
         EditorFrame := TFrameArrayEditor.Create(Self);
       end;
-    etAIAPI:
+    else
       begin
-        EditorFrame := TAIAPIEditorFrame.Create(Self);
+        // 处理其他类型，特别是AI API
+        ConfigType := EditorTypeToConfigType(PropItem^.EditorType);
+        if ConfigType = ctAIAPI then
+          EditorFrame := TAIAPIEditorFrame.Create(Self)
+        else
+          Exit; // 非复杂类型不处理
       end;
-  else
-    Exit; // 非复杂类型不处理
   end;
-  
+
   if EditorFrame <> nil then
   begin
     // 设置编辑器位置和属性
     EditorFrame.Parent := pnlEditorContent;
     EditorFrame.Align := alClient;
     EditorFrame.Visible := True;
-    
+
     // 为没有内置保存/取消按钮的编辑器添加按钮面板
     if not (EditorFrame is TFrameDBEditor) then
     begin
@@ -2397,7 +2840,7 @@ begin
       ButtonPanel.Align := alBottom;
       ButtonPanel.Height := 40;
       ButtonPanel.BevelOuter := bvNone;
-      
+
       // 创建保存按钮
       SaveBtn := TButton.Create(Self);
       SaveBtn.Parent := ButtonPanel;
@@ -2407,7 +2850,7 @@ begin
       SaveBtn.Top := 8;
       SaveBtn.Width := 75;
       SaveBtn.OnClick := EditorSaveClick;
-      
+
       // 创建取消按钮
       CancelBtn := TButton.Create(Self);
       CancelBtn.Parent := ButtonPanel;
@@ -2418,10 +2861,10 @@ begin
       CancelBtn.Width := 75;
       CancelBtn.OnClick := EditorCancelClick;
     end;
-    
+
     // 加载节点数据到编辑器
     LoadNodeDataToEditor(Node, EditorFrame);
-    
+
     // 保存当前正在编辑的节点和编辑器
     FCurrentEditNode := Node;
     FCurrentEditor := EditorFrame;
@@ -2434,10 +2877,10 @@ var
   JSONObj: TJSONObject;
 begin
   if (Node = nil) or (EditorFrame = nil) then Exit;
-  
+
   PropItem := PConfigPropertyItem(Node.Data);
   if PropItem = nil then Exit;
-  
+
   try
     // 尝试解析JSON数据
     if PropItem^.PropertyValue <> '' then
@@ -2458,11 +2901,11 @@ begin
             // 加载列表信息
             // TFrameListEditor实现...
           end
-          else if EditorFrame is TFrameObjectEditor then
-          begin
-            // 加载对象信息
-            // TFrameObjectEditor实现...
-          end
+          // // else if EditorFrame is TFrameObjectEditor then
+          // begin
+          //   // 加载对象信息
+          //   // TFrameObjectEditor实现...
+          // end
           else if EditorFrame is TFrameArrayEditor then
           begin
             // 加载数组信息
@@ -2490,10 +2933,10 @@ var
   JSONObj: TJSONObject;
 begin
   if (FCurrentEditor = nil) or (FCurrentEditNode = nil) then Exit;
-  
+
   PropItem := PConfigPropertyItem(FCurrentEditNode.Data);
   if PropItem = nil then Exit;
-  
+
   JSONObj := TJSONObject.Create;
   try
     // 根据编辑器类型保存数据
@@ -2507,7 +2950,7 @@ begin
       // 保存列表信息
       // TFrameListEditor实现...
     end
-    else if FCurrentEditor is TFrameObjectEditor then
+    // else if FCurrentEditor is TFrameObjectEditor then
     begin
       // 保存对象信息
       // TFrameObjectEditor实现...
@@ -2522,13 +2965,13 @@ begin
       // 保存API信息
       // TAIAPIEditorFrame实现...
     end;
-    
+
     // 更新节点数据
     PropItem^.PropertyValue := JSONObj.ToString;
   finally
     JSONObj.Free;
   end;
-  
+
   // 更新JSON视图
   UpdateJsonMemo;
 end;
@@ -2537,15 +2980,15 @@ procedure TFrmBuildConfig.EditorSaveClick(Sender: TObject);
 begin
   // 保存编辑器数据到节点
   SaveEditorDataToNode;
-  
+
   // 清除编辑器内容面板中的所有控件
   while pnlEditorContent.ControlCount > 0 do
     pnlEditorContent.Controls[0].Free;
-  
+
   // 重置当前编辑器和节点
   FCurrentEditor := nil;
   FCurrentEditNode := nil;
-  
+
   // 切回JSON页
   PageControl1.ActivePage := tsJSON;
 end;
@@ -2555,14 +2998,736 @@ begin
   // 清除编辑器内容面板中的所有控件
   while pnlEditorContent.ControlCount > 0 do
     pnlEditorContent.Controls[0].Free;
-  
+
   // 重置当前编辑器和节点
   FCurrentEditor := nil;
   FCurrentEditNode := nil;
-  
+
   // 切回JSON页
   PageControl1.ActivePage := tsJSON;
 end;
 
-end.
+function TFrmBuildConfig.BuildPropertyPath(Node: TTreeNode): string;
+var
+  Path: string;
+  CurrentNode: TTreeNode;
+begin
+  Path := '';
+  CurrentNode := Node;
 
+  // 构建从根到当前节点的路径
+  while CurrentNode <> nil do
+  begin
+    if Path = '' then
+      Path := CurrentNode.Text
+    else
+      Path := CurrentNode.Text + '.' + Path;
+
+    CurrentNode := CurrentNode.Parent;
+  end;
+
+  Result := Path;
+end;
+
+procedure TFrmBuildConfig.btnEmptyLineClick(Sender: TObject);
+begin
+  // 调用已实现的方法，避免代码重复
+  btnAddEmptyLineClick(Sender);
+end;
+
+procedure TFrmBuildConfig.tvJSONChange(Sender: TObject; Node: TTreeNode);
+begin
+  // 当JSON树视图选择更改时的处理
+  if Node = nil then Exit;
+
+  // 可以在这里添加节点选择变更的处理逻辑
+  // 例如：显示节点属性、更新状态等
+end;
+
+procedure TFrmBuildConfig.sgINISelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+  // 当INI网格单元格选择时的处理
+  CanSelect := True; // 允许选择
+
+  // 为选中的行设置右键菜单
+  if ARow > 1 then
+  begin
+    // 启用右键菜单
+    sgINI.PopupMenu := popupINI;
+
+    // 如果是分节名或空行，禁用删除菜单项
+    if (GetGridCell(1, ARow) = '分节名') then
+    begin
+      if Assigned(popupINI) and (popupINI.Items.Count > 2) then
+      begin
+        popupINI.Items[2].Enabled := False; // 禁用删除
+        popupINI.Items[0].Enabled := False; // 禁用编辑
+      end;
+    end
+    else if (GetGridCell(1, ARow) = '空行') then
+    begin
+      if Assigned(popupINI) and (popupINI.Items.Count > 2) then
+      begin
+        popupINI.Items[2].Enabled := True; // 允许删除
+        popupINI.Items[0].Enabled := False; // 禁用编辑
+      end;
+    end
+    else
+    begin
+      if Assigned(popupINI) and (popupINI.Items.Count > 2) then
+      begin
+        popupINI.Items[2].Enabled := True; // 允许删除
+        popupINI.Items[0].Enabled := True; // 允许编辑
+      end;
+    end;
+  end
+  else
+  begin
+    // 第一行不允许右键菜单
+    sgINI.PopupMenu := nil;
+  end;
+
+  // 每次选择单元格后更新INI内容显示
+  UpdateIniMemo;
+end;
+
+procedure TFrmBuildConfig.sgINIDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  DropRow: Integer;
+  TempCells: array[0..2] of string;
+begin
+  // 获取放置位置的行号
+  DropRow := sgINI.MouseCoord(X, Y).Y;
+
+  // 确保拖放到有效行
+  if (DropRow > 0) and (DropRow < sgINI.RowCount) and (sgINI.Row > 0) and (sgINI.Row < sgINI.RowCount) then
+  begin
+    // 源行和目标行不同时才进行处理
+    if DropRow <> sgINI.Row then
+    begin
+      // 保存被拖动行的数据
+      TempCells[0] := GetGridCell(0, sgINI.Row);
+      TempCells[1] := GetGridCell(1, sgINI.Row);
+      TempCells[2] := GetGridCell(2, sgINI.Row);
+
+      // 移动数据，先删除拖动行，再插入到目标位置
+      if DropRow > sgINI.Row then
+      begin
+        // 向下移动
+        for var i := sgINI.Row to DropRow - 1 do
+        begin
+          SetGridCell(0, i, GetGridCell(0, i + 1));
+          SetGridCell(1, i, GetGridCell(1, i + 1));
+          SetGridCell(2, i, GetGridCell(2, i + 1));
+        end;
+      end
+      else
+      begin
+        // 向上移动
+        for var i := sgINI.Row downto DropRow + 1 do
+        begin
+          SetGridCell(0, i, GetGridCell(0, i - 1));
+          SetGridCell(1, i, GetGridCell(1, i - 1));
+          SetGridCell(2, i, GetGridCell(2, i - 1));
+        end;
+      end;
+
+      // 在目标位置插入数据
+      SetGridCell(0, DropRow, TempCells[0]);
+      SetGridCell(1, DropRow, TempCells[1]);
+      SetGridCell(2, DropRow, TempCells[2]);
+
+      // 选择目标行
+      sgINI.Row := DropRow;
+
+      // 更新INI内容显示
+      UpdateIniMemo;
+    end;
+  end;
+end;
+
+procedure TFrmBuildConfig.sgINIDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+  // INI网格拖动经过时的处理
+  Accept := (Source = sgINI) and (Y > sgINI.RowHeights[0]); // 只接受从自己拖过来的，且不是表头行
+end;
+
+procedure TFrmBuildConfig.tvJSONDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  SourceNode, TargetNode: TTreeNode;
+  SourceData, TargetData: PConfigPropertyItem;
+  PointPos: TPoint;
+begin
+  if Source <> tvJSON then Exit;
+
+  // 获取拖动源节点和目标节点
+  SourceNode := tvJSON.Selected;
+  if SourceNode = nil then Exit;
+
+  PointPos := tvJSON.ScreenToClient(Point(X, Y));
+  TargetNode := tvJSON.GetNodeAt(PointPos.X, PointPos.Y);
+
+  // 确保有效的目标节点
+  if (TargetNode = nil) or (TargetNode = SourceNode) or TargetNode.HasAsParent(SourceNode) then Exit;
+
+  // 获取节点数据
+  SourceData := PConfigPropertyItem(SourceNode.Data);
+  if TargetNode <> nil then
+    TargetData := PConfigPropertyItem(TargetNode.Data)
+  else
+    TargetData := nil;
+
+  // 只允许将节点移动到对象类型的节点下
+  if (TargetData <> nil) and (TargetData^.EditorType <> etObject) and (TargetData^.EditorType <> etArray) then Exit;
+
+  // 移动节点
+  SourceNode.MoveTo(TargetNode, naAddChild);
+
+  // 更新节点路径
+  SourceData^.PropertyPath := BuildPropertyPath(SourceNode);
+
+  // 更新所有子节点的路径
+  for var i := 0 to SourceNode.Count - 1 do
+  begin
+    var ChildData := PConfigPropertyItem(SourceNode.Item[i].Data);
+    if ChildData <> nil then
+      ChildData^.PropertyPath := BuildPropertyPath(SourceNode.Item[i]);
+  end;
+
+  // 展开目标节点
+  if TargetNode <> nil then
+    TargetNode.Expand(False);
+
+  // 更新JSON内容显示
+  UpdateJsonMemo;
+end;
+
+procedure TFrmBuildConfig.tvJSONDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+var
+  TargetNode: TTreeNode;
+  TargetData: PConfigPropertyItem;
+  PointPos: TPoint;
+begin
+  Accept := False;
+
+  // 只接受从自己拖过来的
+  if Source <> tvJSON then Exit;
+
+  // 获取鼠标位置的节点
+  PointPos := tvJSON.ScreenToClient(Point(X, Y));
+  TargetNode := tvJSON.GetNodeAt(PointPos.X, PointPos.Y);
+
+  // 如果没有目标节点，允许拖放（拖到根）
+  if TargetNode = nil then
+  begin
+    Accept := True;
+    Exit;
+  end;
+
+  // 获取目标节点数据
+  TargetData := PConfigPropertyItem(TargetNode.Data);
+  if TargetData = nil then Exit;
+
+  // 只允许拖放到对象或数组类型节点上
+  Accept := (TargetData^.EditorType = etObject) or (TargetData^.EditorType = etArray);
+end;
+
+function TFrmBuildConfig.GetGridCell(ACol, ARow: Integer): string;
+begin
+  Result := '';
+  try
+    if Assigned(sgINI) and (ACol >= 0) and (ARow >= 0) and
+       (ACol < sgINI.ColCount) and (ARow < sgINI.RowCount) then
+      Result := sgINI.Rows[ARow][ACol];
+  except
+    on E: Exception do
+      OutputDebugString(PChar('Error in GetGridCell: ' + E.Message));
+  end;
+end;
+
+procedure TFrmBuildConfig.SetGridCell(ACol, ARow: Integer; const Value: string);
+begin
+  try
+    if Assigned(sgINI) and (ACol >= 0) and (ARow >= 0) and
+       (ACol < sgINI.ColCount) and (ARow < sgINI.RowCount) then
+      sgINI.Rows[ARow][ACol] := Value;
+  except
+    on E: Exception do
+      OutputDebugString(PChar('Error in SetGridCell: ' + E.Message));
+  end;
+end;
+
+function TFrmBuildConfig.IsGridCellEmpty(ACol, ARow: Integer): Boolean;
+begin
+  Result := True;
+  try
+    if Assigned(sgINI) and (ACol >= 0) and (ARow >= 0) and
+       (ACol < sgINI.ColCount) and (ARow < sgINI.RowCount) then
+      Result := sgINI.Rows[ARow][ACol] = '';
+  except
+    on E: Exception do
+      OutputDebugString(PChar('Error in IsGridCellEmpty: ' + E.Message));
+  end;
+end;
+
+// 在implementation部分添加方法实现
+procedure TFrmBuildConfig.pcAttributeChange(Sender: TObject);
+begin
+  // 根据当前活动标签页控制面板可见性和主标签页
+  if pcAttribute.ActivePage = tsINIGrid then
+  begin
+    // 当INI表格标签页激活时，显示INI面板，隐藏JSON面板
+    pnlIni.Visible := True;
+    pnlJson.Visible := False;
+
+    // 同步显示INI主标签页
+    if PageControl1.ActivePage <> tsINI then
+      PageControl1.ActivePage := tsINI;
+  end
+  else if pcAttribute.ActivePage = tsJSONTree then
+  begin
+    // 当JSON树标签页激活时，显示JSON面板，隐藏INI面板
+    pnlIni.Visible := False;
+    pnlJson.Visible := True;
+
+    // 同步显示JSON主标签页
+    if PageControl1.ActivePage <> tsJSON then
+      PageControl1.ActivePage := tsJSON;
+  end;
+end;
+
+// 新增：保存配置列表到文件
+procedure TFrmBuildConfig.SaveConfigList;
+var
+  FileList: TStringList;
+  i: Integer;
+begin
+  // 创建字符串列表
+  FileList := TStringList.Create;
+  try
+    // 添加ComboBox中的所有项目
+    for i := 0 to cbFileName.Items.Count - 1 do
+      FileList.Add(cbFileName.Items[i]);
+
+    // 保存到文件
+    try
+      FileList.SaveToFile(FConfigListFile);
+    except
+      on E: Exception do
+        ShowMessage('保存配置列表失败: ' + E.Message);
+    end;
+  finally
+    FileList.Free;
+  end;
+end;
+
+// 新增：从文件加载配置列表
+procedure TFrmBuildConfig.LoadConfigList;
+var
+  FileList: TStringList;
+begin
+  // 只有当文件存在时才加载
+  if not FileExists(FConfigListFile) then
+    Exit;
+
+  // 创建字符串列表
+  FileList := TStringList.Create;
+  try
+    // 从文件加载
+    try
+      FileList.LoadFromFile(FConfigListFile);
+
+      // 清除当前项目并添加加载的项目
+      cbFileName.Items.Clear;
+      cbFileName.Items.AddStrings(FileList);
+
+      // 如果有项目，选择第一个
+      if cbFileName.Items.Count > 0 then
+      begin
+        cbFileName.ItemIndex := 0;
+        cbFileNameChange(nil);
+      end;
+    except
+      on E: Exception do
+        ShowMessage('加载配置列表失败: ' + E.Message);
+    end;
+  finally
+    FileList.Free;
+  end;
+end;
+
+// 新增：ComboBox项目改变时的处理
+procedure TFrmBuildConfig.cbFileNameChange(Sender: TObject);
+var
+  IniFileName, JsonFileName: string;
+begin
+  // 确保有选中的项目
+  if cbFileName.ItemIndex < 0 then
+    Exit;
+
+  // 获取选中的文件名
+  IniFileName := cbFileName.Items[cbFileName.ItemIndex];
+
+  // 确保文件存在
+  if not FileExists(IniFileName) then
+  begin
+    ShowMessage('文件不存在: ' + IniFileName);
+    Exit;
+  end;
+
+  // 生成对应的JSON文件名
+  JsonFileName := ChangeFileExt(IniFileName, '.json');
+
+  // 加载配置文件
+  LoadConfigFiles(IniFileName, JsonFileName);
+
+  // 更新当前文件名
+  FCurrentIniFile := IniFileName;
+  FCurrentJsonFile := JsonFileName;
+end;
+
+// 新增：保存配置到选定文件
+procedure TFrmBuildConfig.btnSaveConfigClick(Sender: TObject);
+var
+  IniFileName, JsonFileName: string;
+begin
+  // 确保有选中的项目
+  if cbFileName.ItemIndex < 0 then
+  begin
+    ShowMessage('请先选择一个配置文件或创建新的配置文件');
+    Exit;
+  end;
+
+  // 获取选中的文件名
+  IniFileName := cbFileName.Items[cbFileName.ItemIndex];
+  JsonFileName := ChangeFileExt(IniFileName, '.json');
+
+  // 保存文件
+  try
+    SaveIniFile(IniFileName);
+    SaveJsonFile(JsonFileName);
+
+    // 更新当前文件名
+    FCurrentIniFile := IniFileName;
+    FCurrentJsonFile := JsonFileName;
+
+    ShowMessage('配置已保存到: ' + IniFileName);
+  except
+    on E: Exception do
+      ShowMessage('保存配置失败: ' + E.Message);
+  end;
+end;
+
+// 新增：创建新的配置文件
+procedure TFrmBuildConfig.btnNewConfigClick(Sender: TObject);
+var
+  IniFileName, JsonFileName: string;
+begin
+  // 打开保存对话框
+  dlgOpenFile.Filter := 'INI文件 (*.ini)|*.ini|所有文件 (*.*)|*.*';
+  dlgOpenFile.Title := '创建新配置文件';
+  dlgOpenFile.DefaultExt := 'ini';
+  dlgOpenFile.Options := dlgOpenFile.Options + [ofOverwritePrompt];
+
+  if dlgOpenFile.Execute then
+  begin
+    // 获取文件名
+    IniFileName := dlgOpenFile.FileName;
+    JsonFileName := ChangeFileExt(IniFileName, '.json');
+
+    // 清除当前数据
+    ClearAllData;
+
+    // 尝试创建并保存空文件
+    try
+      // 创建INI文件，添加默认内容
+      with TIniFile.Create(IniFileName) do
+      try
+        WriteString('General', 'Created', FormatDateTime('yyyy-mm-dd hh:nn:ss', Now));
+      finally
+        Free;
+      end;
+
+      // 创建JSON文件，添加默认内容
+      with TStringList.Create do
+      try
+        Text := '{}';
+        SaveToFile(JsonFileName);
+      finally
+        Free;
+      end;
+
+      // 更新当前文件名
+      FCurrentIniFile := IniFileName;
+      FCurrentJsonFile := JsonFileName;
+
+      // 如果ComboBox中不存在该文件名，则添加
+      if cbFileName.Items.IndexOf(IniFileName) < 0 then
+      begin
+        cbFileName.Items.Add(IniFileName);
+        // 保存配置列表
+        SaveConfigList;
+      end;
+
+      // 设置为当前选中项
+      cbFileName.ItemIndex := cbFileName.Items.IndexOf(IniFileName);
+
+      // 加载新创建的配置文件
+      LoadConfigFiles(IniFileName, JsonFileName);
+
+      ShowMessage('新配置文件已创建: ' + IniFileName);
+    except
+      on E: Exception do
+        ShowMessage('创建新配置文件失败: ' + E.Message);
+    end;
+  end;
+end;
+
+// 新增：删除配置文件
+procedure TFrmBuildConfig.btnDeleteConfigClick(Sender: TObject);
+var
+  IniFileName, JsonFileName: string;
+  DeleteIndex: Integer;
+  DeleteFiles: Boolean;
+begin
+  // 确保有选中的项目
+  if cbFileName.ItemIndex < 0 then
+  begin
+    ShowMessage('请先选择一个配置文件');
+    Exit;
+  end;
+
+  // 获取选中的文件名和索引
+  DeleteIndex := cbFileName.ItemIndex;
+  IniFileName := cbFileName.Items[DeleteIndex];
+  JsonFileName := ChangeFileExt(IniFileName, '.json');
+
+  // 询问是否要删除物理文件
+  DeleteFiles := MessageDlg('是否同时删除物理文件？' + #13#10 +
+                            'INI文件: ' + IniFileName + #13#10 +
+                            'JSON文件: ' + JsonFileName,
+                            mtConfirmation, [mbYes, mbNo, mbCancel], 0) = mrYes;
+
+  // 如果用户选择取消，则退出
+  if MessageDlg('确定要从列表中删除此配置吗？', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+    Exit;
+
+  // 如果用户选择同时删除物理文件
+  if DeleteFiles then
+  begin
+    try
+      // 删除INI文件
+      if FileExists(IniFileName) then
+        DeleteFile(IniFileName);
+
+      // 删除JSON文件
+      if FileExists(JsonFileName) then
+        DeleteFile(JsonFileName);
+    except
+      on E: Exception do
+      begin
+        ShowMessage('删除文件失败: ' + E.Message);
+        Exit;
+      end;
+    end;
+  end;
+
+  // 从ComboBox中删除项目
+  cbFileName.Items.Delete(DeleteIndex);
+
+  // 保存配置列表
+  SaveConfigList;
+
+  // 清除当前数据
+  ClearAllData;
+  FCurrentIniFile := '';
+  FCurrentJsonFile := '';
+
+  // 如果还有其他配置，选择第一个
+  if cbFileName.Items.Count > 0 then
+  begin
+    cbFileName.ItemIndex := 0;
+    cbFileNameChange(nil);
+  end;
+
+  ShowMessage('配置已从列表中删除');
+end;
+
+procedure TFrmBuildConfig.btnKeyClick(Sender: TObject);
+var
+  PropertyName, PropertyValue: string;
+begin
+  // 添加密码属性的逻辑
+  PropertyName := GetNewPropertyName('Password');
+  if PropertyName = '' then Exit;
+
+  PropertyValue := '';
+  if not GetPropertyInputFromUser('密码属性', '请输入密码值（将被加密存储）:', PropertyValue) then Exit;
+
+  // 这里可以添加密码加密逻辑
+  // 示例: PropertyValue := EncryptPassword(PropertyValue);
+
+  // 添加到网格
+  AddPropertyToGrid(PropertyName, '密码', PropertyValue);
+end;
+
+procedure TFrmBuildConfig.btnRegClick(Sender: TObject);
+var
+  PropertyName, PropertyValue: string;
+begin
+  // 添加正则表达式属性的逻辑
+  PropertyName := GetNewPropertyName('RegEx');
+  if PropertyName = '' then Exit;
+
+  PropertyValue := '';
+  if not GetPropertyInputFromUser('正则表达式属性', '请输入正则表达式:', PropertyValue) then Exit;
+
+  // 这里可以添加正则表达式验证逻辑
+  // 示例: if not IsValidRegEx(PropertyValue) then ...
+
+  // 添加到网格
+  AddPropertyToGrid(PropertyName, '正则表达式', PropertyValue);
+end;
+
+procedure TFrmBuildConfig.btnEMailClick(Sender: TObject);
+var
+  PropertyName, PropertyValue: string;
+begin
+  // 添加邮箱地址属性的逻辑
+  PropertyName := GetNewPropertyName('Email');
+  if PropertyName = '' then Exit;
+
+  PropertyValue := '';
+  if not GetPropertyInputFromUser('邮箱地址属性', '请输入邮箱地址:', PropertyValue) then Exit;
+
+  // 这里可以添加邮箱地址验证逻辑
+  // 示例: if not IsValidEmail(PropertyValue) then ...
+
+  // 添加到网格
+  AddPropertyToGrid(PropertyName, '邮箱地址', PropertyValue);
+end;
+
+procedure TFrmBuildConfig.btnUrlClick(Sender: TObject);
+var
+  PropertyName, PropertyValue: string;
+begin
+  // 添加URL属性的逻辑
+  PropertyName := GetNewPropertyName('URL');
+  if PropertyName = '' then Exit;
+
+  PropertyValue := '';
+  if not GetPropertyInputFromUser('URL属性', '请输入URL地址:', PropertyValue) then Exit;
+
+  // 这里可以添加URL验证逻辑
+  // 示例: if not IsValidURL(PropertyValue) then ...
+
+  // 添加到网格
+  AddPropertyToGrid(PropertyName, 'URL', PropertyValue);
+end;
+
+
+procedure TFrmBuildConfig.InitializeValidator;
+begin
+  // 创建验证器
+  FValidator := TConfigValidator.Create;
+
+  // 添加验证规则
+  // 数值类型验证
+  FValidator.AddNumericRule('General/ctPlain.Number', 'Number');
+
+  // 必填项验证
+  FValidator.AddRequiredRule('General/ctPlain.Text', 'Text', '文本属性不能为空');
+
+  // 范围验证
+  FValidator.AddRangeRule('General/ctPlain.Age', 'Age', 0, 120, '年龄必须在0到120之间');
+
+  // 正则表达式验证
+  FValidator.AddRegexRule('General/ctPlain.Email', 'Email', '^[\w\.-]+@[\w\.-]+\.[\w]+$', '邮箱格式不正确');
+
+  // 自定义验证
+  FValidator.AddCustomRule('General/ctPlain.Password', 'Password',
+    function(const Value: string): Boolean
+    begin
+      // 密码长度至少为8位
+      Result := Length(Value) >= 8;
+    end,
+    '密码长度至少为8位');
+end;
+
+function TFrmBuildConfig.ValidateConfig: Boolean;
+var
+  JSONObj: TJSONObject;
+  i: Integer;
+  Section, Key, Value: string;
+begin
+  // 清除之前的验证结果
+  FValidator.Results.Clear;
+
+  // 验证INI配置
+  for i := 1 to sgINI.RowCount - 1 do
+  begin
+    if (sgINI.Cells[0, i] <> '') and (sgINI.Cells[1, i] <> '') then
+    begin
+      Section := sgINI.Cells[0, i];
+      Key := sgINI.Cells[1, i];
+      Value := sgINI.Cells[2, i];
+
+      ValidateINIProperty(Section, Key, Value);
+    end;
+  end;
+
+  // 验证JSON配置
+  // 这里可以添加JSON配置的验证逻辑
+
+  // 返回验证结果
+  Result := FValidator.Results.Count = 0;
+
+  // 如果有验证错误，显示验证结果
+  if not Result then
+    ShowValidationResults;
+end;
+
+function TFrmBuildConfig.ValidateINIProperty(const Section, Key, Value: string): Boolean;
+begin
+  // 使用验证器验证属性
+  Result := FValidator.ValidateINI(Section, Key, Value);
+end;
+
+procedure TFrmBuildConfig.ShowValidationResults;
+var
+  ValidationForm: TfrmValidation;
+begin
+  // 创建验证结果对话框
+  ValidationForm := TfrmValidation.Create(Self);
+  try
+    // 设置选择属性事件
+    ValidationForm.OnSelectProperty := procedure(const Path, Name: string)
+    begin
+      // 在这里可以实现选中属性的逻辑
+      // 例如，在网格中查找并选中对应的行
+      for var i := 1 to sgINI.RowCount - 1 do
+      begin
+        if (sgINI.Cells[0, i] + '/' + sgINI.Cells[1, i] = Path) or
+           (sgINI.Cells[1, i] = Name) then
+        begin
+          sgINI.Row := i;
+          Break;
+        end;
+      end;
+    end;
+
+    // 显示验证结果
+    ValidationForm.ShowResults(FValidator.Results);
+  finally
+    ValidationForm.Free;
+  end;
+end;
+
+procedure TFrmBuildConfig.btnValidateClick(Sender: TObject);
+begin
+  // 验证配置
+  if ValidateConfig then
+    ShowMessage('验证通过，所有配置项都符合规则。');
+end;
+
+end.

@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.ComCtrls, Vcl.Grids, Vcl.Menus, System.UITypes, System.StrUtils,
-  System.JSON, System.IniFiles, Vcl.Buttons, Vcl.ExtDlgs, System.Types,
+  System.JSON, JSONHelpers, System.IniFiles, Vcl.Buttons, Vcl.ExtDlgs, System.Types,
   System.DateUtils, System.Generics.Collections, ControllerIntf, ModelConfig,
   ConfigValidator, ValidationDialog, FrameDBEditor, FrameListEditor, FrameObjectEditor,
   FrameArrayEditor, System.IOUtils, ConfigTypes, FrameFontEditor, FrameAIAPIEditor,

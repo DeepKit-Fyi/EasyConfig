@@ -3,7 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, Vcl.Graphics, Winapi.Windows;
+  System.SysUtils, System.Classes, System.JSON, JSONHelpers, Vcl.Graphics, Winapi.Windows;
 
 type
   // 配置格式枚举

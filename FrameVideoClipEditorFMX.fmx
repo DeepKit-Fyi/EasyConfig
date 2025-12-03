@@ -1,0 +1,305 @@
+object FrameVideoClipEditorFMX: TFrameVideoClipEditorFMX
+  Size.Width = 450.000000000000000000
+  Size.Height = 400.000000000000000000
+  Size.PlatformDefault = False
+  object layMain: TLayout
+    Align = Client
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Size.Width = 434.000000000000000000
+    Size.Height = 384.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object grpSource: TGroupBox
+      Align = Top
+      Size.Width = 434.000000000000000000
+      Size.Height = 70.000000000000000000
+      Size.PlatformDefault = False
+      Text = #28304#25991#20214
+      TabOrder = 0
+      object laySource: TLayout
+        Align = Top
+        Position.Y = 16.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblSource: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #35270#39057#25991#20214':'
+        end
+        object edtSource: TEdit
+          Align = Client
+          Size.Width = 266.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          OnChange = edtChange
+        end
+        object btnBrowse: TButton
+          Align = Right
+          Position.X = 354.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          Text = #27983#35272'...'
+          OnClick = btnBrowseClick
+        end
+      end
+    end
+    object grpTime: TGroupBox
+      Align = Top
+      Position.Y = 70.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 130.000000000000000000
+      Size.PlatformDefault = False
+      Text = #26102#38388#35774#32622
+      TabOrder = 1
+      object layStartTime: TLayout
+        Align = Top
+        Position.Y = 16.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblStartTime: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #24320#22987#26102#38388':'
+        end
+        object spnStartTime: TSpinBox
+          Align = Left
+          Position.X = 88.000000000000000000
+          Size.Width = 120.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          DecimalDigits = 2
+          Max = 999999.000000000000000000
+          OnChange = spnTimeChange
+        end
+        object lblStartUnit: TLabel
+          Align = Left
+          Position.X = 208.000000000000000000
+          Margins.Left = 8.000000000000000000
+          Size.Width = 30.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #31186
+        end
+      end
+      object layEndTime: TLayout
+        Align = Top
+        Position.Y = 48.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object lblEndTime: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #32467#26463#26102#38388':'
+        end
+        object spnEndTime: TSpinBox
+          Align = Left
+          Position.X = 88.000000000000000000
+          Size.Width = 120.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          DecimalDigits = 2
+          Max = 999999.000000000000000000
+          OnChange = spnTimeChange
+        end
+        object lblEndUnit: TLabel
+          Align = Left
+          Position.X = 208.000000000000000000
+          Margins.Left = 8.000000000000000000
+          Size.Width = 30.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #31186
+        end
+      end
+      object layDuration: TLayout
+        Align = Top
+        Position.Y = 80.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object lblDuration: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #26102#38271':'
+        end
+        object lblDurationValue: TLabel
+          Align = Left
+          Position.X = 88.000000000000000000
+          Size.Width = 120.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          TextSettings.FontColor = claGray
+          Text = '0.00 '#31186
+        end
+      end
+    end
+    object grpEffects: TGroupBox
+      Align = Top
+      Position.Y = 200.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 170.000000000000000000
+      Size.PlatformDefault = False
+      Text = #25928#26524#35774#32622
+      TabOrder = 2
+      object layVolume: TLayout
+        Align = Top
+        Position.Y = 16.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblVolume: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #38899#37327':'
+        end
+        object spnVolume: TSpinBox
+          Align = Left
+          Position.X = 88.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Max = 200.000000000000000000
+          Value = 100.000000000000000000
+          OnChange = edtChange
+        end
+        object lblVolumePercent: TLabel
+          Align = Left
+          Position.X = 188.000000000000000000
+          Margins.Left = 8.000000000000000000
+          Size.Width = 20.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = '%'
+        end
+      end
+      object layFadeIn: TLayout
+        Align = Top
+        Position.Y = 48.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object lblFadeIn: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #28129#20837':'
+        end
+        object spnFadeIn: TSpinBox
+          Align = Left
+          Position.X = 88.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          DecimalDigits = 1
+          Max = 60.000000000000000000
+          OnChange = edtChange
+        end
+        object lblFadeInUnit: TLabel
+          Align = Left
+          Position.X = 188.000000000000000000
+          Margins.Left = 8.000000000000000000
+          Size.Width = 30.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #31186
+        end
+      end
+      object layFadeOut: TLayout
+        Align = Top
+        Position.Y = 80.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object lblFadeOut: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #28129#20986':'
+        end
+        object spnFadeOut: TSpinBox
+          Align = Left
+          Position.X = 88.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          DecimalDigits = 1
+          Max = 60.000000000000000000
+          OnChange = edtChange
+        end
+        object lblFadeOutUnit: TLabel
+          Align = Left
+          Position.X = 188.000000000000000000
+          Margins.Left = 8.000000000000000000
+          Size.Width = 30.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = #31186
+        end
+      end
+      object chkLoop: TCheckBox
+        Align = Top
+        Position.Y = 112.000000000000000000
+        Margins.Left = 8.000000000000000000
+        Size.Width = 426.000000000000000000
+        Size.Height = 28.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        Text = #24490#29615#25773#25918
+        OnChange = edtChange
+      end
+    end
+  end
+end

@@ -1,0 +1,346 @@
+object FrameAIAPIEditorFMX: TFrameAIAPIEditorFMX
+  Size.Width = 500.000000000000000000
+  Size.Height = 550.000000000000000000
+  Size.PlatformDefault = False
+  object layMain: TLayout
+    Align = Client
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Size.Width = 484.000000000000000000
+    Size.Height = 534.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object layProvider: TLayout
+      Align = Top
+      Size.Width = 484.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object lblProvider: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = 'AI '#20379#24212#21830':'
+      end
+      object cboProvider: TComboBox
+        Align = Client
+        Size.Width = 384.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = cboProviderChange
+      end
+    end
+    object layBaseURL: TLayout
+      Align = Top
+      Position.Y = 36.000000000000000000
+      Size.Width = 484.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object lblBaseURL: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = 'API URL:'
+      end
+      object edtBaseURL: TEdit
+        Align = Client
+        Size.Width = 384.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        ReadOnly = True
+        OnChange = edtChange
+      end
+    end
+    object layAPIKey: TLayout
+      Align = Top
+      Position.Y = 72.000000000000000000
+      Size.Width = 484.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object lblAPIKey: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = 'API Key:'
+      end
+      object edtAPIKey: TEdit
+        Align = Client
+        Password = True
+        Size.Width = 304.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = edtChange
+      end
+      object btnShowKey: TButton
+        Align = Right
+        Position.X = 404.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = #26174#31034
+        OnClick = btnShowKeyClick
+      end
+    end
+    object layModel: TLayout
+      Align = Top
+      Position.Y = 108.000000000000000000
+      Size.Width = 484.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      object lblModel: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #27169#22411':'
+      end
+      object cboModel: TComboBox
+        Align = Left
+        Position.X = 100.000000000000000000
+        Size.Width = 200.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = cboModelChange
+      end
+      object edtModelCustom: TEdit
+        Align = Client
+        Margins.Left = 8.000000000000000000
+        Size.Width = 176.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Visible = False
+        TextPrompt = #33258#23450#20041#27169#22411#21517#31216
+        OnChange = edtChange
+      end
+    end
+    object grpParams: TGroupBox
+      Align = Top
+      Position.Y = 144.000000000000000000
+      Size.Width = 484.000000000000000000
+      Size.Height = 160.000000000000000000
+      Size.PlatformDefault = False
+      Text = #21442#25968#35774#32622
+      TabOrder = 4
+      object layTemperature: TLayout
+        Align = Top
+        Position.Y = 16.000000000000000000
+        Size.Width = 484.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblTemperature: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 92.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'Temperature:'
+        end
+        object trkTemperature: TTrackBar
+          Align = Client
+          Size.Width = 324.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Max = 2.000000000000000000
+          Frequency = 0.100000001490116100
+          OnChange = trkTemperatureChange
+        end
+        object lblTempValue: TLabel
+          Align = Right
+          Position.X = 424.000000000000000000
+          Size.Width = 60.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Center
+          Text = '0.70'
+        end
+      end
+      object layMaxTokens: TLayout
+        Align = Top
+        Position.Y = 48.000000000000000000
+        Size.Width = 484.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object lblMaxTokens: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 92.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'MaxTokens:'
+        end
+        object spnMaxTokens: TSpinBox
+          Align = Left
+          Position.X = 100.000000000000000000
+          Size.Width = 150.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Max = 128000.000000000000000000
+          Value = 4096.000000000000000000
+          OnChange = edtChange
+        end
+      end
+      object layTopP: TLayout
+        Align = Top
+        Position.Y = 80.000000000000000000
+        Size.Width = 484.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object lblTopP: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 92.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'TopP:'
+        end
+        object trkTopP: TTrackBar
+          Align = Client
+          Size.Width = 324.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Max = 1.000000000000000000
+          Frequency = 0.100000001490116100
+          OnChange = trkTopPChange
+        end
+        object lblTopPValue: TLabel
+          Align = Right
+          Position.X = 424.000000000000000000
+          Size.Width = 60.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Center
+          Text = '1.00'
+        end
+      end
+      object layTimeout: TLayout
+        Align = Top
+        Position.Y = 112.000000000000000000
+        Size.Width = 484.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        object lblTimeout: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 92.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'Timeout(s):'
+        end
+        object spnTimeout: TSpinBox
+          Align = Left
+          Position.X = 100.000000000000000000
+          Size.Width = 120.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Max = 300.000000000000000000
+          Value = 30.000000000000000000
+          OnChange = edtChange
+        end
+      end
+    end
+    object grpAdvanced: TGroupBox
+      Align = Top
+      Position.Y = 304.000000000000000000
+      Size.Width = 484.000000000000000000
+      Size.Height = 180.000000000000000000
+      Size.PlatformDefault = False
+      Text = #39640#32423#36873#39033
+      TabOrder = 5
+      object laySystemPrompt: TLayout
+        Align = Top
+        Position.Y = 16.000000000000000000
+        Size.Width = 484.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblSystemPrompt: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 24.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'System Prompt:'
+        end
+      end
+      object mmoSystemPrompt: TMemo
+        Align = Top
+        Position.Y = 40.000000000000000000
+        Margins.Left = 8.000000000000000000
+        Margins.Right = 8.000000000000000000
+        Size.Width = 468.000000000000000000
+        Size.Height = 100.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = edtChange
+      end
+      object chkStream: TCheckBox
+        Align = Top
+        Position.Y = 140.000000000000000000
+        Margins.Left = 8.000000000000000000
+        Size.Width = 476.000000000000000000
+        Size.Height = 28.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = #21551#29992#27969#24335#36755#20986' (Stream)'
+        IsChecked = True
+        OnChange = edtChange
+      end
+    end
+    object layButtons: TLayout
+      Align = Bottom
+      Position.Y = 494.000000000000000000
+      Size.Width = 484.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 6
+      object btnTest: TButton
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Text = #27979#35797' API'
+        OnClick = btnTestClick
+      end
+      object lblTestResult: TLabel
+        Align = Client
+        Margins.Left = 16.000000000000000000
+        Size.Width = 368.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+      end
+    end
+  end
+end

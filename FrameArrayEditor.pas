@@ -1,11 +1,12 @@
-unit FrameArrayEditor;
+﻿unit FrameArrayEditor;
 
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, System.UITypes, System.Generics.Collections,
-  Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, 
-  Vcl.Dialogs, Vcl.Grids, ConfigFrameBase, UtilsTypes;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.ComCtrls, System.JSON, System.Generics.Collections, System.UITypes,
+  ConfigFrameBase, UtilsTypes, JSONHelpers;
 
 type
   TArrayItemType = (aitString, aitNumber, aitBoolean, aitObject);
@@ -67,41 +68,41 @@ end;
 
 procedure TFrameArrayEditor.CreateControls;
 begin
-  // 创建主面板
+  // Create main panel
   pnlMain := TPanel.Create(Self);
   pnlMain.Parent := Self;
   pnlMain.Align := alClient;
   pnlMain.BevelOuter := bvNone;
   
-  // 创建类型选择面板
+  // Create type selection panel
   var TypePanel := TPanel.Create(pnlMain);
   TypePanel.Parent := pnlMain;
   TypePanel.Align := alTop;
   TypePanel.Height := 40;
   TypePanel.BevelOuter := bvNone;
   
-  // 创建类型标签
+  // Create type label
   lblItemType := TLabel.Create(TypePanel);
   lblItemType.Parent := TypePanel;
   lblItemType.Left := 10;
   lblItemType.Top := 12;
-  lblItemType.Caption := '数组项类型:';
+  lblItemType.Caption := 'Array Item Type:';
   
-  // 创建类型下拉框
+  // Create type dropdown
   cmbItemType := TComboBox.Create(TypePanel);
   cmbItemType.Parent := TypePanel;
   cmbItemType.Left := 100;
   cmbItemType.Top := 8;
   cmbItemType.Width := 150;
   cmbItemType.Style := csDropDownList;
-  cmbItemType.Items.Add('字符串');
-  cmbItemType.Items.Add('数值');
-  cmbItemType.Items.Add('布尔值');
-  cmbItemType.Items.Add('对象');
+  cmbItemType.Items.Add('String');
+  cmbItemType.Items.Add('Number');
+  cmbItemType.Items.Add('Boolean');
+  cmbItemType.Items.Add('Object');
   cmbItemType.ItemIndex := 0;
   cmbItemType.OnChange := cmbItemTypeChange;
   
-  // 创建列表控件
+  // Create list control
   lstItems := TListBox.Create(pnlMain);
   lstItems.Parent := pnlMain;
   lstItems.Align := alClient;
@@ -109,66 +110,66 @@ begin
   lstItems.Margins.SetBounds(5, 5, 5, 5);
   lstItems.OnClick := lstItemsClick;
   
-  // 创建控制面板
+  // Create control panel
   pnlControls := TPanel.Create(pnlMain);
   pnlControls.Parent := pnlMain;
   pnlControls.Align := alBottom;
   pnlControls.Height := 40;
   pnlControls.BevelOuter := bvNone;
   
-  // 添加按钮
+  // Add button
   btnAdd := TButton.Create(pnlControls);
   btnAdd.Parent := pnlControls;
   btnAdd.Left := 5;
   btnAdd.Top := 5;
   btnAdd.Width := 60;
-  btnAdd.Caption := '添加';
+  btnAdd.Caption := 'Add';
   btnAdd.OnClick := btnAddClick;
   
-  // 编辑按钮
+  // Edit button
   btnEdit := TButton.Create(pnlControls);
   btnEdit.Parent := pnlControls;
   btnEdit.Left := 70;
   btnEdit.Top := 5;
   btnEdit.Width := 60;
-  btnEdit.Caption := '编辑';
+  btnEdit.Caption := 'Edit';
   btnEdit.OnClick := btnEditClick;
   btnEdit.Enabled := False;
   
-  // 删除按钮
+  // Delete button
   btnDelete := TButton.Create(pnlControls);
   btnDelete.Parent := pnlControls;
   btnDelete.Left := 135;
   btnDelete.Top := 5;
   btnDelete.Width := 60;
-  btnDelete.Caption := '删除';
+  btnDelete.Caption := 'Delete';
   btnDelete.OnClick := btnDeleteClick;
   btnDelete.Enabled := False;
   
-  // 上移按钮
+  // Move up button
   btnMoveUp := TButton.Create(pnlControls);
   btnMoveUp.Parent := pnlControls;
   btnMoveUp.Left := 200;
   btnMoveUp.Top := 5;
   btnMoveUp.Width := 60;
-  btnMoveUp.Caption := '上移';
+  btnMoveUp.Caption := 'Move Up';
   btnMoveUp.OnClick := btnMoveUpClick;
   btnMoveUp.Enabled := False;
   
-  // 下移按钮
+  // Move down button
   btnMoveDown := TButton.Create(pnlControls);
   btnMoveDown.Parent := pnlControls;
   btnMoveDown.Left := 265;
   btnMoveDown.Top := 5;
   btnMoveDown.Width := 60;
-  btnMoveDown.Caption := '下移';
+  btnMoveDown.Caption := 'Move Down';
   btnMoveDown.OnClick := btnMoveDownClick;
   btnMoveDown.Enabled := False;
 end;
 
 procedure TFrameArrayEditor.cmbItemTypeChange(Sender: TObject);
 begin
-  // 更新数组项类型
+  // Update array item type
   case cmbItemType.ItemIndex of
     0: FItemType := aitString;
     1: FItemType := aitNumber;
@@ -178,17 +179,17 @@ begin
     FItemType := aitString;
   end;
   
-  // 清空列表
+  // Clear list
   if lstItems.Items.Count > 0 then
   begin
-    if MessageDlg('更改数组项类型将清空当前列表，是否继续?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    if MessageDlg('Changing array item type will clear the current list. Continue?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
     begin
       lstItems.Items.Clear;
       FObjectItems.Clear;
     end
     else
     begin
-      // 恢复原来的选择
+      // Restore original selection
       case FItemType of
         aitString: cmbItemType.ItemIndex := 0;
         aitNumber: cmbItemType.ItemIndex := 1;
@@ -198,17 +199,16 @@ begin
     end;
   end;
   
-  // 更新按钮状态
+  // Update button states
   UpdateButtonStates;
   
-  // 标记为已修改
+  // Mark as modified
   Modified := True;
 end;
 
 procedure TFrameArrayEditor.UpdateButtonStates;
 begin
-  // 更新按钮状态
-  btnEdit.Enabled := lstItems.ItemIndex >= 0;
+  // 鏇存柊鎸夐挳鐘舵€?  btnEdit.Enabled := lstItems.ItemIndex >= 0;
   btnDelete.Enabled := lstItems.ItemIndex >= 0;
   btnMoveUp.Enabled := lstItems.ItemIndex > 0;
   btnMoveDown.Enabled := (lstItems.ItemIndex >= 0) and (lstItems.ItemIndex < lstItems.Items.Count - 1);
@@ -229,9 +229,9 @@ begin
   case FItemType of
     aitString:
       begin
-        // 添加字符串项
+        // Add string item
         NewItem := '';
-        if InputQuery('添加字符串', '请输入字符串值:', NewItem) then
+        if InputQuery('Add String', 'Please enter a string value:', NewItem) then
         begin
           lstItems.Items.Add(NewItem);
           Modified := True;
@@ -239,9 +239,9 @@ begin
       end;
     aitNumber:
       begin
-        // 添加数值项
+        // Add number item
         NewItem := '0';
-        if InputQuery('添加数值', '请输入数值:', NewItem) then
+        if InputQuery('Add Number', 'Please enter a numeric value:', NewItem) then
         begin
           try
             Value := StrToFloat(NewItem);
@@ -249,14 +249,14 @@ begin
             Modified := True;
           except
             on E: Exception do
-              ShowMessage('请输入有效的数值');
+              ShowMessage('Please enter a valid number');
           end;
         end;
       end;
     aitBoolean:
       begin
-        // 添加布尔项
-        if MessageDlg('请选择布尔值', mtConfirmation, mbYesNo, 0) = mrYes then
+        // Add boolean item
+        if MessageDlg('Please select a boolean value', mtConfirmation, mbYesNo, 0) = mrYes then
         begin
           BoolValue := True;
           lstItems.Items.Add('True');
@@ -270,15 +270,15 @@ begin
       end;
     aitObject:
       begin
-        // 添加对象项
+        // Add object item
         JSONObj := TJSONObject.Create;
         FObjectItems.Add(JSONObj);
-        lstItems.Items.Add(Format('对象 %d', [FObjectItems.Count]));
+        lstItems.Items.Add(Format('Object %d', [FObjectItems.Count]));
         Modified := True;
       end;
   end;
   
-  // 更新按钮状态
+  // Update button states
   UpdateButtonStates;
 end;
 
@@ -297,10 +297,10 @@ begin
   case FItemType of
     aitString:
       begin
-        // 编辑字符串项
+        // Edit string item
         OldValue := lstItems.Items[SelectedIndex];
         NewValue := OldValue;
-        if InputQuery('编辑字符串', '请输入字符串值:', NewValue) then
+        if InputQuery('Edit String', 'Please enter a string value:', NewValue) then
         begin
           lstItems.Items[SelectedIndex] := NewValue;
           Modified := True;
@@ -308,10 +308,10 @@ begin
       end;
     aitNumber:
       begin
-        // 编辑数值项
+        // Edit number item
         OldValue := lstItems.Items[SelectedIndex];
         NewValue := OldValue;
-        if InputQuery('编辑数值', '请输入数值:', NewValue) then
+        if InputQuery('Edit Number', 'Please enter a numeric value:', NewValue) then
         begin
           try
             DValue := StrToFloat(NewValue);
@@ -319,17 +319,17 @@ begin
             Modified := True;
           except
             on E: Exception do
-              ShowMessage('请输入有效的数值');
+              ShowMessage('Please enter a valid number');
           end;
         end;
       end;
     aitBoolean:
       begin
-        // 编辑布尔项
+        // Edit boolean item
         OldValue := lstItems.Items[SelectedIndex];
         BoolValue := SameText(OldValue, 'True');
         
-        if MessageDlg('编辑布尔值', mtConfirmation, mbYesNo, 0) = mrYes then
+        if MessageDlg('Edit boolean value', mtConfirmation, mbYesNo, 0) = mrYes then
         begin
           if not BoolValue then
           begin
@@ -348,13 +348,13 @@ begin
       end;
     aitObject:
       begin
-        // 编辑对象项
+        // Edit object item
         if (SelectedIndex >= 0) and (SelectedIndex < FObjectItems.Count) then
         begin
           JSONObj := FObjectItems[SelectedIndex];
-          // 使用对象编辑器编辑对象
-          // 这里应该打开一个对话框让用户编辑JSON对象
-          // 简单起见，我们只是将对象转换为字符串显示
+          // Use object editor to edit object
+          // Here we should open a dialog for editing the JSON object
+          // For simplicity, we just display the object as a string
           ShowMessage(JSONObj.ToString);
           Modified := True;
         end;
@@ -370,9 +370,9 @@ begin
   if SelectedIndex < 0 then
     Exit;
   
-  if MessageDlg('确定要删除选定的项目吗?', mtConfirmation, mbYesNo, 0) = mrYes then
+  if MessageDlg('Are you sure you want to delete the selected item?', mtConfirmation, mbYesNo, 0) = mrYes then
   begin
-    // 如果是对象类型，同时删除对应的JSON对象
+    // If it's an object type, also delete the corresponding JSON object
     if FItemType = aitObject then
     begin
       if (SelectedIndex >= 0) and (SelectedIndex < FObjectItems.Count) then
@@ -385,7 +385,7 @@ begin
     lstItems.Items.Delete(SelectedIndex);
     Modified := True;
     
-    // 更新按钮状态
+    // Update button states
     UpdateButtonStates;
   end;
 end;
@@ -399,10 +399,10 @@ begin
   if (SelectedIndex <= 0) or (SelectedIndex >= lstItems.Items.Count) then
     Exit;
   
-  // 交换列表项
+  // Exchange list items
   lstItems.Items.Exchange(SelectedIndex, SelectedIndex - 1);
   
-  // 如果是对象类型，同时交换JSON对象
+  // If it's an object type, also exchange JSON objects
   if FItemType = aitObject then
   begin
     if (SelectedIndex < FObjectItems.Count) and (SelectedIndex - 1 >= 0) then
@@ -413,11 +413,11 @@ begin
     end;
   end;
   
-  // 选中移动后的项
+  // Select the moved item
   lstItems.ItemIndex := SelectedIndex - 1;
   Modified := True;
   
-  // 更新按钮状态
+  // Update button states
   UpdateButtonStates;
 end;
 
@@ -430,10 +430,10 @@ begin
   if (SelectedIndex < 0) or (SelectedIndex >= lstItems.Items.Count - 1) then
     Exit;
   
-  // 交换列表项
+  // Exchange list items
   lstItems.Items.Exchange(SelectedIndex, SelectedIndex + 1);
   
-  // 如果是对象类型，同时交换JSON对象
+  // If it's an object type, also exchange JSON objects
   if FItemType = aitObject then
   begin
     if (SelectedIndex < FObjectItems.Count) and (SelectedIndex + 1 < FObjectItems.Count) then
@@ -444,11 +444,11 @@ begin
     end;
   end;
   
-  // 选中移动后的项
+  // Select the moved item
   lstItems.ItemIndex := SelectedIndex + 1;
   Modified := True;
   
-  // 更新按钮状态
+  // Update button states
   UpdateButtonStates;
 end;
 
@@ -487,7 +487,7 @@ var
   ItemType: TArrayItemType;
   JSONObj: TJSONObject;
 begin
-  // 清空现有数据
+  // Clear existing data
   lstItems.Items.Clear;
   for i := 0 to FObjectItems.Count - 1 do
     FObjectItems[i].Free;
@@ -496,13 +496,13 @@ begin
   if not Assigned(JSONObject) then
     Exit;
   
-  // 尝试获取数组类型
+  // Try to get array type
   if JSONObject.TryGetValue('item_type', TypeString) then
     FItemType := GetItemTypeFromString(TypeString)
   else
     FItemType := aitString;
   
-  // 更新类型下拉框
+  // Update type dropdown
   case FItemType of
     aitString: cmbItemType.ItemIndex := 0;
     aitNumber: cmbItemType.ItemIndex := 1;
@@ -512,7 +512,7 @@ begin
     cmbItemType.ItemIndex := 0;
   end;
   
-  // 获取数组值
+  // Get array value
   if JSONObject.TryGetValue('value', ItemValue) and (ItemValue is TJSONArray) then
   begin
     JSONArray := TJSONArray(ItemValue);
@@ -536,13 +536,13 @@ begin
           begin
             JSONObj := TJSONObject(ItemValue.Clone as TJSONObject);
             FObjectItems.Add(JSONObj);
-            lstItems.Items.Add(Format('对象 %d', [FObjectItems.Count]));
+            lstItems.Items.Add(Format('Object %d', [FObjectItems.Count]));
           end;
       end;
     end;
   end;
   
-  // 更新按钮状态
+  // Update button states
   UpdateButtonStates;
   Modified := False;
 end;
@@ -554,19 +554,19 @@ var
   BValue: Boolean;
   DValue: Double;
 begin
-  // 确保JSONObject不为空
+  // Ensure JSONObject is not nil
   if not Assigned(JSONObject) then
     JSONObject := TJSONObject.Create;
   
-  // 设置数组项类型
+  // Set array item type
   JSONObject.RemovePair('item_type');
   JSONObject.AddPair('item_type', GetItemTypeAsString(FItemType));
   
-  // 设置配置类型
+  // Set config type
   JSONObject.RemovePair('_type');
   JSONObject.AddPair('_type', ConfigTypeToString(ctArray));
   
-  // 创建数组值
+  // Create array value
   JSONArray := TJSONArray.Create;
   
   for i := 0 to lstItems.Items.Count - 1 do
@@ -592,7 +592,7 @@ begin
     end;
   end;
   
-  // 设置数组值
+  // Set array value
   JSONObject.RemovePair('value');
   JSONObject.AddPair('value', JSONArray);
   

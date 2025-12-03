@@ -1,0 +1,550 @@
+﻿unit ControllerConfigs;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Vcl.Forms, Vcl.Controls, Vcl.ExtCtrls,
+  UtilsTypes, System.JSON;
+
+type
+  TControllerConfigsClass = class
+  private
+    class var FInstance: TControllerConfigsClass;
+    
+    // 褰撳墠閫変腑鐨勫鏉傚睘鎬х被鍨?
+    FCurrentPropertyType: TComplexPropertyType;
+    
+    // 褰撳墠缂栬緫鐨凧SON瀵硅薄
+    FCurrentJson: TJSONObject;
+    
+    // 褰撳墠缂栬緫鐨勫睘鎬у悕绉?
+    FCurrentPropertyName: string;
+    
+    // 鐖跺鍣ㄩ潰鏉匡紝鐢ㄤ簬鏀剧疆缂栬緫鍣‵rame
+    FParentPanel: TPanel;
+    
+    // 褰撳墠缂栬緫鍣‵rame
+    FCurrentEditorFrame: TFrame;
+    
+    // 閫氱敤灞炴€х紪杈戝畬鎴愬洖璋?
+    FOnEditComplete: TNotifyEvent;
+    
+    // 鍒涘缓鍚勭被鍨嬬紪杈戝櫒鐨勬柟娉?
+    function CreateEditorFrame(PropertyType: TComplexPropertyType): TFrame;
+    
+    // 鍔犺浇JSON鏁版嵁鍒扮紪杈戝櫒
+    procedure LoadJsonToEditor(Editor: TFrame; Json: TJSONObject);
+    
+    // 浠庣紪杈戝櫒淇濆瓨鏁版嵁鍒癑SON
+    procedure SaveEditorToJson(Editor: TFrame; var Json: TJSONObject);
+    
+    constructor Create;
+  public
+    // 鍗曚緥璁块棶鏂规硶
+    class function GetInstance: TControllerConfigsClass;
+    
+    // 鏍规嵁Tag鏄剧ず澶嶆潅灞炴€ч厤缃晫闈?
+    procedure ShowConfigByTag(Tag: Integer);
+    
+    // 璁剧疆鐖跺鍣ㄩ潰鏉?
+    procedure SetParentPanel(Panel: TPanel);
+    
+    // 缂栬緫澶嶆潅灞炴€?
+    procedure EditComplexProperty(PropertyType: TComplexPropertyType; 
+      PropertyName: string; Json: TJSONObject; OnComplete: TNotifyEvent);
+    
+    // 鍒涘缓鏂扮殑澶嶆潅灞炴€?
+    function CreateComplexProperty(PropertyType: TComplexPropertyType; 
+      PropertyName: string; OnComplete: TNotifyEvent): TJSONObject;
+    
+    // 淇濆瓨褰撳墠缂栬緫鐨勫睘鎬?
+    procedure SaveCurrentProperty;
+    
+    // 鍙栨秷褰撳墠缂栬緫
+    procedure CancelCurrentEdit;
+    
+    // 閲婃斁璧勬簮
+    destructor Destroy; override;
+    
+    // 灞炴€?
+    function GetCurrentPropertyType: TComplexPropertyType;
+    function GetCurrentJson: TJSONObject;
+    function GetCurrentPropertyName: string;
+    
+    property CurrentPropertyType: TComplexPropertyType read GetCurrentPropertyType;
+    property CurrentJson: TJSONObject read GetCurrentJson;
+    property CurrentPropertyName: string read GetCurrentPropertyName;
+  end;
+
+// 鍏ㄥ眬璁块棶鐐?
+function GetControllerConfigs: TControllerConfigsClass;
+
+implementation
+
+uses
+  Vcl.Dialogs, System.Generics.Collections, ConfigFrameBase,
+  FrameBgDrawEditor, FrameVideoClipEditor, FrameVideoEditor, FrameDateTimeRangeEditor,
+  FrameKeyValueDictEditor, FrameUrlConfigEditor, FrameNetConfigEditor, FrameGeoLocationEditor,
+  FrameEncryptEditor;
+
+var
+  // 淇濆瓨鎵€鏈夊垱寤虹殑Frame锛岀敤浜庡悗缁噴鏀?
+  FrameList: TList<TFrame>;
+
+function GetControllerConfigs: TControllerConfigsClass;
+begin
+  Result := TControllerConfigsClass.GetInstance;
+end;
+
+{ TControllerConfigsClass }
+
+constructor TControllerConfigsClass.Create;
+begin
+  inherited;
+  FCurrentJson := nil;
+  FCurrentEditorFrame := nil;
+end;
+
+destructor TControllerConfigsClass.Destroy;
+begin
+  // 娓呯悊璧勬簮
+  if Assigned(FCurrentJson) then
+    FCurrentJson.Free;
+  
+  if Assigned(FCurrentEditorFrame) then
+    FCurrentEditorFrame.Free;
+  
+  inherited;
+end;
+
+function TControllerConfigsClass.GetCurrentPropertyType: TComplexPropertyType;
+begin
+  Result := FCurrentPropertyType;
+end;
+
+function TControllerConfigsClass.GetCurrentJson: TJSONObject;
+begin
+  Result := FCurrentJson;
+end;
+
+function TControllerConfigsClass.GetCurrentPropertyName: string;
+begin
+  Result := FCurrentPropertyName;
+end;
+
+class function TControllerConfigsClass.GetInstance: TControllerConfigsClass;
+begin
+  if not Assigned(FInstance) then
+    FInstance := TControllerConfigsClass.Create;
+  Result := FInstance;
+end;
+
+procedure TControllerConfigsClass.SetParentPanel(Panel: TPanel);
+begin
+  FParentPanel := Panel;
+end;
+
+procedure TControllerConfigsClass.ShowConfigByTag(Tag: Integer);
+var
+  CPT: TComplexPropertyType;
+  PropertyName: string;
+  Json: TJSONObject;
+begin
+  // 获取复杂属性类型
+  CPT := TComplexPropertyType(Tag);
+  
+  // 获取属性名称（用户输入）
+  PropertyName := '';
+  if not InputQuery('New property', 'Enter property name', PropertyName) then
+    Exit;
+  
+  if PropertyName = '' then
+    Exit;
+  
+  // 创建新的复杂属性
+  Json := CreateComplexProperty(CPT, PropertyName, nil);
+  
+  // 显示成功消息
+  if Assigned(Json) then
+    ShowMessage('Property ' + PropertyName + ' added successfully');
+end;
+
+function TControllerConfigsClass.CreateEditorFrame(
+  PropertyType: TComplexPropertyType): TFrame;
+begin
+  Result := nil;
+  
+  // Create editor frame based on property type
+  case PropertyType of
+    // Priority complex properties
+    cptBgDraw, cptTextOnBg, cptImageOnBg, cptCaptionOnBg:
+      begin
+        Result := TFrameBgDrawEditor.Create(nil);
+      end;
+    
+    cptVideoClip:
+      begin
+        Result := TFrameVideoClipEditor.Create(nil);
+      end;
+    
+    cptVideo:
+      begin
+        Result := TFrameVideoEditor.Create(nil);
+      end;
+    
+    // New complex property editors
+    cptDateTimeRange:
+      begin
+        Result := TFrameDateTimeRangeEditor.Create(nil);
+      end;
+      
+    cptKeyValueDict:
+      begin
+        Result := TFrameKeyValueDictEditor.Create(nil);
+      end;
+      
+    cptUrlConfig:
+      begin
+        Result := TFrameUrlConfigEditor.Create(nil);
+      end;
+      
+    cptNetConfig:
+      begin
+        Result := TFrameNetConfigEditor.Create(nil);
+      end;
+      
+    cptGeoLocation:
+      begin
+        Result := TFrameGeoLocationEditor.Create(nil);
+      end;
+      
+    cptEncrypt:
+      begin
+        Result := TFrameEncryptEditor.Create(nil);
+      end;
+    
+    // Other complex properties
+    else
+      begin
+        ShowMessage('Editor for property type ' + IntToStr(Ord(PropertyType)) + ' not implemented yet');
+      end;
+  end;
+  
+  // If Frame was created, add it to the list
+  if Assigned(Result) and not Assigned(FrameList) then
+    FrameList := TList<TFrame>.Create;
+  
+  if Assigned(Result) and Assigned(FrameList) then
+    FrameList.Add(Result);
+end;
+
+procedure TControllerConfigsClass.EditComplexProperty(PropertyType: TComplexPropertyType;
+  PropertyName: string; Json: TJSONObject; OnComplete: TNotifyEvent);
+begin
+  // 淇濆瓨褰撳墠鐘舵€?
+  FCurrentPropertyType := PropertyType;
+  FCurrentPropertyName := PropertyName;
+  
+  // 閲婃斁涔嬪墠鐨凧SON瀵硅薄
+  if Assigned(FCurrentJson) then
+    FCurrentJson.Free;
+  
+  // 澶嶅埗JSON瀵硅薄
+  if Assigned(Json) then
+    FCurrentJson := TJSONObject(Json.Clone)
+  else
+    FCurrentJson := TJSONObject.Create;
+  
+  // 閲婃斁涔嬪墠鐨勭紪杈戝櫒
+  if Assigned(FCurrentEditorFrame) then
+  begin
+    FCurrentEditorFrame.Free;
+    FCurrentEditorFrame := nil;
+  end;
+  
+  // 鍒涘缓鏂扮殑缂栬緫鍣?
+  FCurrentEditorFrame := CreateEditorFrame(PropertyType);
+  
+  // 璁剧疆鍥炶皟
+  FOnEditComplete := OnComplete;
+  
+  if Assigned(FCurrentEditorFrame) and Assigned(FParentPanel) then
+  begin
+    // 璁剧疆缂栬緫鍣≒arent
+    FCurrentEditorFrame.Parent := FParentPanel;
+    FCurrentEditorFrame.Align := alClient;
+    
+    // 鍔犺浇鏁版嵁鍒扮紪杈戝櫒
+    LoadJsonToEditor(FCurrentEditorFrame, FCurrentJson);
+    
+    // 鏄剧ず缂栬緫鍣?
+    FCurrentEditorFrame.Visible := True;
+  end;
+end;
+
+function TControllerConfigsClass.CreateComplexProperty(PropertyType: TComplexPropertyType;
+  PropertyName: string; OnComplete: TNotifyEvent): TJSONObject;
+var
+  Json: TJSONObject;
+begin
+  // 鍒涘缓鏂扮殑JSON瀵硅薄
+  Json := TJSONObject.Create;
+  
+  // 鏍规嵁灞炴€х被鍨嬪～鍏呴粯璁ゅ€?
+  case PropertyType of
+    // 浼樺厛瀹炵幇鐨勫鏉傚睘鎬?
+    cptBgDraw:
+      begin
+        Json.AddPair('_type', 'etBgDraw');
+        Json.AddPair('_id', 'etBgDraw.' + PropertyName);
+        Json.AddPair('background', '');
+        Json.AddPair('elements', TJSONArray.Create);
+      end;
+    
+    cptTextOnBg:
+      begin
+        Json.AddPair('_type', 'etTextOnBg');
+        Json.AddPair('_id', 'etTextOnBg.' + PropertyName);
+        Json.AddPair('text', '鏂囨湰鍐呭');
+        Json.AddPair('x', '0');
+        Json.AddPair('y', '0');
+        Json.AddPair('font', TJSONObject.Create);
+      end;
+    
+    cptImageOnBg:
+      begin
+        Json.AddPair('_type', 'etImageOnBg');
+        Json.AddPair('_id', 'etImageOnBg.' + PropertyName);
+        Json.AddPair('image', '');
+        Json.AddPair('x', '0');
+        Json.AddPair('y', '0');
+        Json.AddPair('scale', '1.0');
+      end;
+    
+    cptCaptionOnBg:
+      begin
+        Json.AddPair('_type', 'etCaptionOnBg');
+        Json.AddPair('_id', 'etCaptionOnBg.' + PropertyName);
+        Json.AddPair('text', '瀛楀箷鏂囨湰');
+        Json.AddPair('x', '0');
+        Json.AddPair('y', '0');
+        Json.AddPair('font', TJSONObject.Create);
+        Json.AddPair('duration', '5.0');
+      end;
+    
+    cptVideoClip:
+      begin
+        Json.AddPair('_type', 'etVideoClip');
+        Json.AddPair('_id', 'etVideoClip.' + PropertyName);
+        Json.AddPair('background', '');
+        Json.AddPair('duration', '10.0');
+        Json.AddPair('fps', '30');
+        Json.AddPair('audio', '');
+        Json.AddPair('captions', TJSONArray.Create);
+      end;
+    
+    cptVideo:
+      begin
+        Json.AddPair('_type', 'etVideo');
+        Json.AddPair('_id', 'etVideo.' + PropertyName);
+        Json.AddPair('cover', '');
+        Json.AddPair('ending', '');
+        Json.AddPair('bg_directory', '');
+        Json.AddPair('audio_directory', '');
+        Json.AddPair('subtitle_file', '');
+        Json.AddPair('media_settings', TJSONObject.Create);
+        Json.AddPair('clips', TJSONArray.Create);
+      end;
+    
+    // 鏂板鐨勫鏉傚睘鎬?
+    cptDateTimeRange:
+      begin
+        Json.AddPair('_type', 'etDateTimeRange');
+        Json.AddPair('_id', 'etDateTimeRange.' + PropertyName);
+        Json.AddPair('name', PropertyName);
+        Json.AddPair('description', '');
+        Json.AddPair('start_date', FormatDateTime('yyyy-mm-dd"T"hh:nn:ss', Now));
+        Json.AddPair('end_date', FormatDateTime('yyyy-mm-dd"T"hh:nn:ss', Now + 1));
+        Json.AddPair('use_time', TJSONBool.Create(True));
+        Json.AddPair('duration_seconds', TJSONNumber.Create(86400)); // 榛樿1澶?
+        Json.AddPair('repeat', TJSONBool.Create(False));
+        Json.AddPair('repeat_type', TJSONNumber.Create(0)); // 姣忓ぉ
+        Json.AddPair('repeat_interval', TJSONNumber.Create(1));
+        Json.AddPair('enable_notification', TJSONBool.Create(False));
+        Json.AddPair('notify_before', TJSONNumber.Create(15));
+        Json.AddPair('notify_unit', '鍒嗛挓');
+      end;
+      
+    cptKeyValueDict:
+      begin
+        Json.AddPair('_type', 'etKeyValueDict');
+        Json.AddPair('_id', 'etKeyValueDict.' + PropertyName);
+        Json.AddPair('name', PropertyName);
+        Json.AddPair('description', '');
+        Json.AddPair('enable_type_check', TJSONBool.Create(False));
+        Json.AddPair('default_type', '瀛楃涓?);
+        Json.AddPair('items', TJSONArray.Create);
+      end;
+      
+    cptUrlConfig:
+      begin
+        Json.AddPair('_type', 'etUrlConfig');
+        Json.AddPair('_id', 'etUrlConfig.' + PropertyName);
+        Json.AddPair('name', PropertyName);
+        Json.AddPair('description', '');
+        Json.AddPair('base_url', '');
+        Json.AddPair('protocol', 'https');
+        Json.AddPair('use_ssl', TJSONBool.Create(True));
+        Json.AddPair('port', '443');
+        Json.AddPair('timeout', '30000');
+        Json.AddPair('enable_proxy', TJSONBool.Create(False));
+        Json.AddPair('headers', TJSONArray.Create);
+        Json.AddPair('parameters', TJSONArray.Create);
+      end;
+      
+    cptNetConfig:
+      begin
+        Json.AddPair('_type', 'etNetConfig');
+        Json.AddPair('_id', 'etNetConfig.' + PropertyName);
+        Json.AddPair('name', PropertyName);
+        Json.AddPair('description', '');
+        Json.AddPair('dhcp', TJSONBool.Create(True));
+        Json.AddPair('ip_address', '');
+        Json.AddPair('subnet_mask', '');
+        Json.AddPair('gateway', '');
+        Json.AddPair('mac_address', '');
+        Json.AddPair('ipv6', TJSONBool.Create(False));
+        Json.AddPair('network_name', '');
+        Json.AddPair('network_type', TJSONNumber.Create(0));
+        Json.AddPair('mtu', '1500');
+        Json.AddPair('auto_connect', TJSONBool.Create(True));
+        Json.AddPair('enable_proxy', TJSONBool.Create(False));
+        Json.AddPair('custom_dns', TJSONBool.Create(False));
+      end;
+      
+    cptGeoLocation:
+      begin
+        Json.AddPair('_type', 'etGeoLocation');
+        Json.AddPair('_id', 'etGeoLocation.' + PropertyName);
+        Json.AddPair('name', PropertyName);
+        Json.AddPair('description', '');
+        Json.AddPair('latitude', '39.9042');  // 榛樿鍖椾含鍧愭爣
+        Json.AddPair('longitude', '116.4074');
+        Json.AddPair('altitude', '0');
+        Json.AddPair('accuracy', '10');
+        Json.AddPair('location_name', '');
+        Json.AddPair('location_type', '鍏朵粬');
+        Json.AddPair('is_favorite', TJSONBool.Create(False));
+        Json.AddPair('formatted_address', '');
+        Json.AddPair('show_on_map', TJSONBool.Create(True));
+        Json.AddPair('map_provider', '鐧惧害鍦板浘');
+        Json.AddPair('default_zoom', TJSONNumber.Create(12));
+      end;
+      
+    cptEncrypt:
+      begin
+        Json.AddPair('_type', 'etEncrypt');
+        Json.AddPair('_id', 'etEncrypt.' + PropertyName);
+        Json.AddPair('name', PropertyName);
+        Json.AddPair('description', '');
+        Json.AddPair('encryption_type', '对称加密');
+        Json.AddPair('algorithm', 'AES');
+        Json.AddPair('key_size', '256 位');
+        Json.AddPair('mode', 'CBC');
+        Json.AddPair('padding', 'PKCS7');
+        Json.AddPair('use_iv', TJSONBool.Create(True));
+        Json.AddPair('default_iv', TJSONBool.Create(True));
+        Json.AddPair('key_format', 'Base64');
+        Json.AddPair('password', '');
+        Json.AddPair('salt', '');
+        Json.AddPair('iterations', TJSONNumber.Create(10000));
+        Json.AddPair('key_derivation', 'PBKDF2');
+      end;
+    
+    // 鍏朵粬澶嶆潅灞炴€?
+    else
+      begin
+        Json.AddPair('_type', 'etObject');
+        Json.AddPair('_id', 'etObject.' + PropertyName);
+        Json.AddPair('name', PropertyName);
+      end;
+  end;
+  
+  // 缂栬緫灞炴€?
+  EditComplexProperty(PropertyType, PropertyName, Json, OnComplete);
+  
+  Result := Json;
+end;
+
+procedure TControllerConfigsClass.LoadJsonToEditor(Editor: TFrame; Json: TJSONObject);
+begin
+  // 宸查泦鎴愮殑缂栬緫鍣?
+  if Editor is TBaseConfigFrame then
+  begin
+    TBaseConfigFrame(Editor).SetJSONObject(Json);
+    TBaseConfigFrame(Editor).LoadFromJSON;
+  end
+  else
+  begin
+    ShowMessage('鏈煡鐨勭紪杈戝櫒绫诲瀷锛屾棤娉曞姞杞絁SON鏁版嵁');
+  end;
+end;
+
+procedure TControllerConfigsClass.SaveEditorToJson(Editor: TFrame; var Json: TJSONObject);
+begin
+  // 宸查泦鎴愮殑缂栬緫鍣?
+  if Editor is TBaseConfigFrame then
+  begin
+    // 鍏堢'淇滼SON瀵硅薄瀛樺湪
+    if not Assigned(Json) then
+      Json := TJSONObject.Create;
+    
+    // 灏嗙紪杈戝櫒鏁版嵁淇濆瓨鍒癑SON
+    TBaseConfigFrame(Editor).SaveToJSON;
+  end
+  else
+  begin
+    ShowMessage('鏈煡鐨勭紪杈戝櫒绫诲瀷锛屾棤娉曚繚瀛楯SON鏁版嵁');
+  end;
+end;
+
+procedure TControllerConfigsClass.SaveCurrentProperty;
+begin
+  // 淇濆瓨褰撳墠灞炴€?
+  if Assigned(FCurrentEditorFrame) and Assigned(FCurrentJson) then
+  begin
+    SaveEditorToJson(FCurrentEditorFrame, FCurrentJson);
+    
+    // 璋冪敤鍥炶皟
+    if Assigned(FOnEditComplete) then
+      FOnEditComplete(Self);
+  end;
+end;
+
+procedure TControllerConfigsClass.CancelCurrentEdit;
+begin
+  // 鍙栨秷褰撳墠缂栬緫
+  if Assigned(FCurrentEditorFrame) then
+  begin
+    FCurrentEditorFrame.Visible := False;
+    
+    // 濡傛灉闇€瑕侊紝鍙互鍦ㄨ繖閲岄噴鏀捐祫婧?
+  end;
+end;
+
+initialization
+
+finalization
+  // 娓呯悊鍗曚緥瀹炰緥
+  if Assigned(TControllerConfigsClass.FInstance) then
+    TControllerConfigsClass.FInstance.Free;
+  
+  // 娓呯悊鎵€鏈夊垱寤虹殑Frame
+  if Assigned(FrameList) then
+  begin
+    for var Frame in FrameList do
+      Frame.Free;
+    FrameList.Free;
+  end;
+
+end. 

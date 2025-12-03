@@ -1,301 +1,240 @@
 object FrameBgDrawEditor: TFrameBgDrawEditor
   Left = 0
   Top = 0
-  Width = 800
-  Height = 600
+  Width = 640
+  Height = 480
   TabOrder = 0
-  object splHorizontal: TSplitter
-    Left = 0
-    Top = 406
-    Width = 800
-    Height = 3
-    Cursor = crVSplit
-    Align = alBottom
-    ExplicitTop = 430
-    ExplicitWidth = 430
-  end
-  object pnlToolbar: TPanel
-    Left = 0
-    Top = 0
-    Width = 800
-    Height = 41
-    Align = alTop
-    TabOrder = 0
-    object btnAddText: TButton
-      Left = 16
-      Top = 6
-      Width = 90
-      Height = 25
-      Caption = #28155#21152#25991#26412
-      TabOrder = 0
-      OnClick = btnAddTextClick
-    end
-    object btnAddImage: TButton
-      Left = 112
-      Top = 6
-      Width = 90
-      Height = 25
-      Caption = #28155#21152#22270#29255
-      TabOrder = 1
-      OnClick = btnAddImageClick
-    end
-    object btnAddCaption: TButton
-      Left = 208
-      Top = 6
-      Width = 90
-      Height = 25
-      Caption = #28155#21152#23383#24149
-      TabOrder = 2
-      OnClick = btnAddCaptionClick
-    end
-    object btnDelete: TButton
-      Left = 304
-      Top = 6
-      Width = 90
-      Height = 25
-      Caption = #21024#38500#20803#32032
-      TabOrder = 3
-      OnClick = btnDeleteClick
-    end
-    object btnSave: TButton
-      Left = 693
-      Top = 6
-      Width = 90
-      Height = 25
-      Anchors = [akTop, akRight]
-      Caption = #20445#23384
-      TabOrder = 4
-      OnClick = btnSaveClick
-    end
-  end
   object pnlBackground: TPanel
     Left = 0
-    Top = 41
-    Width = 800
-    Height = 41
+    Top = 0
+    Width = 640
+    Height = 50
     Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 0
+    object lblBackground: TLabel
+      Left = 16
+      Top = 16
+      Width = 60
+      Height = 13
+      Caption = '背景图路径:'
+    end
+    object edtBackground: TEdit
+      Left = 88
+      Top = 13
+      Width = 465
+      Height = 21
+      TabOrder = 0
+      OnChange = EditModified
+    end
+    object btnBrowse: TButton
+      Left = 559
+      Top = 11
+      Width = 75
+      Height = 25
+      Caption = '浏览...'
+      TabOrder = 1
+      OnClick = btnBrowseClick
+    end
+  end
+  object pnlElements: TPanel
+    Left = 0
+    Top = 50
+    Width = 640
+    Height = 430
+    Align = alClient
+    BevelOuter = bvNone
     TabOrder = 1
-    object btnLoadBackground: TButton
+    object lblElements: TLabel
       Left = 16
       Top = 6
-      Width = 121
-      Height = 25
-      Caption = #21152#36733#32972#26223#22270#29255
-      TabOrder = 0
-      OnClick = btnLoadBackgroundClick
+      Width = 48
+      Height = 13
+      Caption = '元素列表:'
     end
-  end
-  object pnlCanvas: TPanel
-    Left = 0
-    Top = 82
-    Width = 800
-    Height = 324
-    Align = alClient
-    TabOrder = 2
-  end
-  object pnlProperties: TPanel
-    Left = 0
-    Top = 409
-    Width = 800
-    Height = 191
-    Align = alBottom
-    TabOrder = 3
-    object lblElementProperties: TLabel
+    object lstElements: TListBox
       Left = 16
-      Top = 13
-      Width = 72
-      Height = 15
-      Caption = #20803#32032#23646#24615#32534#36753
-    end
-    object pgProperties: TPageControl
-      Left = 1
-      Top = 32
-      Width = 798
-      Height = 158
-      ActivePage = tsGeneral
-      Align = alBottom
-      MultiLine = True
+      Top = 24
+      Width = 217
+      Height = 393
+      ItemHeight = 13
       TabOrder = 0
-      object tsGeneral: TTabSheet
-        Caption = #36890#29992#23646#24615
-        object lblName: TLabel
-          Left = 16
-          Top = 16
-          Width = 52
-          Height = 15
-          Caption = #20803#32032#21517#31216
-        end
-        object lblPositionX: TLabel
-          Left = 16
-          Top = 53
-          Width = 38
-          Height = 15
-          Caption = 'X'#22352#26631
-        end
-        object lblPositionY: TLabel
-          Left = 202
-          Top = 53
-          Width = 38
-          Height = 15
-          Caption = 'Y'#22352#26631
-        end
-        object edtElementName: TEdit
-          Left = 74
-          Top = 13
-          Width = 267
-          Height = 23
-          TabOrder = 0
-          OnChange = edtElementNameChange
-        end
-        object edtPositionX: TEdit
-          Left = 74
-          Top = 50
-          Width = 90
-          Height = 23
-          TabOrder = 1
-          OnChange = edtPositionXChange
-        end
-        object edtPositionY: TEdit
-          Left = 250
-          Top = 50
-          Width = 90
-          Height = 23
-          TabOrder = 2
-          OnChange = edtPositionYChange
-        end
-        object chkVisible: TCheckBox
-          Left = 74
-          Top = 88
-          Width = 97
-          Height = 17
-          Caption = #21487#35265
-          Checked = True
-          State = cbChecked
-          TabOrder = 3
-          OnClick = chkVisibleClick
-        end
+      OnClick = lstElementsClick
+    end
+    object pnlElementButtons: TPanel
+      Left = 239
+      Top = 24
+      Width = 98
+      Height = 393
+      BevelOuter = bvNone
+      TabOrder = 1
+      object btnAddElement: TButton
+        Left = 0
+        Top = 0
+        Width = 98
+        Height = 25
+        Caption = '添加元素'
+        TabOrder = 0
+        OnClick = btnAddElementClick
       end
-      object tsTextProps: TTabSheet
-        Caption = #25991#26412#23646#24615
-        ImageIndex = 1
-        object lblText: TLabel
-          Left = 16
-          Top = 16
-          Width = 52
-          Height = 15
-          Caption = #25991#26412#20869#23481
-        end
-        object edtText: TEdit
-          Left = 74
-          Top = 13
-          Width = 267
-          Height = 23
-          TabOrder = 0
-          OnChange = edtTextChange
-        end
-        object btnFont: TButton
-          Left = 74
-          Top = 50
-          Width = 121
-          Height = 25
-          Caption = #36873#25321#23383#20307
-          TabOrder = 1
-          OnClick = btnFontClick
-        end
+      object btnEditElement: TButton
+        Left = 0
+        Top = 31
+        Width = 98
+        Height = 25
+        Caption = '编辑元素'
+        Enabled = False
+        TabOrder = 1
+        OnClick = btnEditElementClick
       end
-      object tsImageProps: TTabSheet
-        Caption = #22270#29255#23646#24615
-        ImageIndex = 2
-        object lblImagePath: TLabel
-          Left = 16
-          Top = 16
-          Width = 52
-          Height = 15
-          Caption = #22270#29255#36335#24452
-        end
-        object lblScale: TLabel
-          Left = 16
-          Top = 53
-          Width = 26
-          Height = 15
-          Caption = #32553#25918
-        end
-        object edtImagePath: TEdit
-          Left = 74
-          Top = 13
-          Width = 267
-          Height = 23
-          ReadOnly = True
-          TabOrder = 0
-        end
-        object btnBrowseImage: TButton
-          Left = 347
-          Top = 13
-          Width = 75
-          Height = 25
-          Caption = #27983#35272'...'
-          TabOrder = 1
-          OnClick = btnBrowseImageClick
-        end
-        object edtScale: TEdit
-          Left = 74
-          Top = 50
-          Width = 90
-          Height = 23
-          TabOrder = 2
-          Text = '1.00'
-          OnChange = edtScaleChange
-        end
+      object btnDeleteElement: TButton
+        Left = 0
+        Top = 62
+        Width = 98
+        Height = 25
+        Caption = '删除元素'
+        Enabled = False
+        TabOrder = 2
+        OnClick = btnDeleteElementClick
       end
-      object tsCaptionProps: TTabSheet
-        Caption = #23383#24149#23646#24615
-        ImageIndex = 3
-        object lblDuration: TLabel
-          Left = 16
-          Top = 16
-          Width = 52
-          Height = 15
-          Caption = #26174#31034#26102#38271
-        end
-        object lblStartTime: TLabel
-          Left = 16
-          Top = 53
-          Width = 52
-          Height = 15
-          Caption = #24320#22987#26102#38388
-        end
-        object edtDuration: TEdit
-          Left = 74
-          Top = 13
-          Width = 90
-          Height = 23
-          TabOrder = 0
-          Text = '5.00'
-          OnChange = edtDurationChange
-        end
-        object edtStartTime: TEdit
-          Left = 74
-          Top = 50
-          Width = 90
-          Height = 23
-          TabOrder = 1
-          Text = '0.00'
-          OnChange = edtStartTimeChange
-        end
+      object btnMoveUp: TButton
+        Left = 0
+        Top = 124
+        Width = 98
+        Height = 25
+        Caption = '上移'
+        Enabled = False
+        TabOrder = 3
+        OnClick = btnMoveUpClick
+      end
+      object btnMoveDown: TButton
+        Left = 0
+        Top = 155
+        Width = 98
+        Height = 25
+        Caption = '下移'
+        Enabled = False
+        TabOrder = 4
+        OnClick = btnMoveDownClick
+      end
+    end
+    object pnlElementDetails: TPanel
+      Left = 343
+      Top = 24
+      Width = 281
+      Height = 393
+      BevelOuter = bvNone
+      TabOrder = 2
+      Visible = False
+      object lblElementType: TLabel
+        Left = 16
+        Top = 16
+        Width = 48
+        Height = 13
+        Caption = '元素类型:'
+      end
+      object lblElementName: TLabel
+        Left = 16
+        Top = 56
+        Width = 48
+        Height = 13
+        Caption = '元素名称:'
+      end
+      object lblX: TLabel
+        Left = 16
+        Top = 96
+        Width = 10
+        Height = 13
+        Caption = 'X:'
+      end
+      object lblY: TLabel
+        Left = 112
+        Top = 96
+        Width = 10
+        Height = 13
+        Caption = 'Y:'
+      end
+      object lblScale: TLabel
+        Left = 208
+        Top = 96
+        Width = 36
+        Height = 13
+        Caption = '缩放比:'
+      end
+      object lblAdditional: TLabel
+        Left = 16
+        Top = 136
+        Width = 48
+        Height = 13
+        Caption = '文本内容:'
+      end
+      object cmbElementType: TComboBox
+        Left = 80
+        Top = 13
+        Width = 145
+        Height = 21
+        Style = csDropDownList
+        TabOrder = 0
+        OnChange = cmbElementTypeChange
+      end
+      object edtElementName: TEdit
+        Left = 80
+        Top = 53
+        Width = 185
+        Height = 21
+        TabOrder = 1
+      end
+      object edtX: TEdit
+        Left = 32
+        Top = 93
+        Width = 65
+        Height = 21
+        TabOrder = 2
+      end
+      object edtY: TEdit
+        Left = 128
+        Top = 93
+        Width = 65
+        Height = 21
+        TabOrder = 3
+      end
+      object edtScale: TEdit
+        Left = 248
+        Top = 93
+        Width = 25
+        Height = 21
+        TabOrder = 4
+        Text = '1.0'
+      end
+      object memAdditional: TMemo
+        Left = 16
+        Top = 155
+        Width = 257
+        Height = 193
+        TabOrder = 5
+      end
+      object btnSaveElement: TButton
+        Left = 98
+        Top = 354
+        Width = 75
+        Height = 25
+        Caption = '保存'
+        TabOrder = 6
+        OnClick = btnSaveElementClick
+      end
+      object btnCancelElement: TButton
+        Left = 179
+        Top = 354
+        Width = 75
+        Height = 25
+        Caption = '取消'
+        TabOrder = 7
+        OnClick = btnCancelElementClick
       end
     end
   end
-  object dlgOpenImage: TOpenPictureDialog
-    Left = 440
-    Top = 48
-  end
-  object dlgFont: TFontDialog
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    Left = 528
-    Top = 48
+  object dlgOpenPicture: TOpenDialog
+    Left = 416
+    Top = 8
   end
 end 

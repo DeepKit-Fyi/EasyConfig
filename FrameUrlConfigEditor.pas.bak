@@ -1,0 +1,890 @@
+unit FrameUrlConfigEditor;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.JSON, System.JSON.Types, Vcl.Controls, Vcl.Forms, 
+  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs, Vcl.Imaging.pngimage,
+  ConfigFrameBase, UtilsTypes;
+
+type
+  // URL配置编辑器Frame
+  TFrameUrlConfigEditor = class(TBaseConfigFrame)
+    pnlMain: TPanel;
+    grpUrlConfig: TGroupBox;
+    lblName: TLabel;
+    lblDescription: TLabel;
+    edtName: TEdit;
+    memDescription: TMemo;
+    lblBaseUrl: TLabel;
+    edtBaseUrl: TEdit;
+    lblProtocol: TLabel;
+    cbbProtocol: TComboBox;
+    chkUseSSL: TCheckBox;
+    lblPort: TLabel;
+    edtPort: TEdit;
+    lblTimeout: TLabel;
+    edtTimeout: TEdit;
+    lblHeaders: TLabel;
+    sgHeaders: TStringGrid;
+    pnlHeaderButtons: TPanel;
+    btnAddHeader: TButton;
+    btnDeleteHeader: TButton;
+    lblParameters: TLabel;
+    sgParameters: TStringGrid;
+    pnlParamButtons: TPanel;
+    btnAddParam: TButton;
+    btnDeleteParam: TButton;
+    pnlButtons: TPanel;
+    btnUpdate: TButton;
+    btnCancel: TButton;
+    lblAuthentication: TLabel;
+    cbbAuthType: TComboBox;
+    lblUsername: TLabel;
+    edtUsername: TEdit;
+    lblPassword: TLabel;
+    edtPassword: TEdit;
+    lblApiKey: TLabel;
+    edtApiKey: TEdit;
+    btnTestUrl: TButton;
+    procedure btnUpdateClick(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
+    procedure btnAddHeaderClick(Sender: TObject);
+    procedure btnDeleteHeaderClick(Sender: TObject);
+    procedure btnAddParamClick(Sender: TObject);
+    procedure btnDeleteParamClick(Sender: TObject);
+    procedure cbbAuthTypeChange(Sender: TObject);
+    procedure chkUseSSLClick(Sender: TObject);
+    procedure cbbProtocolChange(Sender: TObject);
+    procedure btnTestUrlClick(Sender: TObject);
+  private
+    procedure InitControls;
+    procedure InitStringGrids;
+    procedure UpdateAuthenticationControls;
+    function BuildFullUrl: string;
+    function ValidateInput: Boolean;
+  protected
+    procedure LoadFromJSON; override;
+    procedure CreateControls; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure SaveToJSON; override;
+  end;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  System.NetEncoding, System.Net.URLClient, System.Net.HttpClient;
+
+{ TFrameUrlConfigEditor }
+
+constructor TFrameUrlConfigEditor.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  CreateControls;
+  InitControls;
+end;
+
+destructor TFrameUrlConfigEditor.Destroy;
+begin
+  inherited;
+end;
+
+procedure TFrameUrlConfigEditor.CreateControls;
+begin
+  inherited;
+  
+  // 这个方法会在构造函数中调用，如果控件已在DFM文件中设计好，则不需要额外创建
+  // 如果需要动态创建控件，可以在这里添加代码
+end;
+
+procedure TFrameUrlConfigEditor.InitControls;
+begin
+  // 初始化协议下拉框
+  cbbProtocol.Items.Clear;
+  cbbProtocol.Items.Add('http');
+  cbbProtocol.Items.Add('https');
+  cbbProtocol.Items.Add('ftp');
+  cbbProtocol.Items.Add('ftps');
+  cbbProtocol.Items.Add('ws');
+  cbbProtocol.Items.Add('wss');
+  cbbProtocol.ItemIndex := 1; // https
+  
+  // 初始化认证方式下拉框
+  cbbAuthType.Items.Clear;
+  cbbAuthType.Items.Add('无认证');
+  cbbAuthType.Items.Add('Basic认证');
+  cbbAuthType.Items.Add('API Key');
+  cbbAuthType.Items.Add('OAuth');
+  cbbAuthType.ItemIndex := 0;
+  
+  // 默认端口
+  edtPort.Text := '443';
+  
+  // 默认超时(毫秒)
+  edtTimeout.Text := '30000';
+  
+  // 初始化字符串网格
+  InitStringGrids;
+  
+  // 更新认证控件状态
+  UpdateAuthenticationControls;
+end;
+
+procedure TFrameUrlConfigEditor.InitStringGrids;
+begin
+  // 设置标头网格
+  sgHeaders.Cells[0, 0] := '名称';
+  sgHeaders.Cells[1, 0] := '值';
+  sgHeaders.ColWidths[0] := 150;
+  sgHeaders.ColWidths[1] := 250;
+  
+  // 清除网格数据
+  for var I := 1 to sgHeaders.RowCount - 1 do
+    for var J := 0 to sgHeaders.ColCount - 1 do
+      sgHeaders.Cells[J, I] := '';
+  
+  // 设置参数网格
+  sgParameters.Cells[0, 0] := '名称';
+  sgParameters.Cells[1, 0] := '值';
+  sgParameters.Cells[2, 0] := '必填';
+  sgParameters.ColWidths[0] := 150;
+  sgParameters.ColWidths[1] := 200;
+  sgParameters.ColWidths[2] := 50;
+  
+  // 清除网格数据
+  for var I := 1 to sgParameters.RowCount - 1 do
+    for var J := 0 to sgParameters.ColCount - 1 do
+      sgParameters.Cells[J, I] := '';
+  
+  // 重置行数
+  sgHeaders.RowCount := 2;
+  sgParameters.RowCount := 2;
+  
+  // 添加一些常用标头
+  sgHeaders.Cells[0, 1] := 'Content-Type';
+  sgHeaders.Cells[1, 1] := 'application/json';
+end;
+
+procedure TFrameUrlConfigEditor.LoadFromJSON;
+var
+  Value: TJSONValue;
+  Headers, Parameters: TJSONArray;
+  Item: TJSONObject;
+  Row: Integer;
+begin
+  if not Assigned(JSONObject) then
+    Exit;
+  
+  // 加载基本属性
+  Value := JSONObject.GetValue('name');
+  if Assigned(Value) then
+    edtName.Text := Value.Value;
+    
+  Value := JSONObject.GetValue('description');
+  if Assigned(Value) then
+    memDescription.Text := Value.Value;
+  
+  // 加载URL配置
+  Value := JSONObject.GetValue('base_url');
+  if Assigned(Value) then
+    edtBaseUrl.Text := Value.Value;
+  
+  Value := JSONObject.GetValue('protocol');
+  if Assigned(Value) then
+  begin
+    var Protocol := Value.Value;
+    var ProtocolIndex := cbbProtocol.Items.IndexOf(Protocol);
+    if ProtocolIndex >= 0 then
+      cbbProtocol.ItemIndex := ProtocolIndex;
+  end;
+  
+  Value := JSONObject.GetValue('use_ssl');
+  if Assigned(Value) and (Value is TJSONBool) then
+    chkUseSSL.Checked := (Value as TJSONBool).AsBoolean;
+  
+  Value := JSONObject.GetValue('port');
+  if Assigned(Value) and (Value is TJSONNumber) then
+    edtPort.Text := IntToStr((Value as TJSONNumber).AsInt);
+  
+  Value := JSONObject.GetValue('timeout');
+  if Assigned(Value) and (Value is TJSONNumber) then
+    edtTimeout.Text := IntToStr((Value as TJSONNumber).AsInt);
+  
+  // 加载认证信息
+  Value := JSONObject.GetValue('auth_type');
+  if Assigned(Value) then
+  begin
+    var AuthType := Value.Value;
+    if SameText(AuthType, 'none') then
+      cbbAuthType.ItemIndex := 0
+    else if SameText(AuthType, 'basic') then
+      cbbAuthType.ItemIndex := 1
+    else if SameText(AuthType, 'apikey') then
+      cbbAuthType.ItemIndex := 2
+    else if SameText(AuthType, 'oauth') then
+      cbbAuthType.ItemIndex := 3;
+  end;
+  
+  Value := JSONObject.GetValue('username');
+  if Assigned(Value) then
+    edtUsername.Text := Value.Value;
+    
+  Value := JSONObject.GetValue('password');
+  if Assigned(Value) then
+    edtPassword.Text := Value.Value;
+    
+  Value := JSONObject.GetValue('api_key');
+  if Assigned(Value) then
+    edtApiKey.Text := Value.Value;
+  
+  // 加载标头
+  Value := JSONObject.GetValue('headers');
+  if Assigned(Value) and (Value is TJSONArray) then
+  begin
+    Headers := Value as TJSONArray;
+    
+    // 清除表格
+    for var I := 1 to sgHeaders.RowCount - 1 do
+      for var J := 0 to sgHeaders.ColCount - 1 do
+        sgHeaders.Cells[J, I] := '';
+    
+    // 如果有标头，设置行数
+    if Headers.Count > 0 then
+    begin
+      sgHeaders.RowCount := Headers.Count + 1;
+      
+      // 填充标头数据
+      for var I := 0 to Headers.Count - 1 do
+      begin
+        Row := I + 1;
+        Item := Headers.Items[I] as TJSONObject;
+        
+        var NameValue := Item.GetValue('name');
+        if Assigned(NameValue) then
+          sgHeaders.Cells[0, Row] := NameValue.Value;
+          
+        var ValueValue := Item.GetValue('value');
+        if Assigned(ValueValue) then
+          sgHeaders.Cells[1, Row] := ValueValue.Value;
+      end;
+    end
+    else
+      sgHeaders.RowCount := 2;
+  end;
+  
+  // 加载参数
+  Value := JSONObject.GetValue('parameters');
+  if Assigned(Value) and (Value is TJSONArray) then
+  begin
+    Parameters := Value as TJSONArray;
+    
+    // 清除表格
+    for var I := 1 to sgParameters.RowCount - 1 do
+      for var J := 0 to sgParameters.ColCount - 1 do
+        sgParameters.Cells[J, I] := '';
+    
+    // 如果有参数，设置行数
+    if Parameters.Count > 0 then
+    begin
+      sgParameters.RowCount := Parameters.Count + 1;
+      
+      // 填充参数数据
+      for var I := 0 to Parameters.Count - 1 do
+      begin
+        Row := I + 1;
+        Item := Parameters.Items[I] as TJSONObject;
+        
+        var NameValue := Item.GetValue('name');
+        if Assigned(NameValue) then
+          sgParameters.Cells[0, Row] := NameValue.Value;
+          
+        var ValueValue := Item.GetValue('value');
+        if Assigned(ValueValue) then
+          sgParameters.Cells[1, Row] := ValueValue.Value;
+        
+        var RequiredValue := Item.GetValue('required');
+        if Assigned(RequiredValue) and (RequiredValue is TJSONBool) then
+        begin
+          if (RequiredValue as TJSONBool).AsBoolean then
+            sgParameters.Cells[2, Row] := 'True'
+          else
+            sgParameters.Cells[2, Row] := 'False';
+        end;
+      end;
+    end
+    else
+      sgParameters.RowCount := 2;
+  end;
+  
+  // 更新认证控件状态
+  UpdateAuthenticationControls;
+end;
+
+procedure TFrameUrlConfigEditor.SaveToJSON;
+var
+  Headers, Parameters: TJSONArray;
+  Item: TJSONObject;
+begin
+  if not Assigned(JSONObject) then
+    JSONObject := TJSONObject.Create;
+  
+  // 保存基本属性
+  JSONObject.RemovePair('_type');
+  JSONObject.AddPair('_type', 'etUrlConfig');
+  JSONObject.RemovePair('name');
+  JSONObject.AddPair('name', edtName.Text);
+  JSONObject.RemovePair('description');
+  JSONObject.AddPair('description', memDescription.Text);
+  
+  // 保存URL配置
+  JSONObject.RemovePair('base_url');
+  JSONObject.AddPair('base_url', edtBaseUrl.Text);
+  
+  if cbbProtocol.ItemIndex >= 0 then
+  begin
+    JSONObject.RemovePair('protocol');
+    JSONObject.AddPair('protocol', cbbProtocol.Items[cbbProtocol.ItemIndex]);
+  end;
+  
+  JSONObject.RemovePair('use_ssl');
+  JSONObject.AddPair('use_ssl', TJSONBool.Create(chkUseSSL.Checked));
+  
+  try
+    var Port := StrToIntDef(edtPort.Text, 443);
+    JSONObject.RemovePair('port');
+    JSONObject.AddPair('port', TJSONNumber.Create(Port));
+  except
+    JSONObject.RemovePair('port');
+    JSONObject.AddPair('port', TJSONNumber.Create(443));
+  end;
+  
+  try
+    var Timeout := StrToIntDef(edtTimeout.Text, 30000);
+    JSONObject.RemovePair('timeout');
+    JSONObject.AddPair('timeout', TJSONNumber.Create(Timeout));
+  except
+    JSONObject.RemovePair('timeout');
+    JSONObject.AddPair('timeout', TJSONNumber.Create(30000));
+  end;
+  
+  // 保存认证信息
+  var AuthType := 'none';
+  case cbbAuthType.ItemIndex of
+    1: AuthType := 'basic';
+    2: AuthType := 'apikey';
+    3: AuthType := 'oauth';
+  end;
+  JSONObject.RemovePair('auth_type');
+  JSONObject.AddPair('auth_type', AuthType);
+  
+  JSONObject.RemovePair('username');
+  JSONObject.AddPair('username', edtUsername.Text);
+  JSONObject.RemovePair('password');
+  JSONObject.AddPair('password', edtPassword.Text);
+  JSONObject.RemovePair('api_key');
+  JSONObject.AddPair('api_key', edtApiKey.Text);
+  
+  // 创建标头数组
+  Headers := TJSONArray.Create;
+  
+  // 添加标头
+  for var I := 1 to sgHeaders.RowCount - 1 do
+  begin
+    // 跳过空行
+    if (sgHeaders.Cells[0, I] = '') and (sgHeaders.Cells[1, I] = '') then
+      Continue;
+    
+    // 创建标头项
+    Item := TJSONObject.Create;
+    Item.AddPair('name', sgHeaders.Cells[0, I]);
+    Item.AddPair('value', sgHeaders.Cells[1, I]);
+    
+    // 添加到数组
+    Headers.AddElement(Item);
+  end;
+  
+  // 更新JSON对象
+  JSONObject.RemovePair('headers');
+  JSONObject.AddPair('headers', Headers);
+  
+  // 创建参数数组
+  Parameters := TJSONArray.Create;
+  
+  // 添加参数
+  for var I := 1 to sgParameters.RowCount - 1 do
+  begin
+    // 跳过空行
+    if (sgParameters.Cells[0, I] = '') and (sgParameters.Cells[1, I] = '') then
+      Continue;
+    
+    // 创建参数项
+    Item := TJSONObject.Create;
+    Item.AddPair('name', sgParameters.Cells[0, I]);
+    Item.AddPair('value', sgParameters.Cells[1, I]);
+    
+    // 必填标志
+    var Required := False;
+    if SameText(sgParameters.Cells[2, I], 'True') then
+      Required := True;
+    
+    Item.AddPair('required', TJSONBool.Create(Required));
+    
+    // 添加到数组
+    Parameters.AddElement(Item);
+  end;
+  
+  // 更新JSON对象
+  JSONObject.RemovePair('parameters');
+  JSONObject.AddPair('parameters', Parameters);
+  
+  // 构建完整URL并保存
+  var FullUrl := BuildFullUrl;
+  JSONObject.RemovePair('full_url');
+  JSONObject.AddPair('full_url', FullUrl);
+  
+  // 设置修改标志为false
+  Modified := False;
+end;
+
+function TFrameUrlConfigEditor.BuildFullUrl: string;
+var
+  Protocol, BaseUrl, Port: string;
+begin
+  // 获取协议
+  if cbbProtocol.ItemIndex >= 0 then
+    Protocol := cbbProtocol.Items[cbbProtocol.ItemIndex]
+  else
+    Protocol := 'https';
+  
+  // 获取基础URL（去除开头的http://或https://）
+  BaseUrl := edtBaseUrl.Text;
+  if BaseUrl.StartsWith('http://', True) then
+    BaseUrl := BaseUrl.Substring(7)
+  else if BaseUrl.StartsWith('https://', True) then
+    BaseUrl := BaseUrl.Substring(8);
+  
+  // 如果BaseUrl包含端口号，则不添加端口
+  if Pos(':', BaseUrl) = 0 then
+  begin
+    // 获取端口
+    Port := edtPort.Text;
+    if (Port <> '') and (Port <> '80') and (Port <> '443') then
+      BaseUrl := BaseUrl + ':' + Port;
+  end;
+  
+  // 构建完整URL
+  Result := Protocol + '://' + BaseUrl;
+  
+  // 添加查询参数（如果有）
+  var HasParams := False;
+  var QueryString := '';
+  
+  for var I := 1 to sgParameters.RowCount - 1 do
+  begin
+    if (sgParameters.Cells[0, I] <> '') and (sgParameters.Cells[1, I] <> '') then
+    begin
+      if not HasParams then
+      begin
+        QueryString := '?' + TNetEncoding.URL.Encode(sgParameters.Cells[0, I]) + 
+                        '=' + TNetEncoding.URL.Encode(sgParameters.Cells[1, I]);
+        HasParams := True;
+      end
+      else
+      begin
+        QueryString := QueryString + '&' + TNetEncoding.URL.Encode(sgParameters.Cells[0, I]) + 
+                        '=' + TNetEncoding.URL.Encode(sgParameters.Cells[1, I]);
+      end;
+    end;
+  end;
+  
+  Result := Result + QueryString;
+end;
+
+function TFrameUrlConfigEditor.ValidateInput: Boolean;
+begin
+  Result := True;
+  
+  // 验证名称
+  if Trim(edtName.Text) = '' then
+  begin
+    ShowMessage('请输入名称');
+    edtName.SetFocus;
+    Result := False;
+    Exit;
+  end;
+  
+  // 验证基础URL
+  if Trim(edtBaseUrl.Text) = '' then
+  begin
+    ShowMessage('请输入基础URL');
+    edtBaseUrl.SetFocus;
+    Result := False;
+    Exit;
+  end;
+  
+  // 验证端口
+  try
+    var Port := StrToInt(edtPort.Text);
+    if (Port <= 0) or (Port > 65535) then
+    begin
+      ShowMessage('端口号必须在1-65535之间');
+      edtPort.SetFocus;
+      Result := False;
+      Exit;
+    end;
+  except
+    ShowMessage('请输入有效的端口号');
+    edtPort.SetFocus;
+    Result := False;
+    Exit;
+  end;
+  
+  // 验证超时
+  try
+    var Timeout := StrToInt(edtTimeout.Text);
+    if Timeout <= 0 then
+    begin
+      ShowMessage('超时时间必须大于0');
+      edtTimeout.SetFocus;
+      Result := False;
+      Exit;
+    end;
+  except
+    ShowMessage('请输入有效的超时时间');
+    edtTimeout.SetFocus;
+    Result := False;
+    Exit;
+  end;
+  
+  // 根据认证类型验证输入
+  case cbbAuthType.ItemIndex of
+    1: // Basic认证
+      begin
+        if Trim(edtUsername.Text) = '' then
+        begin
+          ShowMessage('Basic认证需要输入用户名');
+          edtUsername.SetFocus;
+          Result := False;
+          Exit;
+        end;
+      end;
+    2: // API Key
+      begin
+        if Trim(edtApiKey.Text) = '' then
+        begin
+          ShowMessage('API Key认证需要输入API Key');
+          edtApiKey.SetFocus;
+          Result := False;
+          Exit;
+        end;
+      end;
+  end;
+end;
+
+procedure TFrameUrlConfigEditor.UpdateAuthenticationControls;
+begin
+  // 根据认证类型显示/隐藏相关控件
+  case cbbAuthType.ItemIndex of
+    0: // 无认证
+      begin
+        lblUsername.Enabled := False;
+        edtUsername.Enabled := False;
+        lblPassword.Enabled := False;
+        edtPassword.Enabled := False;
+        lblApiKey.Enabled := False;
+        edtApiKey.Enabled := False;
+      end;
+    1: // Basic认证
+      begin
+        lblUsername.Enabled := True;
+        edtUsername.Enabled := True;
+        lblPassword.Enabled := True;
+        edtPassword.Enabled := True;
+        lblApiKey.Enabled := False;
+        edtApiKey.Enabled := False;
+      end;
+    2: // API Key
+      begin
+        lblUsername.Enabled := False;
+        edtUsername.Enabled := False;
+        lblPassword.Enabled := False;
+        edtPassword.Enabled := False;
+        lblApiKey.Enabled := True;
+        edtApiKey.Enabled := True;
+      end;
+    3: // OAuth
+      begin
+        lblUsername.Enabled := True;
+        edtUsername.Enabled := True;
+        lblPassword.Enabled := True;
+        edtPassword.Enabled := True;
+        lblApiKey.Enabled := True;
+        edtApiKey.Enabled := True;
+      end;
+  end;
+end;
+
+procedure TFrameUrlConfigEditor.btnAddHeaderClick(Sender: TObject);
+begin
+  // 查找最后一个非空行
+  var LastRow := sgHeaders.RowCount - 1;
+  while (LastRow > 0) and (sgHeaders.Cells[0, LastRow] = '') and (sgHeaders.Cells[1, LastRow] = '') do
+    Dec(LastRow);
+  
+  // 如果最后一行不是空行，则添加新行
+  if (sgHeaders.Cells[0, LastRow] <> '') or (sgHeaders.Cells[1, LastRow] <> '') then
+  begin
+    sgHeaders.RowCount := sgHeaders.RowCount + 1;
+    LastRow := sgHeaders.RowCount - 1;
+  end;
+  
+  // 在新行中设置默认值
+  sgHeaders.Cells[0, LastRow] := '';
+  sgHeaders.Cells[1, LastRow] := '';
+  
+  // 选中新行的第一个单元格
+  sgHeaders.Row := LastRow;
+  sgHeaders.Col := 0;
+  sgHeaders.SetFocus;
+  
+  Modified := True;
+end;
+
+procedure TFrameUrlConfigEditor.btnAddParamClick(Sender: TObject);
+begin
+  // 查找最后一个非空行
+  var LastRow := sgParameters.RowCount - 1;
+  while (LastRow > 0) and (sgParameters.Cells[0, LastRow] = '') and 
+        (sgParameters.Cells[1, LastRow] = '') do
+    Dec(LastRow);
+  
+  // 如果最后一行不是空行，则添加新行
+  if (sgParameters.Cells[0, LastRow] <> '') or (sgParameters.Cells[1, LastRow] <> '') then
+  begin
+    sgParameters.RowCount := sgParameters.RowCount + 1;
+    LastRow := sgParameters.RowCount - 1;
+  end;
+  
+  // 在新行中设置默认值
+  sgParameters.Cells[0, LastRow] := '';
+  sgParameters.Cells[1, LastRow] := '';
+  sgParameters.Cells[2, LastRow] := 'False';
+  
+  // 选中新行的第一个单元格
+  sgParameters.Row := LastRow;
+  sgParameters.Col := 0;
+  sgParameters.SetFocus;
+  
+  Modified := True;
+end;
+
+procedure TFrameUrlConfigEditor.btnCancelClick(Sender: TObject);
+begin
+  if Assigned(Parent) and (Parent is TPanel) then
+    TPanel(Parent).Visible := False;
+end;
+
+procedure TFrameUrlConfigEditor.btnDeleteHeaderClick(Sender: TObject);
+var
+  Row: Integer;
+begin
+  Row := sgHeaders.Row;
+  
+  // 必须选中一行且不是标题行
+  if (Row < 1) or (Row >= sgHeaders.RowCount) then
+    Exit;
+  
+  // 删除当前行
+  for var I := Row to sgHeaders.RowCount - 2 do
+    for var J := 0 to sgHeaders.ColCount - 1 do
+      sgHeaders.Cells[J, I] := sgHeaders.Cells[J, I + 1];
+  
+  // 清空最后一行
+  for var J := 0 to sgHeaders.ColCount - 1 do
+    sgHeaders.Cells[J, sgHeaders.RowCount - 1] := '';
+  
+  // 如果不是唯一的数据行，则减少行数
+  if sgHeaders.RowCount > 2 then
+    sgHeaders.RowCount := sgHeaders.RowCount - 1;
+  
+  Modified := True;
+end;
+
+procedure TFrameUrlConfigEditor.btnDeleteParamClick(Sender: TObject);
+var
+  Row: Integer;
+begin
+  Row := sgParameters.Row;
+  
+  // 必须选中一行且不是标题行
+  if (Row < 1) or (Row >= sgParameters.RowCount) then
+    Exit;
+  
+  // 删除当前行
+  for var I := Row to sgParameters.RowCount - 2 do
+    for var J := 0 to sgParameters.ColCount - 1 do
+      sgParameters.Cells[J, I] := sgParameters.Cells[J, I + 1];
+  
+  // 清空最后一行
+  for var J := 0 to sgParameters.ColCount - 1 do
+    sgParameters.Cells[J, sgParameters.RowCount - 1] := '';
+  
+  // 如果不是唯一的数据行，则减少行数
+  if sgParameters.RowCount > 2 then
+    sgParameters.RowCount := sgParameters.RowCount - 1;
+  
+  Modified := True;
+end;
+
+procedure TFrameUrlConfigEditor.btnTestUrlClick(Sender: TObject);
+var
+  URL: string;
+  HTTP: THTTPClient;
+  Response: IHTTPResponse;
+begin
+  // 构建完整URL
+  URL := BuildFullUrl;
+  
+  // 确认是否测试
+  if MessageDlg('是否要测试连接以下URL？'#13#10 + URL, 
+    mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+    Exit;
+  
+  Screen.Cursor := crHourGlass;
+  btnTestUrl.Enabled := False;
+  
+  HTTP := THTTPClient.Create;
+  try
+    try
+      // 设置超时时间
+      HTTP.ConnectionTimeout := StrToIntDef(edtTimeout.Text, 30000);
+      
+      // 根据认证类型设置认证信息
+      case cbbAuthType.ItemIndex of
+        1: // Basic认证
+          begin
+            HTTP.CustomHeaders['Authorization'] := 'Basic ' + 
+              TNetEncoding.Base64.Encode(edtUsername.Text + ':' + edtPassword.Text);
+          end;
+        2: // API Key
+          begin
+            HTTP.CustomHeaders['X-API-Key'] := edtApiKey.Text;
+          end;
+      end;
+      
+      // 添加自定义标头
+      for var I := 1 to sgHeaders.RowCount - 1 do
+      begin
+        if (sgHeaders.Cells[0, I] <> '') and (sgHeaders.Cells[1, I] <> '') then
+          HTTP.CustomHeaders[sgHeaders.Cells[0, I]] := sgHeaders.Cells[1, I];
+      end;
+      
+      // 发送HEAD请求测试连接
+      Response := HTTP.Head(URL);
+      
+      if (Response.StatusCode >= 200) and (Response.StatusCode < 300) then
+        ShowMessage('连接成功！'#13#10'状态码: ' + IntToStr(Response.StatusCode))
+      else
+        ShowMessage('连接返回状态码: ' + IntToStr(Response.StatusCode) + 
+                    #13#10'状态: ' + Response.StatusText);
+    except
+      on E: Exception do
+        ShowMessage('连接失败: ' + E.Message);
+    end;
+  finally
+    HTTP.Free;
+    btnTestUrl.Enabled := True;
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TFrameUrlConfigEditor.btnUpdateClick(Sender: TObject);
+begin
+  // 验证输入
+  if not ValidateInput then
+    Exit;
+  
+  // 保存数据
+  SaveToJSON;
+  
+  // 设置修改标志
+  Modified := True;
+  
+  // 通知修改
+  if Assigned(OnModified) then
+    OnModified(Self);
+end;
+
+procedure TFrameUrlConfigEditor.cbbAuthTypeChange(Sender: TObject);
+begin
+  UpdateAuthenticationControls;
+  Modified := True;
+end;
+
+procedure TFrameUrlConfigEditor.cbbProtocolChange(Sender: TObject);
+begin
+  // 根据协议自动设置端口和SSL选项
+  case cbbProtocol.ItemIndex of
+    0: // http
+      begin
+        edtPort.Text := '80';
+        chkUseSSL.Checked := False;
+      end;
+    1: // https
+      begin
+        edtPort.Text := '443';
+        chkUseSSL.Checked := True;
+      end;
+    2: // ftp
+      begin
+        edtPort.Text := '21';
+        chkUseSSL.Checked := False;
+      end;
+    3: // ftps
+      begin
+        edtPort.Text := '990';
+        chkUseSSL.Checked := True;
+      end;
+    4: // ws
+      begin
+        edtPort.Text := '80';
+        chkUseSSL.Checked := False;
+      end;
+    5: // wss
+      begin
+        edtPort.Text := '443';
+        chkUseSSL.Checked := True;
+      end;
+  end;
+  
+  Modified := True;
+end;
+
+procedure TFrameUrlConfigEditor.chkUseSSLClick(Sender: TObject);
+begin
+  // 根据SSL选项自动设置协议
+  if chkUseSSL.Checked then
+  begin
+    case cbbProtocol.ItemIndex of
+      0: cbbProtocol.ItemIndex := 1; // http -> https
+      2: cbbProtocol.ItemIndex := 3; // ftp -> ftps
+      4: cbbProtocol.ItemIndex := 5; // ws -> wss
+    end;
+  end
+  else
+  begin
+    case cbbProtocol.ItemIndex of
+      1: cbbProtocol.ItemIndex := 0; // https -> http
+      3: cbbProtocol.ItemIndex := 2; // ftps -> ftp
+      5: cbbProtocol.ItemIndex := 4; // wss -> ws
+    end;
+  end;
+  
+  Modified := True;
+end;
+
+end. 

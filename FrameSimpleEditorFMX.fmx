@@ -1,0 +1,174 @@
+object FrameSimpleEditorFMX: TFrameSimpleEditorFMX
+  Size.Width = 400.000000000000000000
+  Size.Height = 200.000000000000000000
+  Size.PlatformDefault = False
+  object layMain: TLayout
+    Align = Client
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Size.Width = 384.000000000000000000
+    Size.Height = 184.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object layName: TLayout
+      Align = Top
+      Size.Width = 384.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object lblName: TLabel
+        Align = Left
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #23646#24615#21517':'
+      end
+      object edtName: TEdit
+        Align = Client
+        Size.Width = 304.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+      end
+    end
+    object layType: TLayout
+      Align = Top
+      Position.Y = 36.000000000000000000
+      Size.Width = 384.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object lblType: TLabel
+        Align = Left
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #31867#22411':'
+      end
+      object cboType: TComboBox
+        Align = Left
+        Position.X = 80.000000000000000000
+        Size.Width = 150.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = cboTypeChange
+      end
+    end
+    object layValue: TLayout
+      Align = Top
+      Position.Y = 72.000000000000000000
+      Size.Width = 384.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object lblValue: TLabel
+        Align = Left
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #20540':'
+      end
+      object layValueEdit: TLayout
+        Align = Client
+        Size.Width = 304.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object edtValue: TEdit
+          Align = Client
+          Size.Width = 304.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+        end
+        object spnValue: TSpinBox
+          Align = Left
+          Size.Width = 150.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Visible = False
+          Max = 1000000.000000000000000000
+          Min = -1000000.000000000000000000
+        end
+        object chkValue: TCheckBox
+          Align = Left
+          Size.Width = 100.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          Visible = False
+          Text = #21551#29992
+        end
+        object cboColor: TColorComboBox
+          Align = Left
+          Size.Width = 150.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          Visible = False
+        end
+        object layPathValue: TLayout
+          Align = Client
+          Size.Width = 304.000000000000000000
+          Size.Height = 36.000000000000000000
+          Size.PlatformDefault = False
+          Visible = False
+          TabOrder = 4
+          object edtPath: TEdit
+            Align = Client
+            Size.Width = 224.000000000000000000
+            Size.Height = 36.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+          end
+          object btnBrowse: TButton
+            Align = Right
+            Position.X = 224.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 36.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Text = #27983#35272'...'
+            OnClick = btnBrowseClick
+          end
+        end
+      end
+    end
+    object layButtons: TLayout
+      Align = Bottom
+      Position.Y = 144.000000000000000000
+      Size.Width = 384.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      object btnOK: TButton
+        Align = Right
+        Position.X = 224.000000000000000000
+        Margins.Right = 8.000000000000000000
+        Size.Width = 72.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Text = #30830#23450
+        OnClick = btnOKClick
+      end
+      object btnCancel: TButton
+        Align = Right
+        Position.X = 304.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = #21462#28040
+        OnClick = btnCancelClick
+      end
+    end
+  end
+end

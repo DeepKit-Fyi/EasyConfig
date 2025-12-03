@@ -1,4 +1,4 @@
-program ConfigBuild;
+﻿program ConfigBuild;
 
 uses
   Vcl.Forms,

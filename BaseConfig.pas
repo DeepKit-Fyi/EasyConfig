@@ -3,7 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, System.IniFiles;
+  System.SysUtils, System.Classes, System.JSON, JSONHelpers, System.IniFiles;
 
 type
   // 配置存储基类

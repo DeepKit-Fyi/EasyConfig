@@ -1,11 +1,11 @@
-unit FrameListEditor;
+﻿unit FrameListEditor;
 
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
-  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
-  ConfigFrameBase, UtilsTypes, Vcl.Buttons;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.ComCtrls, Vcl.Buttons, System.JSON, ConfigFrameBase, UtilsTypes, System.UITypes, JSONHelpers;
 
 type
   TFrameListEditor = class(TBaseConfigFrame)
@@ -47,7 +47,7 @@ end;
 
 destructor TFrameListEditor.Destroy;
 begin
-  // 清理资源
+  // 释放所有资源
   inherited;
 end;
 
@@ -59,7 +59,7 @@ begin
   pnlMain.Align := alClient;
   pnlMain.BevelOuter := bvNone;
   
-  // 创建列表控件
+  // 创建列表框
   lstItems := TListBox.Create(pnlMain);
   lstItems.Parent := pnlMain;
   lstItems.Align := alClient;
@@ -74,7 +74,7 @@ begin
   pnlControls.Height := 40;
   pnlControls.BevelOuter := bvNone;
   
-  // 添加按钮
+  // 添加添加按钮
   btnAdd := TButton.Create(pnlControls);
   btnAdd.Parent := pnlControls;
   btnAdd.Left := 5;
@@ -83,7 +83,7 @@ begin
   btnAdd.Caption := '添加';
   btnAdd.OnClick := btnAddClick;
   
-  // 编辑按钮
+  // 添加编辑按钮
   btnEdit := TButton.Create(pnlControls);
   btnEdit.Parent := pnlControls;
   btnEdit.Left := 90;
@@ -93,7 +93,7 @@ begin
   btnEdit.OnClick := btnEditClick;
   btnEdit.Enabled := False;
   
-  // 删除按钮
+  // 添加删除按钮
   btnDelete := TButton.Create(pnlControls);
   btnDelete.Parent := pnlControls;
   btnDelete.Left := 175;
@@ -103,25 +103,25 @@ begin
   btnDelete.OnClick := btnDeleteClick;
   btnDelete.Enabled := False;
   
-  // 上移按钮
+  // 添加上移按钮
   btnMoveUp := TSpeedButton.Create(pnlControls);
   btnMoveUp.Parent := pnlControls;
   btnMoveUp.Left := 260;
   btnMoveUp.Top := 5;
   btnMoveUp.Width := 25;
   btnMoveUp.Height := 25;
-  btnMoveUp.Caption := '↑';
+  btnMoveUp.Caption := '^';
   btnMoveUp.OnClick := btnMoveUpClick;
   btnMoveUp.Enabled := False;
   
-  // 下移按钮
+  // 添加下移按钮
   btnMoveDown := TSpeedButton.Create(pnlControls);
   btnMoveDown.Parent := pnlControls;
   btnMoveDown.Left := 290;
   btnMoveDown.Top := 5;
   btnMoveDown.Width := 25;
   btnMoveDown.Height := 25;
-  btnMoveDown.Caption := '↓';
+  btnMoveDown.Caption := 'v';
   btnMoveDown.OnClick := btnMoveDownClick;
   btnMoveDown.Enabled := False;
 end;

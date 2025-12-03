@@ -1,0 +1,2548 @@
+﻿unit MainForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.ExtCtrls,
+  Vcl.Menus, Vcl.StdCtrls, Vcl.Buttons, System.ImageList, Vcl.ImgList, System.UITypes,
+  System.IniFiles, ConfigManager, BaseConfig, INIConfig, JSONConfig, ConfigTypes,
+  Vcl.FileCtrl, System.Skia, Vcl.Skia, System.IOUtils, FormHelper, TreeHelper,
+  Vcl.Grids, Vcl.ValEdit, System.JSON, Vcl.Themes, System.Generics.Collections;
+
+type
+  PConfigPageInfo = ^TConfigPageInfo;
+  TConfigPageInfo = record
+    Title: string;
+    ConfigType: string;
+    ConfigPath: string;
+    TabSheet: TTabSheet;
+    Modified: Boolean;
+  end;
+
+  TfrmMain = class(TForm)
+    pnlMain: TPanel;
+    splMain: TSplitter;
+    pnlLeft: TPanel;
+    pnlClient: TPanel;
+    tvConfig: TTreeView;
+    pcEditors: TPageControl;
+    sbMain: TStatusBar;
+    pnlButtons: TPanel;
+    btnSave: TBitBtn;
+    btnReload: TBitBtn;
+    btnValidate: TBitBtn;
+    mnuMain: TMainMenu;
+    mnuFile: TMenuItem;
+    mnuOpen: TMenuItem;
+    mnuSave: TMenuItem;
+    mnuSaveAs: TMenuItem;
+    mnuSep1: TMenuItem;
+    mnuExit: TMenuItem;
+    mnuEdit: TMenuItem;
+    mnuCut: TMenuItem;
+    mnuCopy: TMenuItem;
+    mnuPaste: TMenuItem;
+    mnuTools: TMenuItem;
+    mnuValidate: TMenuItem;
+    mnuHelp: TMenuItem;
+    mnuAbout: TMenuItem;
+    ilIcons: TImageList;
+    pmTree: TPopupMenu;
+    pmTreeOpen: TMenuItem;
+    pmTreeNew: TMenuItem;
+    pmTreeDelete: TMenuItem;
+    pmTreeRename: TMenuItem;
+    pmEditor: TPopupMenu;
+    pmEditorSave: TMenuItem;
+    pmEditorClose: TMenuItem;
+    pmEditorValidate: TMenuItem;
+    dlgOpen: TOpenDialog;
+    dlgSave: TSaveDialog;
+    pnlTop: TPanel;
+    pnlRight: TPanel;
+    Splitter1: TSplitter;
+    FileListBox1: TFileListBox;
+    Splitter2: TSplitter;
+    btnSvgSave: TSkSvg;
+    btnSvgOpen: TSkSvg;
+    btnSvgSaveAs: TSkSvg;
+    btnSvgDelete: TSkSvg;
+    btnSvgNewNode: TSkSvg;
+    btnSvgEditNode: TSkSvg;
+    btnSvgRemoveNode: TSkSvg;
+    btnSvgRefresh: TSkSvg;
+    btnSvgExit: TSkSvg;
+    btnSvgToggle: TSkSvg;
+    meoDebug: TMemo;
+    meoOutput: TMemo;
+    ValueListEditor1: TValueListEditor;
+    cbbTheme: TComboBox;
+    lblTheme: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure tvConfigDblClick(Sender: TObject);
+    procedure tvConfigChange(Sender: TObject; Node: TTreeNode);
+    procedure btnSaveClick(Sender: TObject);
+    procedure btnReloadClick(Sender: TObject);
+    procedure btnValidateClick(Sender: TObject);
+    procedure mnuOpenClick(Sender: TObject);
+    procedure mnuSaveClick(Sender: TObject);
+    procedure mnuSaveAsClick(Sender: TObject);
+    procedure mnuExitClick(Sender: TObject);
+    procedure mnuAboutClick(Sender: TObject);
+    procedure pcEditorsChange(Sender: TObject);
+    procedure pmTreeOpenClick(Sender: TObject);
+    procedure pmTreeNewClick(Sender: TObject);
+    procedure pmTreeDeleteClick(Sender: TObject);
+    procedure pmTreeRenameClick(Sender: TObject);
+    procedure pmEditorSaveClick(Sender: TObject);
+    procedure pmEditorCloseClick(Sender: TObject);
+    procedure pmEditorValidateClick(Sender: TObject);
+    procedure btnSvgOpenClick(Sender: TObject);
+    procedure btnSvgSaveClick(Sender: TObject);
+    procedure btnSvgSaveAsClick(Sender: TObject);
+    procedure btnSvgDeleteClick(Sender: TObject);
+    procedure btnSvgNewNodeClick(Sender: TObject);
+    procedure btnSvgEditNodeClick(Sender: TObject);
+    procedure btnSvgRemoveNodeClick(Sender: TObject);
+    procedure btnSvgRefreshClick(Sender: TObject);
+    procedure btnSvgExitClick(Sender: TObject);
+    procedure FileListBox1DblClick(Sender: TObject);
+    procedure btnSvgToggleClick(Sender: TObject);
+    procedure btnSvgExpandCollapseClick(Sender: TObject);
+    procedure ValueListEditorDblClick(Sender: TObject);
+    procedure ValueListEditorValidate(Sender: TObject; ACol, ARow: Integer; const KeyName, KeyValue: string);
+    procedure ValueListStringsValidate(Sender: TObject; var S: string);
+    procedure InitializeBasicInfoTab;
+    procedure AddValueItemClick(Sender: TObject);
+    procedure DeleteValueItemClick(Sender: TObject);
+    procedure SaveValueItemsClick(Sender: TObject);
+    procedure LoadBasicInfoToEditor(const ConfigPath: string);
+    procedure SaveBasicInfoFromEditor(const ConfigPath: string);
+    procedure InitializeTree;
+    function ShouldUseBasicInfoEditor(const ConfigPath: string): Boolean;
+    procedure cbbThemeChange(Sender: TObject);
+    procedure LoadAvailableThemes;
+    procedure ApplyTheme(const ThemeName: string);
+    procedure RenameValueItemClick(Sender: TObject);
+    procedure AddSectionClick(Sender: TObject);
+    procedure ValueListEditorDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+    procedure LoadSectionToEditor(const ConfigPath, SectionName: string);
+  private
+    { Private declarations }
+    FConfigManager: TConfigManager;
+    FOpenPages: TList;
+    FBasicInfoTab: TTabSheet;     // 基础信息选项卡
+    FValueListEditor: TValueListEditor; // 值列表编辑器
+    FCurrentBasicConfigPath: string; // 当前基础信息配置文件路径
+    procedure OpenConfigEditor(const ConfigType, ConfigPath: string);
+    function FindOpenPage(const ConfigPath: string): Integer;
+    procedure CloseConfigPage(Index: Integer);
+    procedure SaveCurrentConfig;
+    procedure ValidateCurrentConfig;
+    procedure UpdateStatusBar;
+    procedure SetModified(Index: Integer; Modified: Boolean);
+    function GetCurrentPageInfo: TConfigPageInfo;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmMain: TfrmMain;
+
+implementation
+
+{$R *.dfm}
+
+{ TfrmMain }
+
+procedure TfrmMain.FormCreate(Sender: TObject);
+var
+  Separator1, Separator2: TPanel;
+  ExpandCollapseBtn: TSkSvg;
+begin
+  // 设置默认样式，避免'Aqua Light Slate'不存在的错误
+  FormHelper.SetApplicationStyle('Windows', nil);
+
+  // 初始化调试和输出区域
+  meoDebug.Clear;
+  meoOutput.Clear;
+
+  // 设置显示中文的正确编码
+  meoDebug.Font.Name := 'Microsoft YaHei UI';
+  meoOutput.Font.Name := 'Microsoft YaHei UI';
+  
+  // 创建主题选择组合框
+  lblTheme := TLabel.Create(Self);
+  lblTheme.Parent := pnlTop;
+  lblTheme.Caption := '主题:';
+  lblTheme.Align := alRight;
+  lblTheme.AlignWithMargins := True;
+  lblTheme.Layout := tlCenter;
+  lblTheme.Margins.Right := 5;
+  lblTheme.Margins.Top := 15;
+  
+  cbbTheme := TComboBox.Create(Self);
+  cbbTheme.Parent := pnlTop;
+  cbbTheme.Width := 150;
+  cbbTheme.Align := alRight;
+  cbbTheme.AlignWithMargins := True;
+  cbbTheme.Margins.Right := 10;
+  cbbTheme.Margins.Top := 15;
+  cbbTheme.Style := csDropDownList;
+  cbbTheme.OnChange := cbbThemeChange;
+  
+  // 在代码中创建toggle按钮
+  btnSvgToggle := TSkSvg.Create(Self);
+  btnSvgToggle.Parent := pnlTop;
+  btnSvgToggle.AlignWithMargins := True;
+  btnSvgToggle.Margins.Left := 5;
+  btnSvgToggle.Margins.Right := 5;
+  btnSvgToggle.Width := 50;
+  btnSvgToggle.Height := 51;
+  btnSvgToggle.Hint := '显示/隐藏空分类';
+  btnSvgToggle.ShowHint := True;
+  btnSvgToggle.OnClick := btnSvgToggleClick;
+  
+  // 创建展开/收缩按钮
+  ExpandCollapseBtn := TSkSvg.Create(Self);
+  ExpandCollapseBtn.Parent := pnlTop;
+  ExpandCollapseBtn.AlignWithMargins := True;
+  ExpandCollapseBtn.Margins.Left := 5;
+  ExpandCollapseBtn.Margins.Right := 5;
+  ExpandCollapseBtn.Width := 50;
+  ExpandCollapseBtn.Height := 51;
+  ExpandCollapseBtn.Hint := '全部展开/收缩';
+  ExpandCollapseBtn.ShowHint := True;
+  ExpandCollapseBtn.OnClick := btnSvgExpandCollapseClick;
+  ExpandCollapseBtn.Name := 'btnSvgExpandCollapse';
+  
+  // 创建分隔线1
+  Separator1 := TPanel.Create(Self);
+  Separator1.Parent := pnlTop;
+  Separator1.Width := 2;
+  Separator1.BevelOuter := bvNone;
+  Separator1.Color := clGray;
+  Separator1.Height := 51;
+  Separator1.Name := 'pnlSeparator1';
+  Separator1.AlignWithMargins := True;
+  Separator1.Margins.Left := 10;
+  Separator1.Margins.Right := 10;
+  Separator1.Align := alLeft;
+  
+  // 创建分隔线2
+  Separator2 := TPanel.Create(Self);
+  Separator2.Parent := pnlTop;
+  Separator2.Width := 2;
+  Separator2.BevelOuter := bvNone;
+  Separator2.Color := clGray;
+  Separator2.Height := 51;
+  Separator2.Name := 'pnlSeparator2';
+  Separator2.AlignWithMargins := True;
+  Separator2.Margins.Left := 10;
+  Separator2.Margins.Right := 10;
+  Separator2.Align := alLeft;
+  
+  // 重新排序按钮 - 配置文件管理
+  btnSvgOpen.Align := alNone;
+  btnSvgSaveAs.Align := alNone;
+  btnSvgDelete.Align := alNone;
+  btnSvgSave.Align := alNone;
+  btnSvgRefresh.Align := alNone;
+  
+  // 子节点管理
+  btnSvgNewNode.Align := alNone;
+  btnSvgRemoveNode.Align := alNone;
+  btnSvgEditNode.Align := alNone;
+  btnSvgToggle.Align := alNone;
+  ExpandCollapseBtn.Align := alNone;
+  
+  // 退出按钮
+  btnSvgExit.Align := alNone;
+  
+  // 重新设置按钮顺序
+  // 第一组：配置文件管理
+  btnSvgOpen.Left := 3;
+  btnSvgOpen.Top := 3;
+  btnSvgOpen.Align := alLeft;
+  
+  btnSvgSaveAs.Left := btnSvgOpen.Left + btnSvgOpen.Width + 5;
+  btnSvgSaveAs.Top := 3;
+  btnSvgSaveAs.Align := alLeft;
+  
+  btnSvgDelete.Left := btnSvgSaveAs.Left + btnSvgSaveAs.Width + 5;
+  btnSvgDelete.Top := 3;
+  btnSvgDelete.Align := alLeft;
+  
+  btnSvgSave.Left := btnSvgDelete.Left + btnSvgDelete.Width + 5;
+  btnSvgSave.Top := 3;
+  btnSvgSave.Align := alLeft;
+  
+  btnSvgRefresh.Left := btnSvgSave.Left + btnSvgSave.Width + 5;
+  btnSvgRefresh.Top := 3;
+  btnSvgRefresh.Align := alLeft;
+  
+  // 分隔线1
+  Separator1.Left := btnSvgRefresh.Left + btnSvgRefresh.Width + 10;
+  Separator1.Top := 3;
+  
+  // 第二组：子节点管理
+  btnSvgNewNode.Left := Separator1.Left + Separator1.Width + 10;
+  btnSvgNewNode.Top := 3;
+  btnSvgNewNode.Align := alLeft;
+  
+  btnSvgRemoveNode.Left := btnSvgNewNode.Left + btnSvgNewNode.Width + 5;
+  btnSvgRemoveNode.Top := 3;
+  btnSvgRemoveNode.Align := alLeft;
+  
+  btnSvgEditNode.Left := btnSvgRemoveNode.Left + btnSvgRemoveNode.Width + 5;
+  btnSvgEditNode.Top := 3;
+  btnSvgEditNode.Align := alLeft;
+  
+  btnSvgToggle.Left := btnSvgEditNode.Left + btnSvgEditNode.Width + 5;
+  btnSvgToggle.Top := 3;
+  btnSvgToggle.Align := alLeft;
+  
+  ExpandCollapseBtn.Left := btnSvgToggle.Left + btnSvgToggle.Width + 5;
+  ExpandCollapseBtn.Top := 3;
+  ExpandCollapseBtn.Align := alLeft;
+  
+  // 分隔线2
+  Separator2.Left := ExpandCollapseBtn.Left + ExpandCollapseBtn.Width + 10;
+  Separator2.Top := 3;
+  
+  // 退出按钮 - 左对齐（实际上还是在右边，但是靠近Separator2）
+  btnSvgExit.Left := Separator2.Left + Separator2.Width + 10;
+  btnSvgExit.Top := 3;
+  btnSvgExit.Align := alLeft;
+  
+  // 确保config目录存在并初始化
+  InitConfigDirectory(meoDebug);
+  
+  // 创建页面列表
+  FOpenPages := TList.Create;
+  
+  // 初始化基础信息选项卡
+  FormHelper.AddDebugText(meoDebug, '正在初始化基础信息编辑选项卡...');
+  InitializeBasicInfoTab;
+  FormHelper.AddDebugText(meoDebug, '基础信息编辑选项卡初始化完成');
+  
+  // 加载应用程序设置
+  LoadApplicationSettings(Self, meoDebug);
+  
+  // 初始化配置管理器
+  FConfigManager := InitConfigManager('config\start.ini', meoDebug);
+  
+  // 初始化文件列表框
+  InitFileListBox(FileListBox1, GetCurrentDir + '\config');
+  
+  // 初始化SVG按钮图标和提示
+  InitSvgButtons(Self);
+  
+  // 加载可用主题
+  LoadAvailableThemes;
+  
+  // 记录启动信息
+  FormHelper.AddDebugText(meoDebug, '配置编辑器启动 - ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', Now));
+  
+  // 初始化树视图并更新状态栏
+  InitializeTree;
+  UpdateStatusBar;
+  
+  // 确保值列表编辑器和标签页是可见的
+  FBasicInfoTab.TabVisible := True;
+  pcEditors.ActivePage := FBasicInfoTab;
+end;
+
+procedure TfrmMain.FormDestroy(Sender: TObject);
+var
+  i: Integer;
+  PageInfo: PConfigPageInfo;
+begin
+  // 保存应用程序设置
+  SaveApplicationSettings(Self, meoDebug);
+  
+  // 清理树型视图中的数据
+  CleanupTreeData(tvConfig);
+  
+  // 释放所有打开的页面信息
+  for i := 0 to FOpenPages.Count - 1 do
+  begin
+    PageInfo := PConfigPageInfo(FOpenPages[i]);
+    Dispose(PageInfo);
+  end;
+  
+  FOpenPages.Free;
+  FConfigManager.Free;
+end;
+
+procedure TfrmMain.InitializeTree;
+var
+  ConfigFiles: TStringList;
+  i: Integer;
+  FilePath: string;
+  BaseConfigIni: TStringList;
+  BaseConfigPath: string;
+begin
+  tvConfig.Items.Clear;
+  
+  // 初始化树型视图的分类结构
+  InitializeTreeCategories(tvConfig);
+  
+  // 创建一个测试用的基础配置文件（如果不存在）
+  BaseConfigPath := GetCurrentDir + '\config\base_config.ini';
+  if not FileExists(BaseConfigPath) then
+  begin
+    BaseConfigIni := TStringList.Create;
+    try
+      BaseConfigIni.Add('; 基础配置测试文件');
+      BaseConfigIni.Add('[General]');
+      BaseConfigIni.Add('AppName=ConfigEditor');
+      BaseConfigIni.Add('Version=1.0');
+      BaseConfigIni.Add('Language=zh-CN');
+      BaseConfigIni.Add('[Interface]');
+      BaseConfigIni.Add('Theme=Windows');
+      BaseConfigIni.Add('FontSize=10');
+      BaseConfigIni.SaveToFile(BaseConfigPath);
+      
+      FormHelper.AddDebugText(meoDebug, '创建测试用基础配置文件: ' + BaseConfigPath);
+    finally
+      BaseConfigIni.Free;
+    end;
+  end;
+  
+  // 加载当前config目录下的所有配置文件
+  ConfigFiles := TStringList.Create;
+  try
+    // 获取所有INI文件
+    FindAllFiles(ConfigFiles, GetCurrentDir + '\config', '*.ini', False);
+    for i := 0 to ConfigFiles.Count - 1 do
+    begin
+      FilePath := ConfigFiles[i];
+      FormHelper.AddDebugText(meoDebug, '加载INI配置文件: ' + FilePath);
+      
+      // 从配置文件中读取属性实体
+      LoadPropertiesFromConfigFile(tvConfig, FilePath);
+    end;
+    
+    // 获取所有JSON文件
+    ConfigFiles.Clear;
+    FindAllFiles(ConfigFiles, GetCurrentDir + '\config', '*.json', False);
+    for i := 0 to ConfigFiles.Count - 1 do
+    begin
+      FilePath := ConfigFiles[i];
+      FormHelper.AddDebugText(meoDebug, '加载JSON配置文件: ' + FilePath);
+      
+      // 从配置文件中读取属性实体
+      LoadPropertiesFromConfigFile(tvConfig, FilePath);
+    end;
+  finally
+    ConfigFiles.Free;
+  end;
+  
+  tvConfig.FullExpand;
+  
+  // 更新调试信息
+  FormHelper.AddDebugText(meoDebug, '树型菜单加载完成，包含 ' + IntToStr(tvConfig.Items.Count) + ' 个节点');
+end;
+
+procedure TfrmMain.tvConfigDblClick(Sender: TObject);
+var
+  Node: TTreeNode;
+  NodeData: PNodeData;
+begin
+  try
+    Node := tvConfig.Selected;
+    if (Node <> nil) and (Node.Data <> nil) then
+    begin
+      NodeData := PNodeData(Node.Data);
+      
+      // 处理不同类型的节点
+      case NodeData.NodeType of
+        ntCategory:
+          begin
+            // 展开或收缩分类节点
+            if Node.Expanded then
+              Node.Collapse(False)
+            else
+              Node.Expand(False);
+          end;
+          
+        ntSection:
+          begin
+            try
+              // 显示详细调试信息
+              FormHelper.AddDebugText(meoDebug, '双击节点，尝试加载节内容...');
+              FormHelper.AddDebugText(meoDebug, Format('节信息: 类型=%d, 节名=%s, 路径=%s', 
+                                    [Ord(NodeData.NodeType), NodeData.SectionName, NodeData.ConfigPath]));
+                                    
+              // 加载节内容到编辑器
+              LoadSectionToEditor(NodeData.ConfigPath, NodeData.SectionName);
+              FormHelper.AddDebugText(meoDebug, '双击加载节内容: ' + NodeData.SectionName);
+            except
+              on E: Exception do
+              begin
+                FormHelper.AddDebugText(meoDebug, '双击加载节内容时出错: ' + E.Message);
+                ShowMessage('加载节内容失败: ' + E.Message);
+              end;
+            end;
+          end;
+          
+        ntPropertyEntity:
+          begin
+            // 检查是否应该使用基础信息编辑器
+            if SameText(NodeData.CategoryName, '基础配置') or 
+               // 简单配置通常节点数量少于10个
+               (ShouldUseBasicInfoEditor(NodeData.ConfigPath)) then
+            begin
+              // 使用基础信息编辑器打开
+              LoadBasicInfoToEditor(NodeData.ConfigPath);
+            end
+            else
+            begin
+              // 使用普通配置编辑器打开
+              OpenConfigEditor(NodeData.ConfigType, NodeData.ConfigPath);
+            end;
+          end;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      FormHelper.AddDebugText(meoDebug, '双击处理时出现未处理的异常: ' + E.Message);
+      ShowMessage('出现错误: ' + E.Message);
+    end;
+  end;
+end;
+
+function TfrmMain.ShouldUseBasicInfoEditor(const ConfigPath: string): Boolean;
+var
+  FileExt: string;
+  IniFile: TMemIniFile;
+  JsonFile: TJSONObject;
+  Sections: TStringList;
+  FileContent: string;
+  ItemCount: Integer;
+  i: Integer;
+begin
+  Result := False;
+  FileExt := LowerCase(ExtractFileExt(ConfigPath));
+  
+  // 对于小型配置文件，使用基础信息编辑器
+  try
+    if FileExt = '.ini' then
+    begin
+      IniFile := TMemIniFile.Create(ConfigPath, TEncoding.UTF8);
+      try
+        Sections := TStringList.Create;
+        try
+          IniFile.ReadSections(Sections);
+          
+          // 计算总键值对数量
+          ItemCount := 0;
+          for i := 0 to Sections.Count - 1 do
+          begin
+            var KeyList := TStringList.Create;
+            try
+              IniFile.ReadSection(Sections[i], KeyList);
+              Inc(ItemCount, KeyList.Count);
+            finally
+              KeyList.Free;
+            end;
+          end;
+          
+          // 如果总键值对数量小于10，认为是简单配置
+          Result := (ItemCount < 10);
+        finally
+          Sections.Free;
+        end;
+      finally
+        IniFile.Free;
+      end;
+    end
+    else if FileExt = '.json' then
+    begin
+      if FileExists(ConfigPath) then
+      begin
+        FileContent := TFile.ReadAllText(ConfigPath, TEncoding.UTF8);
+        try
+          JsonFile := TJSONObject(TJSONObject.ParseJSONValue(FileContent));
+          
+          if JsonFile <> nil then
+          begin
+            try
+              // 如果JSON对象的键少于10个，认为是简单配置
+              Result := (JsonFile.Count < 10);
+              
+              // 进一步检查是否存在复杂嵌套结构
+              if Result then
+              begin
+                for i := 0 to JsonFile.Count - 1 do
+                begin
+                  if (JsonFile.Pairs[i].JsonValue is TJSONObject) or
+                     (JsonFile.Pairs[i].JsonValue is TJSONArray) then
+                  begin
+                    // 存在复杂嵌套结构，不适合使用基础信息编辑器
+                    Result := False;
+                    Break;
+                  end;
+                end;
+              end;
+            finally
+              JsonFile.Free;
+            end;
+          end;
+        except
+          // 如果解析JSON出错，默认使用普通编辑器
+          Result := False;
+        end;
+      end;
+    end;
+  except
+    // 如果解析出错，默认使用普通编辑器
+    Result := False;
+  end;
+end;
+
+procedure TfrmMain.tvConfigChange(Sender: TObject; Node: TTreeNode);
+var
+  NodeData: PNodeData;
+begin
+  try
+    // 更新右键菜单状态
+    UpdateTreeContextMenu(tvConfig, pmTree);
+    
+    // 更新状态栏信息
+    UpdateStatusBar;
+
+    // 检查选中的节点
+    if (Node <> nil) and (Node.Data <> nil) then
+    begin
+      // 确保使用正确的PNodeData类型
+      NodeData := TreeHelper.GetSelectedNodeData(tvConfig);
+      
+      if NodeData <> nil then
+      begin
+        // 添加调试信息
+        FormHelper.AddDebugText(meoDebug, '选中的节点类型: ' + IntToStr(Ord(NodeData.NodeType)) + 
+                              ', 分类: ' + NodeData.CategoryName);
+        if NodeData.SectionName <> '' then
+          FormHelper.AddDebugText(meoDebug, ', 节: ' + NodeData.SectionName);
+        FormHelper.AddDebugText(meoDebug, ', 路径: ' + NodeData.ConfigPath);
+        
+        case NodeData.NodeType of
+          // 属性实体节点（具体的配置文件）
+          ntPropertyEntity:
+            begin
+              // 检查是否是简单配置或基础配置
+              if SameText(NodeData.CategoryName, '基础配置') or 
+                 ShouldUseBasicInfoEditor(NodeData.ConfigPath) then
+              begin
+                FormHelper.AddDebugText(meoDebug, '符合条件，开始加载配置到值列表编辑器...');
+                
+                // 使用值列表编辑器加载配置
+                LoadBasicInfoToEditor(NodeData.ConfigPath);
+                FormHelper.AddDebugText(meoDebug, '加载节点配置到值列表编辑器完成: ' + NodeData.PropertyName);
+              end
+              else
+              begin
+                FormHelper.AddDebugText(meoDebug, '不符合条件，跳过加载');
+              end;
+            end;
+            
+          // 节点（INI文件中的一个Section或JSON中的根节点）
+          ntSection:
+            begin
+              try
+                FormHelper.AddDebugText(meoDebug, '开始加载节的内容到值列表编辑器...');
+                
+                // 加载该节的内容到值列表编辑器
+                LoadSectionToEditor(NodeData.ConfigPath, NodeData.SectionName);
+                FormHelper.AddDebugText(meoDebug, '加载节内容到值列表编辑器完成: ' + NodeData.SectionName);
+              except
+                on E: Exception do
+                begin
+                  FormHelper.AddDebugText(meoDebug, '加载节内容时出错: ' + E.Message);
+                  ShowMessage('加载节内容失败: ' + E.Message);
+                end;
+              end;
+            end;
+            
+          else
+            FormHelper.AddDebugText(meoDebug, '不是可编辑节点类型，跳过加载');
+        end;
+      end
+      else
+      begin
+        FormHelper.AddDebugText(meoDebug, '无法获取节点数据');
+      end;
+    end
+    else
+    begin
+      FormHelper.AddDebugText(meoDebug, '选中的节点无效或无数据');
+    end;
+  except
+    on E: Exception do
+    begin
+      FormHelper.AddDebugText(meoDebug, '处理节点选择时出现未处理的异常: ' + E.Message);
+      ShowMessage('出现错误: ' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmMain.OpenConfigEditor(const ConfigType, ConfigPath: string);
+var
+  Index: Integer;
+  TabSheet: TTabSheet;
+  Editor: TMemo;
+  Config: TBaseConfig;
+  PageInfo: PConfigPageInfo;
+  FileContent: TStringList;
+begin
+  // 检查是否已经打开
+  Index := FindOpenPage(ConfigPath);
+  if Index >= 0 then
+  begin
+    pcEditors.ActivePageIndex := Index;
+    Exit;
+  end;
+  
+  // 创建新标签页
+  TabSheet := TTabSheet.Create(pcEditors);
+  TabSheet.PageControl := pcEditors;
+  TabSheet.Caption := ExtractFileName(ConfigPath);
+  
+  // 创建编辑器控件
+  Editor := TMemo.Create(TabSheet);
+  Editor.Parent := TabSheet;
+  Editor.Align := alClient;
+  Editor.ScrollBars := ssBoth;
+  Editor.WordWrap := False;
+  Editor.Font.Name := 'Consolas'; // 使用等宽字体
+  Editor.Font.Size := 10;
+  
+  // 加载配置内容
+  try
+    // 创建用于加载文件的字符串列表，使用UTF-8编码
+    FileContent := TStringList.Create;
+    try
+      // 尝试使用不同编码加载文件
+      try
+        FileContent.LoadFromFile(ConfigPath, TEncoding.UTF8);
+      except
+        try
+          FileContent.LoadFromFile(ConfigPath, TEncoding.Default);
+        except
+          try
+            FileContent.LoadFromFile(ConfigPath); // 尝试使用默认检测
+          except
+            on E: Exception do
+              FileContent.Text := '无法加载文件: ' + E.Message;
+          end;
+        end;
+      end;
+      
+      // 将内容设置到编辑器
+      Editor.Text := FileContent.Text;
+      
+      // 记录调试信息
+      FormHelper.AddDebugText(meoDebug, '成功加载文件: ' + ConfigPath + 
+                        ', 大小: ' + IntToStr(Length(Editor.Text)) + 
+                        ' 字符, ' + IntToStr(Editor.Lines.Count) + ' 行');
+    finally
+      FileContent.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      Editor.Lines.Text := '加载配置时出错：' + E.Message;
+      FormHelper.AddDebugText(meoDebug, '错误: ' + E.Message);
+    end;
+  end;
+  
+  // 保存页面信息
+  New(PageInfo);
+  PageInfo^.Title := ExtractFileName(ConfigPath);
+  PageInfo^.ConfigType := ConfigType;
+  PageInfo^.ConfigPath := ConfigPath;
+  PageInfo^.TabSheet := TabSheet;
+  PageInfo^.Modified := False;
+  
+  FOpenPages.Add(PageInfo);
+  
+  // 切换到新标签页
+  pcEditors.ActivePage := TabSheet;
+  UpdateStatusBar;
+end;
+
+function TfrmMain.FindOpenPage(const ConfigPath: string): Integer;
+var
+  i: Integer;
+  PageInfo: PConfigPageInfo;
+begin
+  Result := -1;
+  
+  for i := 0 to FOpenPages.Count - 1 do
+  begin
+    PageInfo := PConfigPageInfo(FOpenPages[i]);
+    if SameText(PageInfo^.ConfigPath, ConfigPath) then
+    begin
+      Result := i;
+      Break;
+    end;
+  end;
+end;
+
+procedure TfrmMain.CloseConfigPage(Index: Integer);
+var
+  PageInfo: PConfigPageInfo;
+begin
+  if (Index < 0) or (Index >= FOpenPages.Count) then
+    Exit;
+    
+  PageInfo := PConfigPageInfo(FOpenPages[Index]);
+  
+  // 如果有修改，询问是否保存
+  if PageInfo^.Modified then
+  begin
+    case MessageDlg('配置已修改，是否保存？', mtConfirmation, [mbYes, mbNo, mbCancel], 0) of
+      mrYes: SaveCurrentConfig;
+      mrCancel: Exit;
+    end;
+  end;
+  
+  // 删除标签页
+  PageInfo^.TabSheet.Free;
+  
+  // 删除页面信息
+  Dispose(PageInfo);
+  FOpenPages.Delete(Index);
+  
+  UpdateStatusBar;
+end;
+
+procedure TfrmMain.SaveCurrentConfig;
+var
+  PageInfo: TConfigPageInfo;
+  Editor: TMemo;
+  Config: TBaseConfig;
+begin
+  PageInfo := GetCurrentPageInfo;
+  
+  if PageInfo.TabSheet = nil then
+    Exit;
+    
+  // 获取当前编辑器内容
+  if PageInfo.TabSheet.ControlCount = 0 then
+    Exit;
+    
+  Editor := PageInfo.TabSheet.Controls[0] as TMemo;
+  
+  // 保存配置文件
+  try
+    if SameText(PageInfo.ConfigType, 'INI') then
+      Config := FConfigManager.GetINI(PageInfo.ConfigPath)
+    else if SameText(PageInfo.ConfigType, 'JSON') then
+      Config := FConfigManager.GetJSON(PageInfo.ConfigPath)
+    else
+      Config := nil;
+      
+    if Config <> nil then
+    begin
+      // 直接保存编辑器内容到文件
+      Editor.Lines.SaveToFile(PageInfo.ConfigPath);
+      SetModified(pcEditors.ActivePageIndex, False);
+    end
+    else
+    begin
+      ShowMessage('无法保存配置：' + PageInfo.ConfigPath);
+    end;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('保存配置时出错：' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmMain.ValidateCurrentConfig;
+var
+  PageInfo: TConfigPageInfo;
+  Editor: TMemo;
+  Config: TBaseConfig;
+  ValidationResult: string;
+  TempFile: string;
+begin
+  PageInfo := GetCurrentPageInfo;
+  
+  if PageInfo.TabSheet = nil then
+    Exit;
+    
+  // 获取当前编辑器内容
+  if PageInfo.TabSheet.ControlCount = 0 then
+    Exit;
+    
+  Editor := PageInfo.TabSheet.Controls[0] as TMemo;
+  
+  // 验证配置文件
+  try
+    if SameText(PageInfo.ConfigType, 'INI') then
+      Config := FConfigManager.GetINI(PageInfo.ConfigPath)
+    else if SameText(PageInfo.ConfigType, 'JSON') then
+      Config := FConfigManager.GetJSON(PageInfo.ConfigPath)
+    else
+      Config := nil;
+      
+    if Config <> nil then
+    begin
+      ValidationResult := '';
+      
+      // 创建临时文件进行验证
+      TempFile := ChangeFileExt(PageInfo.ConfigPath, '.tmp');
+      
+      try
+        // 保存当前编辑器内容到临时文件
+        Editor.Lines.SaveToFile(TempFile);
+        
+        // 根据配置类型进行简单验证
+        if Config is TINIConfig then
+        begin
+          // 对于INI文件，尝试加载看是否有异常
+          try
+            var IniFile := TMemIniFile.Create(TempFile);
+            try
+              // 如果能成功读取，说明格式正确
+            finally
+              IniFile.Free;
+            end;
+          except
+            on E: Exception do
+              ValidationResult := E.Message;
+          end;
+        end
+        else if Config is TJSONConfig then
+        begin
+          // 对于JSON文件，尝试解析看是否有异常
+          try
+            var StringList := TStringList.Create;
+            try
+              StringList.LoadFromFile(TempFile);
+              var Content := StringList.Text.Trim;
+              if Content = '' then
+                ValidationResult := '配置文件内容为空'
+              else if not (Content.StartsWith('{') and Content.EndsWith('}')) then
+                ValidationResult := '无效的JSON格式，应该以{开始，以}结束';
+            finally
+              StringList.Free;
+            end;
+          except
+            on E: Exception do
+              ValidationResult := E.Message;
+          end;
+        end;
+      finally
+        // 删除临时文件
+        if FileExists(TempFile) then
+          DeleteFile(TempFile);
+      end;
+      
+      if ValidationResult = '' then
+        ShowMessage('配置有效')
+      else
+        ShowMessage('配置无效：' + ValidationResult);
+    end
+    else
+    begin
+      ShowMessage('无法验证配置：' + PageInfo.ConfigPath);
+    end;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('验证配置时出错：' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmMain.UpdateStatusBar;
+var
+  Node: TTreeNode;
+  PageInfo: TConfigPageInfo;
+  Data: PConfigPageInfo;
+  StatusText: string;
+begin
+  // 更新状态栏信息
+  if pcEditors.PageCount > 0 then
+  begin
+    PageInfo := GetCurrentPageInfo;
+    StatusText := '当前文件: ' + PageInfo.ConfigPath;
+    
+    if PageInfo.Modified then
+      StatusText := StatusText + ' [已修改]';
+      
+    sbMain.Panels[0].Text := StatusText;
+  end
+  else
+  begin
+    Node := tvConfig.Selected;
+    if (Node <> nil) and (Node.Level > 0) and (Node.Data <> nil) then
+    begin
+      Data := PConfigPageInfo(Node.Data);
+      sbMain.Panels[0].Text := '选中: ' + Data^.ConfigPath;
+    end
+    else
+    begin
+      sbMain.Panels[0].Text := '就绪';
+    end;
+  end;
+end;
+
+procedure TfrmMain.SetModified(Index: Integer; Modified: Boolean);
+var
+  PageInfo: PConfigPageInfo;
+begin
+  if (Index < 0) or (Index >= FOpenPages.Count) then
+    Exit;
+    
+  PageInfo := PConfigPageInfo(FOpenPages[Index]);
+  PageInfo^.Modified := Modified;
+  
+  // 更新标签页显示
+  if Modified then
+  begin
+    if Pos('*', PageInfo^.TabSheet.Caption) = 0 then
+      PageInfo^.TabSheet.Caption := '*' + PageInfo^.TabSheet.Caption;
+  end
+  else
+  begin
+    if Pos('*', PageInfo^.TabSheet.Caption) = 1 then
+      PageInfo^.TabSheet.Caption := Copy(PageInfo^.TabSheet.Caption, 2, Length(PageInfo^.TabSheet.Caption));
+  end;
+  
+  UpdateStatusBar;
+end;
+
+function TfrmMain.GetCurrentPageInfo: TConfigPageInfo;
+var
+  PageInfo: PConfigPageInfo;
+begin
+  FillChar(Result, SizeOf(Result), 0);
+  
+  if (pcEditors.ActivePageIndex >= 0) and (pcEditors.ActivePageIndex < FOpenPages.Count) then
+  begin
+    PageInfo := PConfigPageInfo(FOpenPages[pcEditors.ActivePageIndex]);
+    Result := PageInfo^;
+  end;
+end;
+
+procedure TfrmMain.btnSaveClick(Sender: TObject);
+begin
+  SaveCurrentConfig;
+end;
+
+procedure TfrmMain.btnReloadClick(Sender: TObject);
+var
+  PageInfo: TConfigPageInfo;
+  Index: Integer;
+begin
+  PageInfo := GetCurrentPageInfo;
+  
+  if PageInfo.TabSheet = nil then
+    Exit;
+    
+  // 如果有修改，询问是否重新加载
+  if PageInfo.Modified then
+  begin
+    if MessageDlg('配置已修改，重新加载将丢失所有更改。是否继续？', 
+                 mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+      Exit;
+  end;
+  
+  // 关闭并重新打开配置
+  Index := pcEditors.ActivePageIndex;
+  CloseConfigPage(Index);
+  OpenConfigEditor(PageInfo.ConfigType, PageInfo.ConfigPath);
+end;
+
+procedure TfrmMain.btnValidateClick(Sender: TObject);
+begin
+  ValidateCurrentConfig;
+end;
+
+procedure TfrmMain.mnuOpenClick(Sender: TObject);
+begin
+  if dlgOpen.Execute then
+  begin
+    // 根据文件扩展名确定配置类型
+    if SameText(ExtractFileExt(dlgOpen.FileName), '.ini') then
+      OpenConfigEditor('INI', dlgOpen.FileName)
+    else if SameText(ExtractFileExt(dlgOpen.FileName), '.json') then
+      OpenConfigEditor('JSON', dlgOpen.FileName)
+    else
+      ShowMessage('不支持的配置文件类型');
+  end;
+end;
+
+procedure TfrmMain.mnuSaveClick(Sender: TObject);
+begin
+  SaveCurrentConfig;
+end;
+
+procedure TfrmMain.mnuSaveAsClick(Sender: TObject);
+var
+  PageInfo: TConfigPageInfo;
+  Editor: TMemo;
+begin
+  PageInfo := GetCurrentPageInfo;
+  
+  if PageInfo.TabSheet = nil then
+    Exit;
+    
+  // 获取当前编辑器内容
+  if PageInfo.TabSheet.ControlCount = 0 then
+    Exit;
+    
+  Editor := PageInfo.TabSheet.Controls[0] as TMemo;
+  
+  // 设置对话框初始文件名
+  dlgSave.FileName := ExtractFileName(PageInfo.ConfigPath);
+  
+  if dlgSave.Execute then
+  begin
+    try
+      // 保存编辑器内容到新文件
+      Editor.Lines.SaveToFile(dlgSave.FileName);
+      
+      // 重新加载树视图
+      InitializeTree;
+      
+      // 打开新保存的文件
+      if SameText(ExtractFileExt(dlgSave.FileName), '.ini') then
+        OpenConfigEditor('INI', dlgSave.FileName)
+      else if SameText(ExtractFileExt(dlgSave.FileName), '.json') then
+        OpenConfigEditor('JSON', dlgSave.FileName);
+    except
+      on E: Exception do
+      begin
+        ShowMessage('保存配置时出错：' + E.Message);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.mnuExitClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmMain.mnuAboutClick(Sender: TObject);
+begin
+  ShowMessage('配置编辑器 v1.0'#13#10'一个轻量级的配置文件管理工具'#13#10'支持INI和JSON格式配置文件');
+end;
+
+procedure TfrmMain.pcEditorsChange(Sender: TObject);
+begin
+  UpdateStatusBar;
+end;
+
+procedure TfrmMain.pmTreeOpenClick(Sender: TObject);
+var
+  Node: TTreeNode;
+  Data: PConfigPageInfo;
+begin
+  Node := tvConfig.Selected;
+  if (Node <> nil) and (Node.Level > 0) and (Node.Data <> nil) then
+  begin
+    Data := PConfigPageInfo(Node.Data);
+    OpenConfigEditor(Data^.ConfigType, Data^.ConfigPath);
+  end;
+end;
+
+procedure TfrmMain.pmTreeNewClick(Sender: TObject);
+var
+  NodeData: PNodeData;
+  NewFileName, CategoryName, ConfigType, ConfigPath: string;
+begin
+  NodeData := GetSelectedNodeData(tvConfig);
+  if (NodeData <> nil) and (NodeData.NodeType = ntCategory) then
+  begin
+    CategoryName := NodeData.CategoryName;
+    
+    // 显示新建配置文件对话框
+    if InputQuery('新建配置', '请输入配置文件名称（不含扩展名）:', NewFileName) then
+    begin
+      // 创建新的INI配置文件，确保config目录已存在
+      if not DirectoryExists('config') then
+      begin
+        ShowMessage('配置目录不存在：config，请确保该目录存在于应用程序根目录下。');
+        Exit;
+      end;
+        
+      ConfigType := 'INI';
+      ConfigPath := 'config\' + NewFileName + '.ini';
+      
+      // 创建空白配置文件
+      with TStringList.Create do
+      try
+        Add('; ' + CategoryName + ' - 配置文件');
+        Add('; 创建日期: ' + FormatDateTime('yyyy-mm-dd', Now));
+        Add('');
+        Add('[General]');
+        Add('Version=1.0');
+        Add('Description=' + NewFileName);
+        SaveToFile(ConfigPath);
+      finally
+        Free;
+      end;
+      
+      // 添加到树型视图
+      AddPropertyEntityToCategory(tvConfig, CategoryName, NewFileName + '.ini', ConfigType, ConfigPath);
+      
+      // 打开编辑器
+      OpenConfigEditor(ConfigType, ConfigPath);
+    end;
+  end;
+end;
+
+procedure TfrmMain.pmTreeDeleteClick(Sender: TObject);
+var
+  Node: TTreeNode;
+  Data: PConfigPageInfo;
+  ConfigPath: string;
+  Index: Integer;
+begin
+  Node := tvConfig.Selected;
+  if (Node = nil) or (Node.Level = 0) or (Node.Data = nil) then
+    Exit;
+    
+  Data := PConfigPageInfo(Node.Data);
+  ConfigPath := Data^.ConfigPath;
+  
+  // 确认删除
+  if MessageDlg('确定要删除配置文件 "' + ExtractFileName(ConfigPath) + '" 吗？', 
+               mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+    Exit;
+    
+  // 如果文件已打开，先关闭
+  Index := FindOpenPage(ConfigPath);
+  if Index >= 0 then
+    CloseConfigPage(Index);
+    
+  // 删除文件
+  try
+    if DeleteFile(ConfigPath) then
+    begin
+      // 删除树节点
+      Node.Free;
+      ShowMessage('配置文件已删除');
+    end
+    else
+    begin
+      ShowMessage('无法删除配置文件');
+    end;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('删除配置文件时出错：' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmMain.pmTreeRenameClick(Sender: TObject);
+var
+  Node: TTreeNode;
+  Data: PConfigPageInfo;
+  OldPath, NewPath, NewName: string;
+  Index: Integer;
+begin
+  Node := tvConfig.Selected;
+  if (Node = nil) or (Node.Level = 0) or (Node.Data = nil) then
+    Exit;
+    
+  Data := PConfigPageInfo(Node.Data);
+  OldPath := Data^.ConfigPath;
+  
+  // 获取新文件名
+  NewName := InputBox('重命名配置文件', '请输入新文件名：', ExtractFileName(OldPath));
+  
+  if (NewName = '') or (NewName = ExtractFileName(OldPath)) then
+    Exit;
+    
+  // 构造新路径
+  NewPath := ExtractFilePath(OldPath) + NewName;
+  
+  // 如果文件已打开，先关闭
+  Index := FindOpenPage(OldPath);
+  if Index >= 0 then
+    CloseConfigPage(Index);
+    
+  // 重命名文件
+  try
+    if RenameFile(OldPath, NewPath) then
+    begin
+      // 更新节点文本和数据
+      Node.Text := NewName;
+      Data^.Title := NewName;
+      Data^.ConfigPath := NewPath;
+      
+      ShowMessage('配置文件已重命名');
+    end
+    else
+    begin
+      ShowMessage('无法重命名配置文件');
+    end;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('重命名配置文件时出错：' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmMain.pmEditorSaveClick(Sender: TObject);
+begin
+  SaveCurrentConfig;
+end;
+
+procedure TfrmMain.pmEditorCloseClick(Sender: TObject);
+begin
+  CloseConfigPage(pcEditors.ActivePageIndex);
+end;
+
+procedure TfrmMain.pmEditorValidateClick(Sender: TObject);
+begin
+  ValidateCurrentConfig;
+end;
+
+procedure TfrmMain.btnSvgOpenClick(Sender: TObject);
+begin
+  // 打开配置文件
+  mnuOpenClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '打开配置文件');
+end;
+
+procedure TfrmMain.btnSvgSaveClick(Sender: TObject);
+begin
+  // 保存当前配置
+  btnSaveClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '保存配置文件');
+end;
+
+procedure TfrmMain.btnSvgSaveAsClick(Sender: TObject);
+begin
+  // 另存为
+  mnuSaveAsClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '配置另存为');
+end;
+
+procedure TfrmMain.btnSvgDeleteClick(Sender: TObject);
+begin
+  // 删除当前配置
+  pmTreeDeleteClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '删除配置文件');
+end;
+
+procedure TfrmMain.btnSvgNewNodeClick(Sender: TObject);
+begin
+  // 创建新节点
+  pmTreeNewClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '创建新节点');
+end;
+
+procedure TfrmMain.btnSvgEditNodeClick(Sender: TObject);
+begin
+  // 编辑节点
+  pmTreeRenameClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '编辑节点');
+end;
+
+procedure TfrmMain.btnSvgRemoveNodeClick(Sender: TObject);
+begin
+  // 删除节点
+  pmTreeDeleteClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '删除节点');
+end;
+
+procedure TfrmMain.btnSvgRefreshClick(Sender: TObject);
+begin
+  // 刷新
+  InitializeTree;
+  
+  // 刷新FileListBox
+  FileListBox1.Directory := GetCurrentDir + '\config';
+  FileListBox1.Update;
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '刷新配置树和文件列表');
+end;
+
+procedure TfrmMain.btnSvgExitClick(Sender: TObject);
+begin
+  // 退出
+  mnuExitClick(Sender);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '退出配置编辑器');
+end;
+
+procedure TfrmMain.FileListBox1DblClick(Sender: TObject);
+var
+  FileName: string;
+  FileExt: string;
+  ConfigType: string;
+begin
+  if FileListBox1.ItemIndex < 0 then
+    Exit;
+  
+  FileName := FileListBox1.Directory + '\' + FileListBox1.Items[FileListBox1.ItemIndex];
+  FileExt := LowerCase(ExtractFileExt(FileName));
+  
+  // 确定配置类型
+  if FileExt = '.ini' then
+    ConfigType := 'INI'
+  else if FileExt = '.json' then
+    ConfigType := 'JSON'
+  else
+    Exit; // 不支持的文件类型
+  
+  // 打开配置编辑器
+  OpenConfigEditor(ConfigType, FileName);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '从文件列表打开配置: ' + FileName);
+end;
+
+procedure TfrmMain.btnSvgToggleClick(Sender: TObject);
+begin
+  // 切换显示/隐藏没有子节点的分类
+  TreeHelper.ToggleEmptyCategories(tvConfig);
+  
+  // 记录调试信息
+  FormHelper.AddDebugText(meoDebug, '切换显示/隐藏空分类节点');
+end;
+
+procedure TfrmMain.btnSvgExpandCollapseClick(Sender: TObject);
+var
+  i: Integer;
+  AllExpanded: Boolean;
+begin
+  if tvConfig.Items.Count = 0 then
+    Exit;
+    
+  // 检查是否所有节点都已展开
+  AllExpanded := True;
+  for i := 0 to tvConfig.Items.Count - 1 do
+  begin
+    if (tvConfig.Items[i].Level = 0) and tvConfig.Items[i].HasChildren and not tvConfig.Items[i].Expanded then
+    begin
+      AllExpanded := False;
+      Break;
+    end;
+  end;
+  
+  // 展开或收缩所有节点
+  tvConfig.Items.BeginUpdate;
+  try
+    if AllExpanded then
+    begin
+      // 如果所有节点都已展开，则全部收缩
+      for i := 0 to tvConfig.Items.Count - 1 do
+      begin
+        if (tvConfig.Items[i].Level = 0) and tvConfig.Items[i].HasChildren then
+          tvConfig.Items[i].Collapse(True);
+      end;
+      FormHelper.AddDebugText(meoDebug, '所有节点已收缩');
+    end
+    else
+    begin
+      // 否则全部展开
+      for i := 0 to tvConfig.Items.Count - 1 do
+      begin
+        if (tvConfig.Items[i].Level = 0) and tvConfig.Items[i].HasChildren then
+          tvConfig.Items[i].Expand(True);
+      end;
+      FormHelper.AddDebugText(meoDebug, '所有节点已展开');
+    end;
+  finally
+    tvConfig.Items.EndUpdate;
+  end;
+end;
+
+procedure TfrmMain.ValueListEditorDblClick(Sender: TObject);
+begin
+  // 在双击时，如果点击的是第二列（值列），则启动编辑
+  if (FValueListEditor.Col = 1) and (FValueListEditor.Row > 0) then
+  begin
+    FValueListEditor.EditorMode := True;
+    FormHelper.AddDebugText(meoDebug, '开始编辑值: ' + FValueListEditor.Keys[FValueListEditor.Row]);
+  end
+  else if (FValueListEditor.Col = 0) and (FValueListEditor.Row > 0) then
+  begin
+    // 如果点击的是第一列（键名），则调用重命名功能
+    RenameValueItemClick(nil);
+  end;
+  
+  // 标记为已修改
+  FBasicInfoTab.Tag := 1; // 表示有未保存的更改
+end;
+
+procedure TfrmMain.ValueListEditorValidate(Sender: TObject; ACol, ARow: Integer; const KeyName, KeyValue: string);
+begin
+  // 这里可以添加验证逻辑，例如检查值的格式是否正确
+  FormHelper.AddDebugText(meoDebug, Format('验证键值对: %s = %s', [KeyName, KeyValue]));
+  
+  // 此处不能修改KeyValue值，因为是常量
+  // 如果验证失败，可以抛出异常
+  // 例如：if (KeyName = 'Version') and (KeyValue <> '1.0') then
+  //         raise Exception.Create('版本号必须为1.0');
+  
+  // 设置为已修改状态
+  FBasicInfoTab.Tag := 1; // 表示有未保存的更改
+end;
+
+procedure TfrmMain.ValueListStringsValidate(Sender: TObject; var S: string);
+begin
+  // 字符串验证，可以用于更详细的输入验证
+  FormHelper.AddDebugText(meoDebug, Format('验证字符串: %s', [S]));
+  FBasicInfoTab.Tag := 1; // 表示有未保存的更改
+  
+  // 此处可以添加验证逻辑，如果验证失败，可以修改S的值或引发异常
+  // 例如：if not ValidString(S) then S := '默认值';
+end;
+
+procedure TfrmMain.InitializeBasicInfoTab;
+var
+  PopupMenu: TPopupMenu;
+  MenuItem: TMenuItem;
+begin
+  // 创建基础信息选项卡
+  FBasicInfoTab := TTabSheet.Create(pcEditors);
+  FBasicInfoTab.PageControl := pcEditors;
+  FBasicInfoTab.Caption := '基础信息';
+  FBasicInfoTab.Tag := -1; // 使用特殊Tag标记为系统选项卡
+  
+  // 创建值列表编辑器
+  FValueListEditor := TValueListEditor.Create(FBasicInfoTab);
+  FValueListEditor.Parent := FBasicInfoTab;
+  FValueListEditor.Align := alClient;
+  FValueListEditor.FixedCols := 1; // 第一列固定为键名
+  FValueListEditor.Options := [goFixedVertLine, goFixedHorzLine, goVertLine,
+                              goHorzLine, goColSizing, goEditing, goAlwaysShowEditor,
+                              goThumbTracking];
+  FValueListEditor.TitleCaptions.Clear;
+  FValueListEditor.TitleCaptions.Add('配置项');
+  FValueListEditor.TitleCaptions.Add('值');
+  FValueListEditor.OnDblClick := ValueListEditorDblClick;
+  // 设置验证事件
+  FValueListEditor.OnValidate := ValueListEditorValidate;
+
+  // 设置绘制事件，用于显示节标题
+  FValueListEditor.OnDrawCell := ValueListEditorDrawCell;
+  
+  // 关联到公开的控件
+  ValueListEditor1 := FValueListEditor;
+  
+  // 创建上下文菜单
+  PopupMenu := TPopupMenu.Create(FValueListEditor);
+  
+  MenuItem := TMenuItem.Create(PopupMenu);
+  MenuItem.Caption := '添加配置项';
+  MenuItem.OnClick := AddValueItemClick;
+  PopupMenu.Items.Add(MenuItem);
+  
+  MenuItem := TMenuItem.Create(PopupMenu);
+  MenuItem.Caption := '添加新节';
+  MenuItem.OnClick := AddSectionClick;
+  PopupMenu.Items.Add(MenuItem);
+  
+  MenuItem := TMenuItem.Create(PopupMenu);
+  MenuItem.Caption := '删除配置项';
+  MenuItem.OnClick := DeleteValueItemClick;
+  PopupMenu.Items.Add(MenuItem);
+  
+  MenuItem := TMenuItem.Create(PopupMenu);
+  MenuItem.Caption := '重命名配置项';
+  MenuItem.OnClick := RenameValueItemClick;
+  PopupMenu.Items.Add(MenuItem);
+  
+  MenuItem := TMenuItem.Create(PopupMenu);
+  MenuItem.Caption := '-'; // 分隔线
+  PopupMenu.Items.Add(MenuItem);
+  
+  MenuItem := TMenuItem.Create(PopupMenu);
+  MenuItem.Caption := '保存更改';
+  MenuItem.OnClick := SaveValueItemsClick;
+  PopupMenu.Items.Add(MenuItem);
+  
+  FValueListEditor.PopupMenu := PopupMenu;
+  
+  // 设置字体
+  FValueListEditor.Font.Name := 'Microsoft YaHei UI';
+  FValueListEditor.Font.Size := 10;
+  
+  // 默认将基础信息选项卡放在第一个位置
+  FBasicInfoTab.PageIndex := 0;
+  
+  // 初始时显示基础信息选项卡，修改为可见
+  FBasicInfoTab.TabVisible := True;
+  
+  FormHelper.AddDebugText(meoDebug, '基础信息选项卡创建完成，包含值列表编辑器');
+end;
+
+procedure TfrmMain.RenameValueItemClick(Sender: TObject);
+var
+  Row: Integer;
+  OldKeyName, NewKeyName, Value: string;
+begin
+  if FValueListEditor.Row > 0 then // 第0行是标题行
+  begin
+    Row := FValueListEditor.Row;
+    OldKeyName := FValueListEditor.Keys[Row];
+    Value := FValueListEditor.Values[OldKeyName];
+    
+    if InputQuery('重命名配置项', '请输入新的配置项名称:', NewKeyName) then
+    begin
+      if NewKeyName.Trim <> '' then
+      begin
+        try
+          // 删除旧配置项
+          FValueListEditor.DeleteRow(Row);
+          
+          // 添加新配置项，保持原值
+          FValueListEditor.InsertRow(NewKeyName, Value, True);
+          
+          FormHelper.AddDebugText(meoDebug, Format('重命名配置项: %s -> %s', [OldKeyName, NewKeyName]));
+          
+          // 设置为已修改状态
+          FBasicInfoTab.Tag := 1; // 表示有未保存的更改
+        except
+          on E: Exception do
+          begin
+            FormHelper.AddDebugText(meoDebug, '重命名配置项时出错: ' + E.Message);
+            ShowMessage('重命名失败: ' + E.Message);
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.AddValueItemClick(Sender: TObject);
+var
+  KeyName, SelectedSection: string;
+  RowIndex, i, SelectedRow: Integer;
+  Key: string;
+begin
+  // 首先确定当前所在的节
+  SelectedSection := 'General'; // 默认节
+  SelectedRow := FValueListEditor.Row;
+  
+  // 向上查找最近的节标题
+  if (SelectedRow > 0) then
+  begin
+    // 先检查当前行是否是节标题
+    Key := FValueListEditor.Keys[SelectedRow];
+    if (Key.StartsWith('[') and Key.EndsWith(']')) then
+    begin
+      SelectedSection := Copy(Key, 2, Length(Key) - 2); // 去掉方括号
+    end
+    else
+    begin
+      // 向上查找最近的节标题
+      for i := SelectedRow downto 1 do
+      begin
+        Key := FValueListEditor.Keys[i];
+        if (Key.StartsWith('[') and Key.EndsWith(']')) then
+        begin
+          SelectedSection := Copy(Key, 2, Length(Key) - 2); // 去掉方括号
+          Break;
+        end;
+      end;
+    end;
+  end;
+  
+  if InputQuery('添加配置项', '请输入配置项名称:', KeyName) then
+  begin
+    if KeyName.Trim <> '' then
+    begin
+      // 检查是否已存在同名配置项
+      RowIndex := -1;
+      
+      // 完整的键名包含节名
+      if (SelectedSection <> '') then
+        KeyName := SelectedSection + '.' + KeyName;
+        
+      if not FValueListEditor.FindRow(KeyName, RowIndex) then
+      begin
+        // 找到当前节的最后一个配置项，在其后插入
+        var InsertPos := SelectedRow + 1;
+        while (InsertPos < FValueListEditor.RowCount) and 
+              not (FValueListEditor.Keys[InsertPos].StartsWith('[') and FValueListEditor.Keys[InsertPos].EndsWith(']')) do
+          Inc(InsertPos);
+        
+        // 在当前位置插入新项
+        FValueListEditor.InsertRow(KeyName, '', True);
+        FormHelper.AddDebugText(meoDebug, '添加新配置项: ' + KeyName);
+        
+        // 设置为已修改状态
+        FBasicInfoTab.Tag := 1; // 表示有未保存的更改
+      end
+      else
+      begin
+        ShowMessage('已存在同名配置项: ' + KeyName);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.DeleteValueItemClick(Sender: TObject);
+var
+  Row: Integer;
+  KeyName: string;
+begin
+  if FValueListEditor.Row > 0 then // 第0行是标题行
+  begin
+    Row := FValueListEditor.Row;
+    KeyName := FValueListEditor.Keys[Row];
+    
+    if MessageDlg('确定要删除配置项 "' + KeyName + '" 吗?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    begin
+      FValueListEditor.DeleteRow(Row);
+      FormHelper.AddDebugText(meoDebug, '删除配置项: ' + KeyName);
+      
+      // 设置为已修改状态
+      FBasicInfoTab.Tag := 1; // 表示有未保存的更改
+    end;
+  end;
+end;
+
+procedure TfrmMain.SaveValueItemsClick(Sender: TObject);
+begin
+  if FCurrentBasicConfigPath <> '' then
+  begin
+    SaveBasicInfoFromEditor(FCurrentBasicConfigPath);
+    FormHelper.AddDebugText(meoDebug, '保存基础信息配置');
+    
+    // 清除修改标记
+    FBasicInfoTab.Tag := 0;
+  end;
+end;
+
+procedure TfrmMain.LoadBasicInfoToEditor(const ConfigPath: string);
+var
+  IniFile: TMemIniFile;
+  JsonFile: TJSONObject;
+  FileExt: string;
+  Sections, Keys: TStringList;
+  i, j: Integer;
+  Section, Key, Value: string;
+  FileContent: string;
+  CurrentSection: string;
+begin
+  // 清空当前编辑器内容
+  FValueListEditor.Strings.Clear;
+  
+  // 保存当前配置路径
+  FCurrentBasicConfigPath := ConfigPath;
+  
+  // 根据文件扩展名确定配置类型
+  FileExt := LowerCase(ExtractFileExt(ConfigPath));
+  
+  if FileExt = '.ini' then
+  begin
+    // 加载INI文件内容
+    try
+      // 显式使用 UTF-8 编码
+      IniFile := TMemIniFile.Create(ConfigPath, TEncoding.UTF8);
+      try
+        Sections := TStringList.Create;
+        Keys := TStringList.Create;
+        try
+          // 获取所有节
+          IniFile.ReadSections(Sections);
+          
+          // 如果没有节，添加General节
+          if Sections.Count = 0 then
+            Sections.Add('General');
+            
+          for i := 0 to Sections.Count - 1 do
+          begin
+            Section := Sections[i];
+            
+            // 跳过注释或空节
+            if (Section = '') or (Section.StartsWith(';')) then
+              Continue;
+              
+            // 添加节标题
+            try
+              FValueListEditor.InsertRow('[' + Section + ']', '', True);
+              FormHelper.AddDebugText(meoDebug, '添加节标题: ' + Section);
+            except
+              on E: Exception do
+              begin
+                FormHelper.AddDebugText(meoDebug, '添加节标题时出错: ' + Section + ' 错误: ' + E.Message);
+              end;
+            end;
+            
+            // 读取该节中的所有键
+            Keys.Clear;
+            IniFile.ReadSection(Section, Keys);
+            
+            for j := 0 to Keys.Count - 1 do
+            begin
+              Key := Keys[j];
+              Value := IniFile.ReadString(Section, Key, '');
+              
+              // 添加到值列表编辑器，使用Section.Key作为键名
+              try
+                FValueListEditor.Values[Section + '.' + Key] := Value;
+              except
+                on E: Exception do
+                begin
+                  FormHelper.AddDebugText(meoDebug, '添加键值对时出错: ' + Section + '.' + Key + ' = ' + Value + 
+                                          ' 错误: ' + E.Message);
+                end;
+              end;
+            end;
+          end;
+          
+          FormHelper.AddDebugText(meoDebug, '加载基础信息配置: ' + ConfigPath + ', 共' + IntToStr(FValueListEditor.RowCount - 1) + '个项目');
+        finally
+          Keys.Free;
+          Sections.Free;
+        end;
+      finally
+        IniFile.Free;
+      end;
+    except
+      on E: Exception do
+      begin
+        FormHelper.AddDebugText(meoDebug, '加载基础信息配置失败: ' + E.Message);
+        ShowMessage('加载配置失败: ' + E.Message);
+      end;
+    end;
+  end
+  else if FileExt = '.json' then
+  begin
+    // 加载JSON文件内容
+    try
+      if FileExists(ConfigPath) then
+      begin
+        try
+          // 使用 UTF-8 编码读取文件
+          FileContent := TFile.ReadAllText(ConfigPath, TEncoding.UTF8);
+          JsonFile := TJSONObject(TJSONObject.ParseJSONValue(FileContent));
+          
+          if JsonFile <> nil then
+          begin
+            try
+              // 添加默认节
+              try
+                FValueListEditor.InsertRow('[JSON根节点]', '', True);
+              except
+                on E: Exception do
+                begin
+                  FormHelper.AddDebugText(meoDebug, '添加JSON根节点标题时出错: ' + E.Message);
+                end;
+              end;
+            
+              // 遍历JSON对象的所有键值对
+              for i := 0 to JsonFile.Count - 1 do
+              begin
+                Key := JsonFile.Pairs[i].JsonString.Value;
+                
+                // 将JSON值转换为字符串
+                if JsonFile.Pairs[i].JsonValue is TJSONString then
+                  Value := TJSONString(JsonFile.Pairs[i].JsonValue).Value
+                else if JsonFile.Pairs[i].JsonValue is TJSONNumber then
+                  Value := TJSONNumber(JsonFile.Pairs[i].JsonValue).ToString
+                else if JsonFile.Pairs[i].JsonValue is TJSONBool then
+                  Value := BoolToStr(TJSONBool(JsonFile.Pairs[i].JsonValue).AsBoolean, True)
+                else
+                  Value := JsonFile.Pairs[i].JsonValue.ToString;
+                
+                // 添加到值列表编辑器
+                try
+                  FValueListEditor.Values['JSON根节点.' + Key] := Value;
+                except
+                  on E: Exception do
+                  begin
+                    FormHelper.AddDebugText(meoDebug, '添加JSON键值对时出错: ' + Key + ' = ' + Value + 
+                                            ' 错误: ' + E.Message);
+                  end;
+                end;
+              end;
+              
+              FormHelper.AddDebugText(meoDebug, '加载基础信息配置: ' + ConfigPath + ', 共' + IntToStr(FValueListEditor.RowCount - 1) + '个项目');
+            finally
+              JsonFile.Free;
+            end;
+          end;
+        except
+          on E: Exception do
+          begin
+            FormHelper.AddDebugText(meoDebug, '解析JSON失败: ' + E.Message);
+            ShowMessage('解析JSON失败: ' + E.Message);
+          end;
+        end;
+      end;
+    except
+      on E: Exception do
+      begin
+        FormHelper.AddDebugText(meoDebug, '加载基础信息配置失败: ' + E.Message);
+        ShowMessage('加载配置失败: ' + E.Message);
+      end;
+    end;
+  end;
+  
+  // 显示基础信息选项卡
+  FBasicInfoTab.TabVisible := True;
+  pcEditors.ActivePage := FBasicInfoTab;
+end;
+
+procedure TfrmMain.SaveBasicInfoFromEditor(const ConfigPath: string);
+var
+  IniFile: TMemIniFile;
+  JsonFile: TJSONObject;
+  FileExt: string;
+  i: Integer;
+  Key, Value, Section, KeyName: string;
+  P: Integer;
+  IntValue: Integer;
+  FloatValue: Extended;
+  CurrentSection: string;
+begin
+  // 根据文件扩展名确定配置类型
+  FileExt := LowerCase(ExtractFileExt(ConfigPath));
+  
+  FormHelper.AddDebugText(meoDebug, '开始保存配置到: ' + ConfigPath);
+  
+  if FileExt = '.ini' then
+  begin
+    // 保存到INI文件
+    try
+      // 使用 UTF-8 编码
+      IniFile := TMemIniFile.Create(ConfigPath, TEncoding.UTF8);
+      try
+        // 清空原有内容
+        IniFile.Clear;
+        
+        CurrentSection := 'General'; // 默认节
+        
+        // 保存值列表编辑器中的内容
+        for i := 1 to FValueListEditor.RowCount - 1 do // 跳过标题行
+        begin
+          try
+            Key := FValueListEditor.Keys[i];
+            
+            // 检查是否是节标题
+            if (Key.StartsWith('[') and Key.EndsWith(']')) then
+            begin
+              // 更新当前节
+              CurrentSection := Copy(Key, 2, Length(Key) - 2);
+              FormHelper.AddDebugText(meoDebug, '处理节: ' + CurrentSection);
+              Continue; // 跳过节标题行
+            end;
+            
+            Value := FValueListEditor.Values[Key];
+            
+            FormHelper.AddDebugText(meoDebug, Format('保存键值对: %s = %s', [Key, Value]));
+            
+            // 如果键名中包含点号，表示格式为Section.Key
+            P := Pos('.', Key);
+            if P > 0 then
+            begin
+              Section := Copy(Key, 1, P - 1);
+              KeyName := Copy(Key, P + 1, Length(Key));
+              IniFile.WriteString(Section, KeyName, Value);
+            end
+            else
+            begin
+              // 没有点号，使用当前节
+              IniFile.WriteString(CurrentSection, Key, Value);
+            end;
+          except
+            on E: Exception do
+            begin
+              FormHelper.AddDebugText(meoDebug, '保存键值对时出错: ' + Key + ' 错误: ' + E.Message);
+            end;
+          end;
+        end;
+        
+        // 保存到文件
+        IniFile.UpdateFile;
+        FormHelper.AddDebugText(meoDebug, '保存基础信息配置成功: ' + ConfigPath);
+      finally
+        IniFile.Free;
+      end;
+    except
+      on E: Exception do
+      begin
+        FormHelper.AddDebugText(meoDebug, '保存基础信息配置失败: ' + E.Message);
+        ShowMessage('保存配置失败: ' + E.Message);
+      end;
+    end;
+  end
+  else if FileExt = '.json' then
+  begin
+    // 保存到JSON文件
+    try
+      JsonFile := TJSONObject.Create;
+      try
+        // 保存值列表编辑器中的内容
+        for i := 1 to FValueListEditor.RowCount - 1 do // 跳过标题行
+        begin
+          try
+            Key := FValueListEditor.Keys[i];
+            
+            // 跳过节标题
+            if (Key.StartsWith('[') and Key.EndsWith(']')) then
+              Continue;
+              
+            Value := FValueListEditor.Values[Key];
+            
+            FormHelper.AddDebugText(meoDebug, Format('保存JSON键值对: %s = %s', [Key, Value]));
+            
+            // 如果键名中包含点号，只保留点号后面的部分作为JSON的键
+            P := Pos('.', Key);
+            if P > 0 then
+              Key := Copy(Key, P + 1, Length(Key));
+            
+            // 尝试将值解析为适当的JSON类型
+            if (Value = 'True') or (Value = 'False') then
+              JsonFile.AddPair(Key, TJSONBool.Create(Value = 'True'))
+            else if TryStrToInt(Value, IntValue) then
+              JsonFile.AddPair(Key, TJSONNumber.Create(IntValue))
+            else if TryStrToFloat(Value, FloatValue) then
+              JsonFile.AddPair(Key, TJSONNumber.Create(FloatValue))
+            else
+              JsonFile.AddPair(Key, Value);
+          except
+            on E: Exception do
+            begin
+              FormHelper.AddDebugText(meoDebug, '保存JSON键值对时出错: ' + Key + ' 错误: ' + E.Message);
+            end;
+          end;
+        end;
+        
+        // 保存到文件，使用 UTF-8 编码
+        TFile.WriteAllText(ConfigPath, JsonFile.ToJSON, TEncoding.UTF8);
+        FormHelper.AddDebugText(meoDebug, '保存基础信息配置成功: ' + ConfigPath);
+      finally
+        JsonFile.Free;
+      end;
+    except
+      on E: Exception do
+      begin
+        FormHelper.AddDebugText(meoDebug, '保存基础信息配置失败: ' + E.Message);
+        ShowMessage('保存配置失败: ' + E.Message);
+      end;
+    end;
+  end;
+  
+  // 更新界面状态
+  FBasicInfoTab.Tag := 0; // 清除修改标记
+  ShowMessage('配置已保存。');
+end;
+
+procedure TfrmMain.cbbThemeChange(Sender: TObject);
+begin
+  if cbbTheme.ItemIndex >= 0 then
+  begin
+    FormHelper.AddDebugText(meoDebug, '用户选择了主题: ' + cbbTheme.Items[cbbTheme.ItemIndex]);
+    ApplyTheme(cbbTheme.Items[cbbTheme.ItemIndex]);
+  end;
+end;
+
+procedure TfrmMain.LoadAvailableThemes;
+var
+  StyleNames: TArray<string>;
+  i: Integer;
+  CurrentStyle: string;
+  IniFile: TIniFile;
+  SavedTheme: string;
+begin
+  try
+    // 获取所有可用样式名称
+    StyleNames := TStyleManager.StyleNames;
+    
+    FormHelper.AddDebugText(meoDebug, '发现 ' + IntToStr(Length(StyleNames)) + ' 个可用主题');
+    
+    // 添加到组合框
+    cbbTheme.Items.Clear;
+    for i := 0 to High(StyleNames) do
+    begin
+      cbbTheme.Items.Add(StyleNames[i]);
+      FormHelper.AddDebugText(meoDebug, '添加主题: ' + StyleNames[i]);
+    end;
+    
+    // 先从配置文件中获取保存的主题
+    IniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+    try
+      SavedTheme := IniFile.ReadString('Settings', 'Theme', '');
+      
+      if (SavedTheme <> '') and (cbbTheme.Items.IndexOf(SavedTheme) >= 0) then
+      begin
+        FormHelper.AddDebugText(meoDebug, '从配置文件加载保存的主题: ' + SavedTheme);
+        cbbTheme.ItemIndex := cbbTheme.Items.IndexOf(SavedTheme);
+        
+        // 应用保存的主题
+        ApplyTheme(SavedTheme);
+      end
+      else
+      begin
+        // 如果没有保存的主题或无法加载，使用当前活动的样式
+        CurrentStyle := TStyleManager.ActiveStyle.Name;
+        FormHelper.AddDebugText(meoDebug, '当前活动主题: ' + CurrentStyle);
+        
+        cbbTheme.ItemIndex := cbbTheme.Items.IndexOf(CurrentStyle);
+        if cbbTheme.ItemIndex < 0 then
+        begin
+          // 如果当前样式不在列表中，默认使用Windows或第一个可用主题
+          cbbTheme.ItemIndex := cbbTheme.Items.IndexOf('Windows');
+          
+          if cbbTheme.ItemIndex < 0 then
+          begin
+            // 如果Windows样式也不在列表中，使用第一个可用主题
+            if cbbTheme.Items.Count > 0 then
+            begin
+              cbbTheme.ItemIndex := 0;
+              FormHelper.AddDebugText(meoDebug, '使用默认主题: ' + cbbTheme.Items[0]);
+            end;
+          end
+          else
+          begin
+            FormHelper.AddDebugText(meoDebug, '使用Windows主题');
+          end;
+        end;
+      end;
+    finally
+      IniFile.Free;
+    end;
+    
+    FormHelper.AddDebugText(meoDebug, '主题加载完成');
+  except
+    on E: Exception do
+    begin
+      FormHelper.AddDebugText(meoDebug, '加载主题时出错: ' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmMain.ApplyTheme(const ThemeName: string);
+var
+  IniFile: TIniFile;
+begin
+  try
+    if not TStyleManager.TrySetStyle(ThemeName) then
+    begin
+      FormHelper.AddDebugText(meoDebug, '主题应用失败: ' + ThemeName + ' 可能不存在');
+      Exit;
+    end;
+    
+    FormHelper.AddDebugText(meoDebug, '主题应用成功: ' + ThemeName);
+    
+    // 保存主题设置到配置文件
+    try
+      IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName) + 'ConfigManager.ini');
+      try
+        IniFile.WriteString('Settings', 'Theme', ThemeName);
+        FormHelper.AddDebugText(meoDebug, '主题设置已保存到INI文件: ' + ThemeName);
+      finally
+        IniFile.Free;
+      end;
+    except
+      on E: Exception do
+      begin
+        FormHelper.AddDebugText(meoDebug, '保存主题设置时出错: ' + E.Message);
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      FormHelper.AddDebugText(meoDebug, '应用主题时出错: ' + E.Message);
+      ShowMessage('应用主题时出错: ' + E.Message);
+    end;
+  end;
+end;
+
+procedure TfrmMain.AddSectionClick(Sender: TObject);
+var
+  NewSectionName: string;
+begin
+  if InputQuery('添加新节', '请输入新节名称:', NewSectionName) then
+  begin
+    if NewSectionName.Trim <> '' then
+    begin
+      try
+        // 添加新节，使用方括号标记
+        FValueListEditor.InsertRow('[' + NewSectionName + ']', '', True);
+        FormHelper.AddDebugText(meoDebug, '添加新节: ' + NewSectionName);
+        
+        // 设置为已修改状态
+        FBasicInfoTab.Tag := 1; // 表示有未保存的更改
+      except
+        on E: Exception do
+        begin
+          FormHelper.AddDebugText(meoDebug, '添加新节时出错: ' + E.Message);
+          ShowMessage('添加新节失败: ' + E.Message);
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.ValueListEditorDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+var
+  Value, SectionName: string;
+  Grid: TValueListEditor;
+  P: Integer;
+  TextRect: TRect;
+  OldBrushColor: TColor;
+  IsSection: Boolean;
+begin
+  Grid := Sender as TValueListEditor;
+  
+  // 为标题行和数据行应用不同的样式
+  if ARow = 0 then
+  begin
+    // 标题行样式
+    Grid.Canvas.Brush.Color := clBtnFace;
+    Grid.Canvas.Font.Style := [fsBold];
+    Grid.Canvas.FillRect(Rect);
+    
+    // 绘制标题文本
+    TextRect := Rect;
+    InflateRect(TextRect, -2, -2);
+    if ACol = 0 then
+      DrawText(Grid.Canvas.Handle, PChar(Grid.TitleCaptions[0]), -1, TextRect, DT_VCENTER or DT_SINGLELINE or DT_LEFT)
+    else if ACol = 1 then
+      DrawText(Grid.Canvas.Handle, PChar(Grid.TitleCaptions[1]), -1, TextRect, DT_VCENTER or DT_SINGLELINE or DT_LEFT);
+      
+    Exit; // 不再执行后续代码
+  end;
+  
+  // 非标题行的处理
+  if ARow > 0 then
+  begin
+    // 保存原来的画刷颜色
+    OldBrushColor := Grid.Canvas.Brush.Color;
+    
+    // 检查是否是节标题
+    Value := Grid.Keys[ARow];
+    
+    // 判断是否是节的标记项
+    IsSection := False;
+    if (ACol = 0) and (Value <> '') then
+    begin
+      P := Pos('.', Value);
+      if P = 0 then
+      begin
+        // 当没有点号时，查找该行是否在值列表编辑器中有[Section]这样的格式表示节
+        if (Value.StartsWith('[') and Value.EndsWith(']')) then
+        begin
+          IsSection := True;
+          SectionName := Copy(Value, 2, Length(Value) - 2); // 提取节名（去掉方括号）
+          
+          // 绘制节标题行
+          Grid.Canvas.Brush.Color := $00E6FFEE; // 浅绿色背景
+          Grid.Canvas.Font.Style := [fsBold];
+          Grid.Canvas.Font.Color := clNavy;
+          Grid.Canvas.FillRect(Rect);
+          
+          // 绘制节标题文本
+          TextRect := Rect;
+          InflateRect(TextRect, -2, -2);
+          DrawText(Grid.Canvas.Handle, PChar(SectionName), -1, TextRect, DT_VCENTER or DT_SINGLELINE or DT_LEFT);
+          
+          // 如果是第二列，清空该列（节标题行不需要值）
+          if ACol = 1 then
+          begin
+            Grid.Canvas.Brush.Color := $00E6FFEE;
+            Grid.Canvas.FillRect(Rect);
+          end;
+          
+          Exit; // 处理完节标题行后直接退出
+        end;
+      end;
+    end;
+    
+    // 默认样式恢复
+    if not IsSection then
+    begin
+      // 为选中行应用不同的样式
+      if (gdSelected in State) or (gdFocused in State) then
+      begin
+        // 调用默认的单元格绘制方法
+        Grid.DefaultDrawCell(ACol, ARow, Rect, State);
+      end
+      else
+      begin
+        // 为交替行应用不同的背景颜色
+        if Odd(ARow) then
+          Grid.Canvas.Brush.Color := $00F5F5F5 // 浅灰色
+        else
+          Grid.Canvas.Brush.Color := clWhite;
+          
+        Grid.Canvas.FillRect(Rect);
+        
+        // 绘制单元格文本
+        TextRect := Rect;
+        InflateRect(TextRect, -2, -2);
+        
+        if ACol = 0 then
+        begin
+          // 键列
+          DrawText(Grid.Canvas.Handle, PChar(Grid.Keys[ARow]), -1, TextRect, DT_VCENTER or DT_SINGLELINE or DT_LEFT);
+        end
+        else if ACol = 1 then
+        begin
+          // 值列
+          DrawText(Grid.Canvas.Handle, PChar(Grid.Values[Grid.Keys[ARow]]), -1, TextRect, DT_VCENTER or DT_SINGLELINE or DT_LEFT);
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.LoadSectionToEditor(const ConfigPath, SectionName: string);
+var
+  FileExt: string;
+  IniFile: TMemIniFile;
+  JsonFile: TJSONObject;
+  Keys: TStringList;
+  i: Integer;
+  Key, Value: string;
+  FileContent: string;
+  JsonProperty: TJSONPair;
+  EncodingUsed: TEncoding;
+  EncodingOptions: array of TEncoding;
+  SuccessfullyLoaded: Boolean;
+begin
+  try
+    FormHelper.AddDebugText(meoDebug, '===== 开始加载节内容 =====');
+    
+    // 清空当前编辑器内容
+    FValueListEditor.Strings.Clear;
+    
+    // 保存当前配置路径
+    FCurrentBasicConfigPath := ConfigPath;
+    
+    // 根据文件扩展名确定配置类型
+    FileExt := LowerCase(ExtractFileExt(ConfigPath));
+    
+    FormHelper.AddDebugText(meoDebug, '加载文件: ' + ConfigPath);
+    FormHelper.AddDebugText(meoDebug, '节名: ' + SectionName + ' (字节长度: ' + IntToStr(ByteLength(SectionName)) + ')');
+    
+    if FileExt = '.ini' then
+    begin
+      // 定义尝试的编码顺序
+      EncodingOptions := [TEncoding.UTF8, TEncoding.Unicode, TEncoding.Default, TEncoding.ASCII];
+      SuccessfullyLoaded := False;
+      
+      // 尝试使用不同的编码加载INI文件
+      for EncodingUsed in EncodingOptions do
+      begin
+        if SuccessfullyLoaded then
+          Break;
+          
+        FormHelper.AddDebugText(meoDebug, '尝试使用编码: ' + EncodingUsed.ClassName);
+        
+        try
+          IniFile := TMemIniFile.Create(ConfigPath, EncodingUsed);
+          try
+            Keys := TStringList.Create;
+            try
+              // 添加节标题
+              try
+                var SectionHeader := '[' + SectionName + ']';
+                FormHelper.AddDebugText(meoDebug, '正在添加节标题: ' + SectionHeader);
+                
+                FValueListEditor.InsertRow(SectionHeader, '', True);
+                FormHelper.AddDebugText(meoDebug, '成功添加节标题');
+                
+                // 读取该节中的所有键
+                IniFile.ReadSection(SectionName, Keys);
+                
+                FormHelper.AddDebugText(meoDebug, '节包含 ' + IntToStr(Keys.Count) + ' 个键');
+                
+                for i := 0 to Keys.Count - 1 do
+                begin
+                  Key := Keys[i];
+                  Value := IniFile.ReadString(SectionName, Key, '');
+                  
+                  // 添加到值列表编辑器
+                  try
+                    var FullKey := SectionName + '.' + Key;
+                    FormHelper.AddDebugText(meoDebug, '添加键值对: ' + FullKey + ' = ' + Value);
+                    
+                    FValueListEditor.Values[FullKey] := Value;
+                  except
+                    on E: Exception do
+                    begin
+                      FormHelper.AddDebugText(meoDebug, '添加键值对时出错: ' + E.Message);
+                      // 继续尝试添加其他键值对
+                    end;
+                  end;
+                end;
+                
+                SuccessfullyLoaded := True;
+                FormHelper.AddDebugText(meoDebug, '使用 ' + EncodingUsed.ClassName + ' 编码成功加载节内容');
+              except
+                on E: Exception do
+                begin
+                  FormHelper.AddDebugText(meoDebug, '使用 ' + EncodingUsed.ClassName + ' 编码添加节标题时出错: ' + E.Message);
+                  // 将在下一次循环中尝试其他编码
+                end;
+              end;
+            finally
+              Keys.Free;
+            end;
+          finally
+            IniFile.Free;
+          end;
+        except
+          on E: Exception do
+          begin
+            FormHelper.AddDebugText(meoDebug, '使用 ' + EncodingUsed.ClassName + ' 编码加载文件时出错: ' + E.Message);
+            // 将在下一次循环中尝试其他编码
+          end;
+        end;
+      end;
+      
+      if not SuccessfullyLoaded then
+      begin
+        FormHelper.AddDebugText(meoDebug, '所有编码尝试均失败，无法加载节内容');
+        ShowMessage('无法加载配置节: ' + SectionName + '。可能包含不支持的字符编码。');
+      end;
+    end
+    else if FileExt = '.json' then
+    begin
+      // 尝试使用不同的编码加载JSON文件
+      EncodingOptions := [TEncoding.UTF8, TEncoding.Unicode, TEncoding.Default];
+      SuccessfullyLoaded := False;
+      
+      for EncodingUsed in EncodingOptions do
+      begin
+        if SuccessfullyLoaded then
+          Break;
+          
+        FormHelper.AddDebugText(meoDebug, '尝试使用编码: ' + EncodingUsed.ClassName + ' 加载JSON文件');
+        
+        try
+          if FileExists(ConfigPath) then
+          begin
+            try
+              // 使用指定编码读取文件
+              FileContent := TFile.ReadAllText(ConfigPath, EncodingUsed);
+              JsonFile := TJSONObject(TJSONObject.ParseJSONValue(FileContent));
+              
+              if JsonFile <> nil then
+              begin
+                try
+                  // 添加JSON根节点标题
+                  try
+                    FValueListEditor.InsertRow('[JSON根节点]', '', True);
+                    FormHelper.AddDebugText(meoDebug, '添加JSON根节点标题成功');
+                  except
+                    on E: Exception do
+                    begin
+                      FormHelper.AddDebugText(meoDebug, '添加JSON根节点标题时出错: ' + E.Message);
+                      Continue; // 尝试下一种编码
+                    end;
+                  end;
+                
+                  // 遍历JSON对象的所有键值对
+                  for i := 0 to JsonFile.Count - 1 do
+                  begin
+                    JsonProperty := JsonFile.Pairs[i];
+                    Key := JsonProperty.JsonString.Value;
+                    
+                    // 将JSON值转换为字符串
+                    if JsonProperty.JsonValue is TJSONString then
+                      Value := TJSONString(JsonProperty.JsonValue).Value
+                    else if JsonProperty.JsonValue is TJSONNumber then
+                      Value := TJSONNumber(JsonProperty.JsonValue).ToString
+                    else if JsonProperty.JsonValue is TJSONBool then
+                      Value := BoolToStr(TJSONBool(JsonProperty.JsonValue).AsBoolean, True)
+                    else if JsonProperty.JsonValue is TJSONObject then
+                      Value := '[Object]'
+                    else if JsonProperty.JsonValue is TJSONArray then
+                      Value := '[Array]'
+                    else
+                      Value := JsonProperty.JsonValue.ToString;
+                    
+                    // 添加到值列表编辑器
+                    try
+                      var FullKey := 'JSON根节点.' + Key;
+                      FormHelper.AddDebugText(meoDebug, '添加JSON键值对: ' + FullKey);
+                      
+                      FValueListEditor.Values[FullKey] := Value;
+                    except
+                      on E: Exception do
+                      begin
+                        FormHelper.AddDebugText(meoDebug, '添加JSON键值对时出错: ' + E.Message);
+                        // 继续尝试添加其他键值对
+                      end;
+                    end;
+                  end;
+                  
+                  SuccessfullyLoaded := True;
+                  FormHelper.AddDebugText(meoDebug, '使用 ' + EncodingUsed.ClassName + ' 编码成功加载JSON内容');
+                finally
+                  JsonFile.Free;
+                end;
+              end;
+            except
+              on E: Exception do
+              begin
+                FormHelper.AddDebugText(meoDebug, '使用 ' + EncodingUsed.ClassName + ' 编码解析JSON失败: ' + E.Message);
+                // 将在下一次循环中尝试其他编码
+              end;
+            end;
+          end;
+        except
+          on E: Exception do
+          begin
+            FormHelper.AddDebugText(meoDebug, '使用 ' + EncodingUsed.ClassName + ' 编码加载JSON内容失败: ' + E.Message);
+            // 将在下一次循环中尝试其他编码
+          end;
+        end;
+      end;
+      
+      if not SuccessfullyLoaded then
+      begin
+        FormHelper.AddDebugText(meoDebug, '所有编码尝试均失败，无法加载JSON内容');
+        ShowMessage('无法加载JSON配置。可能包含不支持的字符编码。');
+      end;
+    end;
+    
+    // 显示基础信息选项卡
+    FBasicInfoTab.TabVisible := True;
+    pcEditors.ActivePage := FBasicInfoTab;
+    
+    FormHelper.AddDebugText(meoDebug, '===== 节内容加载完成 =====');
+  except
+    on E: Exception do
+    begin
+      FormHelper.AddDebugText(meoDebug, '加载节时出现未处理的异常: ' + E.Message);
+      ShowMessage('出现错误: ' + E.Message);
+    end;
+  end;
+end;
+
+end. 

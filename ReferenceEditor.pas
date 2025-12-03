@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Dialogs, System.JSON, Vcl.Grids, Vcl.ValEdit,
+  Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Dialogs, System.JSON, JSONHelpers, Vcl.Grids, Vcl.ValEdit,
   ConfigManager, System.Generics.Collections, ComplexEditors;
 
 type

@@ -1,9 +1,9 @@
-﻿unit FrameConfigEditor;
+unit FrameConfigEditor;
 
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
+  System.SysUtils, System.Classes, System.JSON, JSONHelpers, Vcl.Controls, Vcl.Forms, 
   Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
   ConfigIntf, ConfigFrameBase, System.UITypes, System.Generics.Collections, UtilsTypes;
 
@@ -34,7 +34,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     
-    // IConfigEditor接口实现
+    // IConfigEditor�ӿ�ʵ��
     procedure SetINIConfig(const Value: IINIConfig);
     procedure SetJSONConfig(const Value: IJSONConfig);
     procedure EditValue(const Section, Key: string);
@@ -89,15 +89,15 @@ begin
   begin
     BaseFrame := TBaseConfigFrame(FCurrentEditor);
     
-    // 保存到JSON配置
+    // ���浽JSON����
     BaseFrame.SaveToJSON;
     
-    // 获取配置类型
+    // ��ȡ��������
     if BaseFrame.JSONObject.FindValue('_type') <> nil then
     begin
       ConfigType := StringToConfigType(BaseFrame.JSONObject.GetValue('_type').Value);
       
-      // 保存到INI配置
+      // ���浽INI����
       case ConfigType of
         ctPlain:
           if BaseFrame.JSONObject.FindValue('value') <> nil then
@@ -141,7 +141,7 @@ begin
           
         ctFont, ctAIAPI, ctDatabase, ctList, ctObject, ctArray:
           begin
-            // 复杂类型，直接使用保存的JSON字符串
+            // �������ͣ�ֱ��ʹ�ñ����JSON�ַ���
             FINIConfig.WriteString(FCurrentSection, FCurrentKey, 
               BaseFrame.JSONObject.ToString);
           end;
@@ -163,9 +163,9 @@ begin
     BaseFrame := TBaseConfigFrame(Result);
     BaseFrame.JSONObject := FJSONConfig.GetJSONObject(FCurrentSection, FCurrentKey);
     BaseFrame.OnModified := HandleEditorModified;
-    // 调用 LoadFromJSON 方法
-    // 由于LoadFromJSON是protected，所以不能直接调用
-    // 我们可以通过设置JSONObject间接触发LoadFromJSON
+    // ���� LoadFromJSON ����
+    // ����LoadFromJSON��protected�����Բ���ֱ�ӵ���
+    // ���ǿ���ͨ������JSONObject��Ӵ���LoadFromJSON
     BaseFrame.JSONObject := BaseFrame.JSONObject;
   end;
 end;
@@ -183,7 +183,7 @@ begin
   FCurrentSection := Section;
   FCurrentKey := Key;
   
-  // 清除当前编辑器
+  // �����ǰ�༭��
   if Assigned(FCurrentEditor) then
   begin
     FCurrentEditor.Free;
@@ -192,14 +192,14 @@ begin
   
   if not Assigned(FJSONConfig) then
   begin
-    ShowMessage('JSON配置接口未初始化');
+    ShowMessage('JSON���ýӿ�δ��ʼ��');
     Exit;
   end;
     
-  // 获取配置类型
+  // ��ȡ��������
   EditorType := FJSONConfig.GetConfigType(Section, Key);
   
-  // 创建相应的编辑器
+  // ������Ӧ�ı༭��
   FCurrentEditor := CreateEditorForType(EditorType);
   
   if Assigned(FCurrentEditor) then
@@ -235,25 +235,25 @@ end;
 
 procedure TframeConfigEditor.tabControlChange(Sender: TObject);
 begin
-  // 根据当前选择的标签页更新编辑器
+  // ���ݵ�ǰѡ��ı�ǩҳ���±༭��
   case tabControl.TabIndex of
     0: begin
-         // 编辑器视图
+         // �༭����ͼ
          if Assigned(FCurrentEditor) then
            FCurrentEditor.Visible := True;
        end;
     1: begin
-         // 原始数据视图 (JSON)
+         // ԭʼ������ͼ (JSON)
          if Assigned(FCurrentEditor) then
            FCurrentEditor.Visible := False;
-         // 可以添加一个文本编辑器显示JSON数据
+         // ��������һ���ı��༭����ʾJSON����
        end;
   end;
 end;
 
 procedure TframeConfigEditor.UpdateButtonState;
 begin
-  // 根据修改状态更新按钮状态
+  // �����޸�״̬���°�ť״̬
   btnSave.Enabled := FModified and Assigned(FCurrentEditor);
   btnCancel.Enabled := Assigned(FCurrentEditor);
 end;
@@ -267,7 +267,7 @@ end;
 
 {$IFDEF DESIGNTIME}
 initialization
-  // 不要在运行时调用Register
+  // ��Ҫ������ʱ����Register
 {$ENDIF}
 
 end. 

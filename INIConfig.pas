@@ -3,7 +3,8 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.IniFiles, System.JSON;
+  System.SysUtils, System.Classes, System.IniFiles, System.JSON, JSONHelpers,
+  UtilsTypesFMX;
 
 type
   // INI配置文件处理类（旧版本，保留但不使用）
@@ -236,20 +237,26 @@ begin
 end;
 
 procedure TLegacyINIConfig.SaveToFile(const FilePath: string);
+var
+  DirPath: string;
 begin
   if not Assigned(FIniFile) then
     Exit;
   
   // 创建目录（如果不存在）
-  ForceDirectories(ExtractFilePath(FilePath));
+  DirPath := ExtractFilePath(FilePath);
+  if (DirPath <> '') and not DirectoryExists(DirPath) then
+    ForceDirectories(DirPath);
   
-  // 保存文件
-  FIniFile.UpdateFile;
+  // 如果文件路径不同，需要重命名
   if FFilePath <> FilePath then
   begin
     FIniFile.Rename(FilePath, False);
     FFilePath := FilePath;
   end;
+  
+  // 保存文件
+  FIniFile.UpdateFile;
   
   FModified := False;
 end;

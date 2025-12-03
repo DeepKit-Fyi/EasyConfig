@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<test-results name="D:\_Progs\02Business\EasyConfig\tests\Win32\Debug\EasyConfigTests.exe" total="68" errors="0" failures="0" ignored="0" inconclusive="0" not-run="0" skipped="0" invalid="0" date="2025-12-03" time="16:00:50">
+  <culture-info current-culture="en" current-uiculture="en" />
+  <test-suite type="Assembly" name="EasyConfigTests.exe" executed="true" result="Success" success="True" time="16:00:50" asserts="0">
+    <results>
+        <test-suite type="Namespace" name="Test" executed="true" result="Success" success="True" time="0.078" asserts="0" >
+          <results>
+              <test-suite type="Fixture" name="TConfigManagerTests" executed="True" result="Success" success="True" time="0.075" >
+                <results>
+                  <test-case name="Test_RoundTrip_EmptyConfig.EmptyConfig" executed="True" result="Success" success="True" time="0.006" asserts="0" />
+                  <test-case name="Test_RoundTrip_SimpleINIValues" executed="True" result="Success" success="True" time="0.005" asserts="0" />
+                  <test-case name="Test_RoundTrip_JSONObjects" executed="True" result="Success" success="True" time="0.004" asserts="0" />
+                  <test-case name="Test_RoundTrip_ComplexConfig" executed="True" result="Success" success="True" time="0.003" asserts="0" />
+                  <test-case name="Test_OpenProject_ParsesJsonFileSection" executed="True" result="Success" success="True" time="0.001" asserts="0" />
+                  <test-case name="Test_OpenProject_CreatesEmptyJSONIfNotExists" executed="True" result="Success" success="True" time="0.001" asserts="0" />
+                  <test-case name="Test_OpenProject_SupportsRelativePath" executed="True" result="Success" success="True" time="0.002" asserts="0" />
+                  <test-case name="Test_OpenProject_SupportsAbsolutePath" executed="True" result="Success" success="True" time="0.001" asserts="0" />
+                  <test-case name="Test_SaveProject_CreatesBackup" executed="True" result="Success" success="True" time="0.006" asserts="0" />
+                  <test-case name="Test_SaveProject_WritesJSONBeforeINI" executed="True" result="Success" success="True" time="0.004" asserts="0" />
+                  <test-case name="Test_NewProject_CreatesEmptyFiles" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_NewProject_SetsJsonFileSection" executed="True" result="Success" success="True" time="0.001" asserts="0" />
+                  <test-case name="Test_IsModified_TrueAfterChange" executed="True" result="Success" success="True" time="0.001" asserts="0" />
+                  <test-case name="Test_IsModified_FalseAfterSave" executed="True" result="Success" success="True" time="0.004" asserts="0" />
+                  <test-case name="Test_IsModified_FalseAfterOpen" executed="True" result="Success" success="True" time="0.002" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="Fixture" name="TConfigValidatorTests" executed="True" result="Success" success="True" time="0.002" >
+                <results>
+                  <test-case name="Test_RequiredField_Empty_ReturnsError" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_RequiredField_NonEmpty_Passes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_InvalidReference_ReturnsError" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_ValidReference_Passes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_RangeRule_InRange_Passes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_RangeRule_OutOfRange_ReturnsError" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_EmailRule_ValidEmail_Passes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_EmailRule_InvalidEmail_ReturnsError" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_URLRule_ValidURL_Passes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_URLRule_InvalidURL_ReturnsError" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_IPAddressRule_ValidIP_Passes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_IPAddressRule_InvalidIP_ReturnsError" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_ColorCodeRule_ValidColor_Passes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_ColorCodeRule_InvalidColor_ReturnsError" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_AutoFix_URL_AddsProtocol" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_AutoFix_Range_ClipsValue" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_AutoFix_ColorCode_AddsHash" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="Fixture" name="TUndoRedoManagerTests" executed="True" result="Success" success="True" time="0.000" >
+                <results>
+                  <test-case name="Test_ExecuteCommand_AddsToUndoStack" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_Undo_RestoresPreviousState" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_Redo_RestoresUndoneState" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_NewCommand_ClearsRedoStack" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_MultipleUndos_RestoreInitialState" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_UndoRedo_RoundTrip" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_CanUndo_EmptyStack_ReturnsFalse" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_CanRedo_EmptyStack_ReturnsFalse" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_Undo_EmptyStack_DoesNothing" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_Redo_EmptyStack_DoesNothing" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_MaxUndoLevels_TrimsOldCommands" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+              <test-suite type="Fixture" name="TUtilsTypesFMXTests" executed="True" result="Success" success="True" time="0.001" >
+                <results>
+                  <test-case name="Test_AllConfigTypes_HaveValidEditorType" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_ConfigTypeToString_ReturnsNonEmpty" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_RoundTrip" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_ComplexTypes_MapToFrameEditor" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_SimpleTypes_MapToSimpleEditor" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.String" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.Integer" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.Float" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.Boolean" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.Font" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.Database" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.AIAPI" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.BgDraw" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_KnownTypes.VideoClip" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_CaseInsensitive" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_StringToConfigType_UnknownReturnsPlain" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_HTMLToAlphaColor_ValidColors.Red" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_HTMLToAlphaColor_ValidColors.Green" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_HTMLToAlphaColor_ValidColors.Blue" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_HTMLToAlphaColor_ValidColors.White" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_HTMLToAlphaColor_ValidColors.Black" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_AlphaColorToHTML_RoundTrip" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_GetTypeFromJSON_WithTypeField" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_GetTypeFromJSON_WithoutTypeField" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                  <test-case name="Test_DetectComplexPropertyType_AllTypes" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                </results>
+              </test-suite>
+          </results>
+        </test-suite>
+    </results>
+  </test-suite>
+</test-results>

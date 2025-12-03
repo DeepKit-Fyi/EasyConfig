@@ -1,0 +1,141 @@
+{
+  "fonts": {
+    "main_font": {
+      "_type": "etFont",
+      "_id": "etFont.main_font",
+      "_description": "应用程序的主要字体",
+      "name": "微软雅黑",
+      "size": 12,
+      "color": "#000000",
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "strike_out": false
+    },
+    "title_font": {
+      "_type": "etFont",
+      "_id": "etFont.title_font",
+      "_description": "标题字体",
+      "name": "微软雅黑",
+      "size": 16,
+      "color": "#333333",
+      "bold": true,
+      "italic": false,
+      "underline": false,
+      "strike_out": false
+    },
+    "code_font": {
+      "_type": "etFont",
+      "_id": "etFont.code_font",
+      "_description": "代码字体",
+      "name": "Consolas",
+      "size": 12,
+      "color": "#222222",
+      "bold": false,
+      "italic": false,
+      "underline": false,
+      "strike_out": false
+    }
+  },
+  "database": {
+    "main_connection": {
+      "_type": "etDatabase",
+      "_id": "etDatabase.main_connection",
+      "_description": "主数据库连接",
+      "driver": "mysql",
+      "host": "localhost",
+      "port": 3306,
+      "database": "mydb",
+      "username": "user",
+      "password": "encrypted:AQIDBAUGBwgJCgsMDQ4PEA==",
+      "parameters": {
+        "charset": "utf8mb4",
+        "timeout": 30,
+        "max_connections": 10
+      }
+    }
+  },
+  "ui": {
+    "main_background": {
+      "_type": "etBackGround",
+      "_id": "etBackGround.main_background",
+      "_description": "主界面背景",
+      "color": "#F5F5F5",
+      "image": {
+        "path": "assets/bg.jpg",
+        "opacity": 0.7,
+        "stretch": "uniform"
+      },
+      "gradient": {
+        "start_color": "#F5F5F5",
+        "end_color": "#E0E0E0",
+        "direction": "vertical"
+      }
+    },
+    "header_text": {
+      "_type": "etTextOnBG",
+      "_id": "etTextOnBG.header_text",
+      "_description": "头部标题文本",
+      "text": "欢迎使用示例应用",
+      "font": {
+        "_ref": "etFont.title_font"
+      },
+      "position": {
+        "x": 100,
+        "y": 50,
+        "isXcenter": true,
+        "isYcenter": false,
+        "scale": 1.0,
+        "z_index": 10
+      },
+      "background": {
+        "_ref": "etBackGround.main_background"
+      }
+    }
+  },
+  "ai_providers": {
+    "openai_gpt4": {
+      "_type": "etAIAPI",
+      "_id": "etAIAPI.openai_gpt4",
+      "_description": "OpenAI GPT-4 API配置",
+      "provider": "OpenAI",
+      "model": "gpt-4",
+      "api_endpoint": "https://api.openai.com/v1/chat/completions",
+      "api_key": {
+        "_type": "etCredential",
+        "_id": "etCredential.openai_key",
+        "value": "encrypted:ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "is_encrypted": true
+      },
+      "parameters": {
+        "temperature": 0.7,
+        "max_tokens": 4000,
+        "top_p": 1.0,
+        "frequency_penalty": 0,
+        "presence_penalty": 0
+      },
+      "timeout": 30,
+      "retry": {
+        "max_retries": 3,
+        "retry_interval": 2,
+        "backoff_factor": 1.5
+      },
+      "output_format": "json",
+      "proxy": {
+        "enabled": false,
+        "url": ""
+      }
+    }
+  },
+  "recent_files": {
+    "_type": "etArray",
+    "_id": "app.recent_files",
+    "_description": "最近打开的文件列表",
+    "items": [
+      "D:\\Documents\\doc1.txt",
+      "D:\\Documents\\doc2.txt",
+      "D:\\Documents\\doc3.txt"
+    ],
+    "max_count": 10
+  }
+} 

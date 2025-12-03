@@ -1,0 +1,39 @@
+procedure TfrmMain.ApplyTheme(const ThemeName: string);
+var
+  IniFile: TIniFile;
+begin
+  try
+    FormHelper.AddDebugText(meoDebug, '尝试应用主题: ' + ThemeName);
+    
+    if TStyleManager.TrySetStyle(ThemeName) then
+    begin
+      FormHelper.AddDebugText(meoDebug, '已成功应用主题: ' + ThemeName);
+      
+      // 保存主题设置到配置文件
+      IniFile := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+      try
+        IniFile.WriteString('Settings', 'Theme', ThemeName);
+        FormHelper.AddDebugText(meoDebug, '已保存主题设置到配置文件');
+      except
+        on E: Exception do
+        begin
+          FormHelper.AddDebugText(meoDebug, '保存主题设置时出错: ' + E.Message);
+        end;
+      finally
+        IniFile.Free;
+      end;
+      
+      // 刷新界面
+      Self.Refresh;
+    end
+    else
+    begin
+      FormHelper.AddDebugText(meoDebug, '无法应用主题: ' + ThemeName);
+    end;
+  except
+    on E: Exception do
+    begin
+      FormHelper.AddDebugText(meoDebug, '应用主题失败: ' + E.Message);
+    end;
+  end;
+end; 

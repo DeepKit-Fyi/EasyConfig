@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Forms,
   Vcl.Controls, Vcl.ComCtrls, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.Menus,
   Vcl.StdCtrls, Vcl.Buttons, Vcl.Grids, Vcl.ValEdit, Vcl.Graphics,
-  System.UITypes, System.JSON, System.Types, System.IniFiles,
+  System.UITypes, System.JSON, JSONHelpers, System.Types, System.IniFiles,
   System.Generics.Collections, ModelConfig, ModelRegistry, HelperForm,
   UtilsLog, ControllerIntf, ViewIntf, ConfigTree, CreateConfigItem,
   FramesComplexEditor;

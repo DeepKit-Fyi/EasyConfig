@@ -1,0 +1,391 @@
+object frmMain: TfrmMain
+  Left = 0
+  Top = 0
+  Caption = #37197#32622#32534#36753#22120
+  ClientHeight = 600
+  ClientWidth = 800
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  Menu = MainMenu1
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  
+  TextHeight = 15
+  object StatusBar1: TStatusBar
+    Left = 0
+    Top = 581
+    Width = 800
+    Height = 19
+    Panels = <
+      item
+        Width = 250
+      end
+      item
+        Width = 250
+      end
+      item
+        Width = 50
+      end>
+    ExplicitTop = 584
+    ExplicitWidth = 804
+  end
+  object Splitter1: TSplitter
+    Left = 200
+    Top = 41
+    Height = 540
+    ExplicitLeft = 201
+    ExplicitTop = 37
+    ExplicitHeight = 490
+  end
+  object Splitter2: TSplitter
+    Left = 0
+    Top = 371
+    Width = 200
+    Height = 3
+    Cursor = crVSplit
+    Align = alNone
+    ExplicitTop = 406
+    ExplicitWidth = 201
+  end
+  object ToolBar1: TToolBar
+    Left = 0
+    Top = 0
+    Width = 800
+    Height = 41
+    ButtonHeight = 38
+    ButtonWidth = 39
+    Caption = 'ToolBar1'
+    Images = ImageList1
+    TabOrder = 3
+    ExplicitWidth = 804
+    object ToolButton1: TToolButton
+      Left = 0
+      Top = 0
+      Caption = 'ToolButton1'
+      ImageIndex = 0
+      OnClick = btnOpenClick
+    end
+    object ToolButton2: TToolButton
+      Left = 39
+      Top = 0
+      Caption = 'ToolButton2'
+      ImageIndex = 1
+      OnClick = btnSaveClick
+    end
+    object ToolButton3: TToolButton
+      Left = 78
+      Top = 0
+      Width = 8
+      Caption = 'ToolButton3'
+      ImageIndex = 2
+      Style = tbsSeparator
+    end
+    object ToolButton4: TToolButton
+      Left = 86
+      Top = 0
+      Caption = 'ToolButton4'
+      ImageIndex = 2
+      OnClick = btnNewClick
+    end
+    object ToolButton5: TToolButton
+      Left = 125
+      Top = 0
+      Caption = 'ToolButton5'
+      ImageIndex = 3
+      OnClick = btnDeleteClick
+    end
+    object ToolButton6: TToolButton
+      Left = 164
+      Top = 0
+      Width = 8
+      Caption = 'ToolButton6'
+      Style = tbsSeparator
+    end
+    object ToolButton7: TToolButton
+      Left = 172
+      Top = 0
+      Caption = 'ToolButton7'
+      ImageIndex = 4
+      OnClick = btnRefreshClick
+    end
+  end
+  object pnlLeft: TPanel
+    Left = 0
+    Top = 41
+    Width = 200
+    Height = 540
+    Align = alLeft
+    TabOrder = 4
+    ExplicitHeight = 543
+    object tvConfig: TTreeView
+      Left = 1
+      Top = 1
+      Width = 198
+      Height = 330
+      Align = alClient
+      DragMode = dmAutomatic
+      Images = ImageList1
+      Indent = 19
+      PopupMenu = pmTree
+      TabOrder = 0
+      OnDblClick = tvConfigDblClick
+      OnDragDrop = tvConfigDragDrop
+      OnDragOver = tvConfigDragOver
+      ExplicitHeight = 368
+    end
+    object Panel1: TPanel
+      Left = 1
+      Top = 331
+      Width = 198
+      Height = 208
+      Align = alBottom
+      TabOrder = 1
+      ExplicitTop = 369
+      object memDebug: TMemo
+        Left = 1
+        Top = 1
+        Width = 196
+        Height = 206
+        Align = alClient
+        ReadOnly = True
+        ScrollBars = ssBoth
+        TabOrder = 0
+      end
+    end
+  end
+  object pnlMain: TPanel
+    Left = 203
+    Top = 41
+    Width = 597
+    Height = 540
+    Align = alClient
+    TabOrder = 5
+    ExplicitWidth = 601
+    ExplicitHeight = 543
+    object pcMain: TPageControl
+      Left = 1
+      Top = 1
+      Width = 595
+      Height = 538
+      Align = alClient
+      TabOrder = 0
+      OnChange = pcMainChange
+      ExplicitWidth = 599
+      ExplicitHeight = 541
+      object tsWelcome: TTabSheet
+        Caption = #27426#36814
+        object Label1: TLabel
+          Left = 88
+          Top = 96
+          Width = 360
+          Height = 45
+          Caption = #37197#32622#32534#36753#22120
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -32
+          Font.Name = 'Segoe UI'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label2: TLabel
+          Left = 88
+          Top = 176
+          Width = 360
+          Height = 30
+          Caption = #35831#20174#24038#20391#36873#25321#37197#32622#25991#20214#25110#21019#24314#26032#37197#32622
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -21
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+        end
+      end
+    end
+  end
+  object ImageList1: TImageList
+    Left = 360
+    Top = 360
+  end
+  object dlgOpen: TOpenDialog
+    DefaultExt = 'ini'
+    Filter = 'INI '#25991#20214' (*.ini)|*.ini|JSON '#25991#20214' (*.json)|*.json|'#20840#37096#25991#20214' (*.*)|*.*'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 456
+    Top = 360
+  end
+  object dlgSave: TSaveDialog
+    DefaultExt = 'ini'
+    Filter = 'INI '#25991#20214' (*.ini)|*.ini|JSON '#25991#20214' (*.json)|*.json|'#20840#37096#25991#20214' (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Left = 528
+    Top = 360
+  end
+  object MainMenu1: TMainMenu
+    Left = 288
+    Top = 360
+    object File1: TMenuItem
+      Caption = #25991#20214'(&F)'
+      object New1: TMenuItem
+        Caption = #26032#24314'(&N)'
+        OnClick = btnNewClick
+      end
+      object Open1: TMenuItem
+        Caption = #25171#24320'(&O)'
+        OnClick = btnOpenClick
+      end
+      object Save1: TMenuItem
+        Caption = #20445#23384'(&S)'
+        OnClick = btnSaveClick
+      end
+      object SaveAs1: TMenuItem
+        Caption = #21478#23384#20026'(&A)'
+        OnClick = btnSaveAsClick
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Close1: TMenuItem
+        Caption = #20851#38381'(&C)'
+        OnClick = btnCloseClick
+      end
+      object Exit1: TMenuItem
+        Caption = #36864#20986'(&X)'
+        OnClick = btnExitClick
+      end
+    end
+    object Edit1: TMenuItem
+      Caption = #32534#36753'(&E)'
+      object Copy1: TMenuItem
+        Caption = #22797#21046'(&C)'
+        OnClick = btnCopyClick
+      end
+      object Paste1: TMenuItem
+        Caption = #31896#36148'(&P)'
+        OnClick = btnPasteClick
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object Refresh1: TMenuItem
+        Caption = #21047#26032'(&R)'
+        OnClick = btnRefreshClick
+      end
+    end
+    object ools1: TMenuItem
+      Caption = #24037#20855'(&T)'
+      object Settings1: TMenuItem
+        Caption = #35774#32622'(&S)'
+        OnClick = btnSettingsClick
+      end
+      object UTF8Converter1: TMenuItem
+        Caption = 'UTF8'#36716#25442#22120
+        OnClick = btnUTF8ConverterClick
+      end
+    end
+    object Help1: TMenuItem
+      Caption = #24110#21161'(&H)'
+      object About1: TMenuItem
+        Caption = #20851#20110'(&A)'
+        OnClick = btnAboutClick
+      end
+    end
+  end
+  object pmTree: TPopupMenu
+    Left = 288
+    Top = 280
+    object Open2: TMenuItem
+      Caption = #25171#24320
+      OnClick = pmTreeOpenClick
+    end
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object New2: TMenuItem
+      Caption = #26032#24314
+      OnClick = pmTreeNewClick
+    end
+    object Delete1: TMenuItem
+      Caption = #21024#38500
+      OnClick = pmTreeDeleteClick
+    end
+    object Rename1: TMenuItem
+      Caption = #37325#21629#21517
+      OnClick = pmTreeRenameClick
+    end
+    object N4: TMenuItem
+      Caption = '-'
+    end
+    object Refresh2: TMenuItem
+      Caption = #21047#26032
+      OnClick = pmTreeRefreshClick
+    end
+  end
+  object dlgFont: TFontDialog
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    Left = 528
+    Top = 280
+  end
+  object dlgColor: TColorDialog
+    Left = 456
+    Top = 280
+  end
+  object pmEditor: TPopupMenu
+    Left = 360
+    Top = 280
+    object Edit2: TMenuItem
+      Caption = #32534#36753
+      OnClick = pmEditorEditClick
+    end
+    object Validate1: TMenuItem
+      Caption = #39564#35777
+      OnClick = pmEditorValidateClick
+    end
+    object Reset1: TMenuItem
+      Caption = #37325#32622
+      OnClick = pmEditorResetClick
+    end
+    object N5: TMenuItem
+      Caption = '-'
+    end
+    object Cut1: TMenuItem
+      Caption = #21098#20999
+      OnClick = pmEditorCutClick
+    end
+    object Copy2: TMenuItem
+      Caption = #22797#21046
+      OnClick = pmEditorCopyClick
+    end
+    object Paste2: TMenuItem
+      Caption = #31896#36148
+      OnClick = pmEditorPasteClick
+    end
+    object SelectAll1: TMenuItem
+      Caption = #20840#36873
+      OnClick = pmEditorSelectAllClick
+    end
+  end
+  object FValueListEditor: TValueListEditor
+    Left = 600
+    Top = 280
+    Width = 150
+    Height = 50
+    TabOrder = 6
+    TitleCaptions.Strings = (
+      #23646#24615
+      #20540)
+    Visible = False
+    ColWidths = (
+      75
+      69)
+  end
+end 

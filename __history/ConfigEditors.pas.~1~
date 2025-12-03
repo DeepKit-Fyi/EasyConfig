@@ -21,12 +21,12 @@ type
     class procedure ClearRegistrations;
   end;
 
-// 娉ㄥ唽缂栬緫鍣ㄥ嚱鏁?
+// 注册编辑器函数
 procedure RegisterConfigEditor(EditorType: TConfigType; CreateFunc: TConfigEditorCreateFunc);
 
 implementation
 
-// 娉ㄥ唽缂栬緫鍣ㄥ嚱鏁?
+// 注册编辑器函数
 procedure RegisterConfigEditor(EditorType: TConfigType; CreateFunc: TConfigEditorCreateFunc);
 begin
   if Assigned(CreateFunc) then
@@ -59,8 +59,8 @@ begin
     Exit;
   end;
   
-  // 濡傛灉娌℃湁鎵惧埌鍒涘缓鍑芥暟锛岃繑鍥瀗il
-  // 鍏蜂綋鐨勭紪杈戝櫒绫诲瀷灏嗛€氳繃RegisterEditor鏂规硶娉ㄥ唽
+  // 如果没有找到创建函数，返回nil
+  // 具体的编辑器类型将通过RegisterEditor方法注册
 end;
 
 class destructor TConfigEditorFactory.Destroy;
@@ -78,4 +78,4 @@ begin
   FEditors.Add(EditorType, CreateFunc);
 end;
 
-end. 
+end.

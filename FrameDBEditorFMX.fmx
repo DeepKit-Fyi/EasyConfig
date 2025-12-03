@@ -1,0 +1,287 @@
+object FrameDBEditorFMX: TFrameDBEditorFMX
+  Size.Width = 450.000000000000000000
+  Size.Height = 400.000000000000000000
+  Size.PlatformDefault = False
+  object layMain: TLayout
+    Align = Client
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Size.Width = 434.000000000000000000
+    Size.Height = 384.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object layType: TLayout
+      Align = Top
+      Size.Width = 434.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object lblType: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #25968#25454#24211#31867#22411':'
+      end
+      object cboType: TComboBox
+        Align = Client
+        Size.Width = 334.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = cboTypeChange
+      end
+    end
+    object layHost: TLayout
+      Align = Top
+      Position.Y = 36.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object lblHost: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #20027#26426#22320#22336':'
+      end
+      object edtHost: TEdit
+        Align = Client
+        Size.Width = 334.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        TextPrompt = #20363#22914': localhost '#25110' 192.168.1.100
+        OnChange = edtChange
+      end
+    end
+    object layPort: TLayout
+      Align = Top
+      Position.Y = 72.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object lblPort: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #31471#21475':'
+      end
+      object spnPort: TSpinBox
+        Align = Left
+        Position.X = 100.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Max = 65535.000000000000000000
+        OnChange = edtChange
+      end
+    end
+    object layDatabase: TLayout
+      Align = Top
+      Position.Y = 108.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      object lblDatabase: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #25968#25454#24211#36335#24452':'
+      end
+      object edtDatabase: TEdit
+        Align = Client
+        Size.Width = 254.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = edtChange
+      end
+      object btnBrowse: TButton
+        Align = Right
+        Position.X = 354.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = #27983#35272'...'
+        OnClick = btnBrowseClick
+      end
+    end
+    object layUser: TLayout
+      Align = Top
+      Position.Y = 144.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 4
+      object lblUser: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #29992#25143#21517':'
+      end
+      object edtUser: TEdit
+        Align = Client
+        Size.Width = 334.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = edtChange
+      end
+    end
+    object layPassword: TLayout
+      Align = Top
+      Position.Y = 180.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      object lblPassword: TLabel
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+        Text = #23494#30721':'
+      end
+      object edtPassword: TEdit
+        Align = Client
+        Password = True
+        Size.Width = 334.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        OnChange = edtChange
+      end
+    end
+    object grpOptions: TGroupBox
+      Align = Top
+      Position.Y = 216.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 120.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'SQLite '#36873#39033
+      TabOrder = 6
+      object layJournalMode: TLayout
+        Align = Top
+        Position.Y = 16.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object lblJournalMode: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'JournalMode:'
+        end
+        object cboJournalMode: TComboBox
+          Align = Left
+          Position.X = 108.000000000000000000
+          Size.Width = 150.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          OnChange = edtChange
+        end
+      end
+      object laySynchronous: TLayout
+        Align = Top
+        Position.Y = 48.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object lblSynchronous: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'Synchronous:'
+        end
+        object cboSynchronous: TComboBox
+          Align = Left
+          Position.X = 108.000000000000000000
+          Size.Width = 150.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          OnChange = edtChange
+        end
+      end
+      object layTimeout: TLayout
+        Align = Top
+        Position.Y = 80.000000000000000000
+        Size.Width = 434.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object lblTimeout: TLabel
+          Align = Left
+          Margins.Left = 8.000000000000000000
+          Size.Width = 100.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.HorzAlign = Leading
+          Text = 'BusyTimeout:'
+        end
+        object spnTimeout: TSpinBox
+          Align = Left
+          Position.X = 108.000000000000000000
+          Size.Width = 120.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Max = 60000.000000000000000000
+          Value = 5000.000000000000000000
+          OnChange = edtChange
+        end
+      end
+    end
+    object layButtons: TLayout
+      Align = Bottom
+      Position.Y = 344.000000000000000000
+      Size.Width = 434.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 7
+      object btnTest: TButton
+        Align = Left
+        Size.Width = 100.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        Text = #27979#35797#36830#25509
+        OnClick = btnTestClick
+      end
+      object lblTestResult: TLabel
+        Align = Client
+        Margins.Left = 16.000000000000000000
+        Size.Width = 318.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.HorzAlign = Leading
+      end
+    end
+  end
+end

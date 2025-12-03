@@ -1,0 +1,527 @@
+unit FormMain;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls,
+  Vcl.ExtCtrls, System.Actions, Vcl.ActnList, System.JSON, System.IOUtils,
+  ControllerConfigs, ConfigManager, UtilsTypes, ErrorLogger, ErrorDialog, ExceptionRecovery;
+
+type
+  TFrmMain = class(TForm)
+    pnlToolbar: TPanel;
+    pgcMain: TPageControl;
+    tsConfigFile: TTabSheet;
+    tsPropEditor: TTabSheet;
+    memConfigJson: TMemo;
+    lstConfigItems: TListBox;
+    pnlConfigEditor: TPanel;
+    splVert: TSplitter;
+    btnNewBgDraw: TButton;
+    btnNewVideoClip: TButton;
+    btnNewVideo: TButton;
+    pnlButtons: TPanel;
+    btnLoadConfig: TButton;
+    btnSaveConfig: TButton;
+    btnEditItem: TButton;
+    btnRemoveItem: TButton;
+    lblSelectedItem: TLabel;
+    pnlEditor: TPanel;
+    btnSave: TButton;
+    btnCancel: TButton;
+    dlgOpenConfig: TOpenDialog;
+    dlgSaveConfig: TSaveDialog;
+    btnNewDateTimeRange: TButton;
+    btnNewKeyValueDict: TButton;
+    btnNewUrlConfig: TButton;
+    btnNewNetConfig: TButton;
+    btnNewGeoLocation: TButton;
+    btnNewEncrypt: TButton;
+    procedure FormCreate(Sender: TObject);
+    procedure btnNewBgDrawClick(Sender: TObject);
+    procedure btnNewVideoClipClick(Sender: TObject);
+    procedure btnNewVideoClick(Sender: TObject);
+    procedure btnLoadConfigClick(Sender: TObject);
+    procedure btnSaveConfigClick(Sender: TObject);
+    procedure btnEditItemClick(Sender: TObject);
+    procedure btnRemoveItemClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
+    procedure lstConfigItemsClick(Sender: TObject);
+    procedure btnNewDateTimeRangeClick(Sender: TObject);
+    procedure btnNewKeyValueDictClick(Sender: TObject);
+    procedure btnNewUrlConfigClick(Sender: TObject);
+    procedure btnNewNetConfigClick(Sender: TObject);
+    procedure btnNewGeoLocationClick(Sender: TObject);
+    procedure btnNewEncryptClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+  private
+    FConfigManager: TConfigManager;
+    FItemList: TList<string>; // Store keys of config items
+    FCurrentEditingKey: string;
+    FCurrentConfigFile: string;
+    
+    procedure ClearItemList;
+    procedure UpdateItemList;
+    procedure OnPropertyEditComplete(Sender: TObject);
+    procedure SaveCurrentProperty;
+    procedure CancelCurrentEdit;
+    procedure AutoSaveCurrentConfig;
+    function HandleConfigException(E: Exception): Boolean;
+  public
+    destructor Destroy; override;
+  end;
+
+var
+  FrmMain: TFrmMain;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmMain.FormCreate(Sender: TObject);
+var
+  LogDir, BackupDir: string;
+begin
+  // 初始化错误日志系统
+  LogDir := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Logs';
+  if not DirectoryExists(LogDir) then
+    ForceDirectories(LogDir);
+  Logger.Initialize(IncludeTrailingPathDelimiter(LogDir) + 'ConfigEditor.log');
+  Logger.Log('应用程序启动', llInfo);
+  
+  // 安装全局异常处理器
+  InstallGlobalExceptionHandler;
+  
+  // 初始化异常恢复系统
+  BackupDir := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Backups';
+  if not DirectoryExists(BackupDir) then
+    ForceDirectories(BackupDir);
+  Recovery.Initialize(BackupDir);
+  Recovery.MaxBackupFiles := 20; // 保留最近20个备份
+  Recovery.AutoSaveInterval := 300; // 5分钟自动保存一次
+  
+  // 创建配置管理器
+  FConfigManager := TConfigManager.Create;
+  FItemList := TList<string>.Create;
+  
+  // 设置编辑器的父容器
+  GetControllerConfigs.SetParentPanel(pnlEditor);
+  
+  // 设置对话框
+  dlgOpenConfig.Filter := 'INI配置文件(*.ini)|*.ini|所有文件(*.*)|*.*';
+  dlgSaveConfig.Filter := 'INI配置文件(*.ini)|*.ini|所有文件(*.*)|*.*';
+  
+  // 初始化UI
+  btnSave.Enabled := False;
+  btnCancel.Enabled := False;
+  btnEditItem.Enabled := False;
+  btnRemoveItem.Enabled := False;
+  
+  Logger.Log('应用程序初始化完成', llInfo);
+end;
+
+procedure TFrmMain.FormDestroy(Sender: TObject);
+begin
+  // 卸载全局异常处理器
+  UninstallGlobalExceptionHandler;
+  
+  // 记录应用程序关闭
+  Logger.Log('应用程序关闭', llInfo);
+end;
+
+destructor TFrmMain.Destroy;
+begin
+  ClearItemList;
+  FItemList.Free;
+  FConfigManager.Free;
+  inherited;
+end;
+
+procedure TFrmMain.ClearItemList;
+begin
+  FItemList.Clear;
+end;
+
+procedure TFrmMain.UpdateItemList;
+var
+  Keys: TArray<string>;
+  Key: string;
+begin
+  // 清空列表
+  lstConfigItems.Items.Clear;
+  ClearItemList;
+  
+  // 获取所有配置项的键
+  Keys := FConfigManager.GetAllKeys;
+  
+  // 添加到列表框
+  for Key in Keys do
+  begin
+    lstConfigItems.Items.Add(Key);
+    FItemList.Add(Key);
+  end;
+  
+  // 更新JSON显示
+  memConfigJson.Text := FConfigManager.GetAllConfigsAsJson.ToString;
+end;
+
+procedure TFrmMain.btnNewBgDrawClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptBgDraw));
+end;
+
+procedure TFrmMain.btnNewVideoClipClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptVideoClip));
+end;
+
+procedure TFrmMain.btnNewVideoClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptVideo));
+end;
+
+procedure TFrmMain.btnNewDateTimeRangeClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptDateTimeRange));
+end;
+
+procedure TFrmMain.btnNewKeyValueDictClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptKeyValueDict));
+end;
+
+procedure TFrmMain.btnNewUrlConfigClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptUrlConfig));
+end;
+
+procedure TFrmMain.btnNewNetConfigClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptNetConfig));
+end;
+
+procedure TFrmMain.btnNewGeoLocationClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptGeoLocation));
+end;
+
+procedure TFrmMain.btnNewEncryptClick(Sender: TObject);
+begin
+  GetControllerConfigs.showConfigByTag(Integer(cptEncrypt));
+end;
+
+procedure TFrmMain.btnLoadConfigClick(Sender: TObject);
+begin
+  if dlgOpenConfig.Execute then
+  begin
+    try
+      // 加载配置文件
+      FConfigManager.LoadFromFile(dlgOpenConfig.FileName);
+      FCurrentConfigFile := dlgOpenConfig.FileName;
+      
+      // 更新列表
+      UpdateItemList;
+      
+      // 记录日志
+      Logger.Log('加载配置文件: ' + dlgOpenConfig.FileName, llInfo);
+    except
+      on E: Exception do
+      begin
+        if not HandleConfigException(E) then
+        begin
+          // 显示错误对话框
+          TfrmErrorDialog.ShowError('加载配置文件失败', 
+            '无法加载配置文件: ' + dlgOpenConfig.FileName, E);
+          
+          // 记录错误
+          Logger.Log('加载配置文件失败', E, llError);
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TFrmMain.btnSaveConfigClick(Sender: TObject);
+begin
+  if FCurrentConfigFile = '' then
+  begin
+    // 如果没有当前文件，显示保存对话框
+    if dlgSaveConfig.Execute then
+      FCurrentConfigFile := dlgSaveConfig.FileName
+    else
+      Exit;
+  end;
+  
+  try
+    // 保存配置文件
+    FConfigManager.SaveToFile(FCurrentConfigFile);
+    
+    // 记录日志
+    Logger.Log('保存配置文件: ' + FCurrentConfigFile, llInfo);
+    
+    // 显示成功消息
+    TfrmErrorDialog.ShowInfo('保存成功', '配置文件已成功保存到: ' + FCurrentConfigFile);
+  except
+    on E: Exception do
+    begin
+      if not HandleConfigException(E) then
+      begin
+        // 显示错误对话框
+        TfrmErrorDialog.ShowError('保存配置文件失败', 
+          '无法保存配置文件: ' + FCurrentConfigFile, E);
+        
+        // 记录错误
+        Logger.Log('保存配置文件失败', E, llError);
+      end;
+    end;
+  end;
+end;
+
+procedure TFrmMain.btnEditItemClick(Sender: TObject);
+var
+  Index: Integer;
+  Key: string;
+  ConfigJson: TJSONObject;
+begin
+  // 获取选中的项
+  Index := lstConfigItems.ItemIndex;
+  if (Index < 0) or (Index >= FItemList.Count) then Exit;
+  
+  Key := FItemList[Index];
+  FCurrentEditingKey := Key;
+  
+  try
+    // 获取配置项的JSON
+    ConfigJson := FConfigManager.GetConfigJson(Key);
+    if ConfigJson = nil then
+    begin
+      TfrmErrorDialog.ShowError('编辑失败', '无法获取配置项的JSON数据: ' + Key);
+      Exit;
+    end;
+    
+    // 显示编辑器
+    GetControllerConfigs.EditConfig(ConfigJson, OnPropertyEditComplete);
+    
+    // 启用保存和取消按钮
+    btnSave.Enabled := True;
+    btnCancel.Enabled := True;
+    
+    // 记录日志
+    Logger.Log('开始编辑配置项: ' + Key, llInfo);
+  except
+    on E: Exception do
+    begin
+      // 显示错误对话框
+      TfrmErrorDialog.ShowError('编辑失败', '无法编辑配置项: ' + Key, E);
+      
+      // 记录错误
+      Logger.Log('编辑配置项失败', E, llError);
+    end;
+  end;
+end;
+
+procedure TFrmMain.btnRemoveItemClick(Sender: TObject);
+var
+  Index: Integer;
+  Key: string;
+begin
+  // 获取选中的项
+  Index := lstConfigItems.ItemIndex;
+  if (Index < 0) or (Index >= FItemList.Count) then Exit;
+  
+  Key := FItemList[Index];
+  
+  // 确认删除
+  if MessageDlg('确认删除', '确定要删除配置项 "' + Key + '" 吗？', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    try
+      // 删除配置项
+      FConfigManager.RemoveConfig(Key);
+      
+      // 更新列表
+      UpdateItemList;
+      
+      // 记录日志
+      Logger.Log('删除配置项: ' + Key, llInfo);
+    except
+      on E: Exception do
+      begin
+        // 显示错误对话框
+        TfrmErrorDialog.ShowError('删除失败', '无法删除配置项: ' + Key, E);
+        
+        // 记录错误
+        Logger.Log('删除配置项失败', E, llError);
+      end;
+    end;
+  end;
+end;
+
+procedure TFrmMain.btnSaveClick(Sender: TObject);
+begin
+  SaveCurrentProperty;
+end;
+
+procedure TFrmMain.btnCancelClick(Sender: TObject);
+begin
+  CancelCurrentEdit;
+end;
+
+procedure TFrmMain.lstConfigItemsClick(Sender: TObject);
+var
+  Index: Integer;
+begin
+  // 获取选中的项
+  Index := lstConfigItems.ItemIndex;
+  
+  // 启用/禁用按钮
+  btnEditItem.Enabled := Index >= 0;
+  btnRemoveItem.Enabled := Index >= 0;
+  
+  // 显示选中项
+  if (Index >= 0) and (Index < FItemList.Count) then
+    lblSelectedItem.Caption := '选中项: ' + FItemList[Index]
+  else
+    lblSelectedItem.Caption := '选中项: 无';
+end;
+
+procedure TFrmMain.OnPropertyEditComplete(Sender: TObject);
+begin
+  // 保存当前编辑的属性
+  SaveCurrentProperty;
+end;
+
+procedure TFrmMain.SaveCurrentProperty;
+var
+  ConfigJson: TJSONObject;
+begin
+  if FCurrentEditingKey = '' then Exit;
+  
+  try
+    // 获取编辑器中的JSON
+    ConfigJson := GetControllerConfigs.GetCurrentJson;
+    if ConfigJson = nil then
+    begin
+      TfrmErrorDialog.ShowWarning('保存失败', '无法获取编辑器中的JSON数据');
+      Exit;
+    end;
+    
+    // 更新配置项
+    FConfigManager.UpdateConfig(FCurrentEditingKey, ConfigJson);
+    
+    // 更新列表
+    UpdateItemList;
+    
+    // 禁用保存和取消按钮
+    btnSave.Enabled := False;
+    btnCancel.Enabled := False;
+    
+    // 清除当前编辑的键
+    FCurrentEditingKey := '';
+    
+    // 清除编辑器
+    GetControllerConfigs.ClearEditor;
+    
+    // 记录日志
+    Logger.Log('保存配置项: ' + FCurrentEditingKey, llInfo);
+    
+    // 自动保存配置文件
+    AutoSaveCurrentConfig;
+  except
+    on E: Exception do
+    begin
+      if not HandleConfigException(E) then
+      begin
+        // 显示错误对话框
+        TfrmErrorDialog.ShowError('保存失败', '无法保存配置项: ' + FCurrentEditingKey, E);
+        
+        // 记录错误
+        Logger.Log('保存配置项失败', E, llError);
+      end;
+    end;
+  end;
+end;
+
+procedure TFrmMain.CancelCurrentEdit;
+begin
+  // 清除编辑器
+  GetControllerConfigs.ClearEditor;
+  
+  // 禁用保存和取消按钮
+  btnSave.Enabled := False;
+  btnCancel.Enabled := False;
+  
+  // 清除当前编辑的键
+  FCurrentEditingKey := '';
+  
+  // 记录日志
+  Logger.Log('取消编辑配置项', llInfo);
+end;
+
+procedure TFrmMain.AutoSaveCurrentConfig;
+begin
+  // 如果有当前配置文件，自动保存
+  if FCurrentConfigFile <> '' then
+    Recovery.AutoSave(FCurrentConfigFile);
+end;
+
+function TFrmMain.HandleConfigException(E: Exception): Boolean;
+var
+  Action: TRecoveryAction;
+  RestoredFileName: string;
+begin
+  Result := False;
+  
+  // 如果没有当前配置文件，无法恢复
+  if FCurrentConfigFile = '' then Exit;
+  
+  // 处理异常
+  Action := Recovery.HandleException(E, FCurrentConfigFile);
+  
+  case Action of
+    raSave:
+      begin
+        // 已保存当前状态，继续工作
+        Result := True;
+      end;
+      
+    raRestore:
+      begin
+        // 恢复到上一个备份
+        if Recovery.RestoreFile(FCurrentConfigFile, RestoredFileName) then
+        begin
+          try
+            // 加载恢复的文件
+            FConfigManager.LoadFromFile(RestoredFileName);
+            
+            // 更新列表
+            UpdateItemList;
+            
+            // 记录日志
+            Logger.Log('已恢复配置文件: ' + RestoredFileName, llInfo);
+            
+            Result := True;
+          except
+            on RestoreEx: Exception do
+            begin
+              // 显示错误对话框
+              TfrmErrorDialog.ShowError('恢复失败', 
+                '无法加载恢复的配置文件: ' + RestoredFileName, RestoreEx);
+              
+              // 记录错误
+              Logger.Log('加载恢复的配置文件失败', RestoreEx, llError);
+            end;
+          end;
+        end;
+      end;
+      
+    raIgnore:
+      begin
+        // 忽略错误，继续工作
+        Result := True;
+      end;
+  end;
+end;
+
+end.

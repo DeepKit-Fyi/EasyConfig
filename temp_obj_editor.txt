@@ -1,0 +1,496 @@
+﻿unit FrameObjectEditor;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.ComCtrls, Vcl.Grids, System.JSON, ConfigFrameBase, UtilsTypes, System.UITypes,
+  JSONHelpers;
+
+type
+  TObjectPropertyType = (ptString, ptNumber, ptBoolean, ptObject, ptArray);
+
+  TObjectProperty = record
+    Name: string;
+    PropertyType: TObjectPropertyType;
+    Value: string;
+  end;
+
+  TFrameObjectEditor = class(TBaseConfigFrame)
+  private
+    pnlMain: TPanel;
+    sgProperties: TStringGrid;
+    pnlControls: TPanel;
+    btnAdd: TButton;
+    btnEdit: TButton;
+    btnDelete: TButton;
+    cmbPropertyType: TComboBox;
+    
+    procedure btnAddClick(Sender: TObject);
+    procedure btnEditClick(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
+    procedure sgPropertiesSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+    procedure InitializeGrid;
+    function GetPropertyTypeAsString(PropertyType: TObjectPropertyType): string;
+    function GetPropertyTypeFromString(const TypeStr: string): TObjectPropertyType;
+  protected
+    procedure LoadFromJSON; override;
+    procedure SaveToJSON; override;
+    procedure CreateControls; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+implementation
+
+{ TFrameObjectEditor }
+
+constructor TFrameObjectEditor.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  CreateControls;
+end;
+
+destructor TFrameObjectEditor.Destroy;
+begin
+  // 濞撳懐鎮婄挧鍕爱
+  inherited;
+end;
+
+procedure TFrameObjectEditor.CreateControls;
+begin
+  // 閸掓稑缂撴稉濠氭桨閺?
+  pnlMain := TPanel.Create(Self);
+  pnlMain.Parent := Self;
+  pnlMain.Align := alClient;
+  pnlMain.BevelOuter := bvNone;
+  
+  // 閸掓稑缂撶仦鐐粹偓褏缍夐弽?
+  sgProperties := TStringGrid.Create(pnlMain);
+  sgProperties.Parent := pnlMain;
+  sgProperties.Align := alClient;
+  sgProperties.AlignWithMargins := True;
+  sgProperties.Margins.SetBounds(5, 5, 5, 5);
+  sgProperties.Options := [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSelect, goEditing];
+  sgProperties.OnSelectCell := sgPropertiesSelectCell;
+  
+  // 閸掓繂顫愰崠鏍х潣閹呯秹閺?
+  InitializeGrid;
+  
+  // 閸掓稑缂撻幒褍鍩楅棃銏℃緲
+  pnlControls := TPanel.Create(pnlMain);
+  pnlControls.Parent := pnlMain;
+  pnlControls.Align := alBottom;
+  pnlControls.Height := 40;
+  pnlControls.BevelOuter := bvNone;
+  
+  // 鐏炵偞鈧呰閸ㄥ绮嶉崥鍫燁攱
+  cmbPropertyType := TComboBox.Create(pnlControls);
+  cmbPropertyType.Parent := pnlControls;
+  cmbPropertyType.Left := 5;
+  cmbPropertyType.Top := 10;
+  cmbPropertyType.Width := 120;
+  cmbPropertyType.Style := csDropDownList;
+  cmbPropertyType.Items.Add('鐎涙顑佹稉?);
+  cmbPropertyType.Items.Add('閺佹澘鐡?);
+  cmbPropertyType.Items.Add('鐢啫鐨甸崐?);
+  cmbPropertyType.Items.Add('鐎电钖?);
+  cmbPropertyType.Items.Add('閺佹壆绮?);
+  cmbPropertyType.ItemIndex := 0;
+  
+  // 濞ｈ濮為幐澶愭尦
+  btnAdd := TButton.Create(pnlControls);
+  btnAdd.Parent := pnlControls;
+  btnAdd.Left := 130;
+  btnAdd.Top := 8;
+  btnAdd.Width := 80;
+  btnAdd.Caption := '濞ｈ濮炵仦鐐粹偓?;
+  btnAdd.OnClick := btnAddClick;
+  
+  // 缂傛牞绶幐澶愭尦
+  btnEdit := TButton.Create(pnlControls);
+  btnEdit.Parent := pnlControls;
+  btnEdit.Left := 215;
+  btnEdit.Top := 8;
+  btnEdit.Width := 80;
+  btnEdit.Caption := '缂傛牞绶仦鐐粹偓?;
+  btnEdit.OnClick := btnEditClick;
+  btnEdit.Enabled := False;
+  
+  // 閸掔娀娅庨幐澶愭尦
+  btnDelete := TButton.Create(pnlControls);
+  btnDelete.Parent := pnlControls;
+  btnDelete.Left := 300;
+  btnDelete.Top := 8;
+  btnDelete.Width := 80;
+  btnDelete.Caption := '閸掔娀娅庣仦鐐粹偓?;
+  btnDelete.OnClick := btnDeleteClick;
+  btnDelete.Enabled := False;
+end;
+
+procedure TFrameObjectEditor.InitializeGrid;
+begin
+  // 鐠佸墽鐤嗙悰銊︾壐閸?
+  sgProperties.ColCount := 3;
+  sgProperties.RowCount := 1; // 娴犲懏鐖ｆ０妯款攽
+  sgProperties.FixedRows := 1;
+  sgProperties.ColWidths[0] := 150; // 鐏炵偞鈧冩倳
+  sgProperties.ColWidths[1] := 100; // 缁鐎?
+  sgProperties.ColWidths[2] := 250; // 閸?
+  
+  // 鐠佸墽鐤嗛弽鍥暯
+  sgProperties.Cells[0, 0] := '鐏炵偞鈧冩倳';
+  sgProperties.Cells[1, 0] := '缁鐎?;
+  sgProperties.Cells[2, 0] := '閸?;
+end;
+
+procedure TFrameObjectEditor.sgPropertiesSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+  // 闁鑵戞禍鍡楃潣閹嗩攽
+  btnEdit.Enabled := ARow > 0;
+  btnDelete.Enabled := ARow > 0;
+end;
+
+function TFrameObjectEditor.GetPropertyTypeAsString(PropertyType: TObjectPropertyType): string;
+begin
+  case PropertyType of
+    ptString: Result := '鐎涙顑佹稉?;
+    ptNumber: Result := '閺佹澘鐡?;
+    ptBoolean: Result := '鐢啫鐨甸崐?;
+    ptObject: Result := '鐎电钖?;
+    ptArray: Result := '閺佹壆绮?;
+    else Result := '鐎涙顑佹稉?;
+  end;
+end;
+
+function TFrameObjectEditor.GetPropertyTypeFromString(const TypeStr: string): TObjectPropertyType;
+begin
+  if TypeStr = '閺佹澘鐡? then
+    Result := ptNumber
+  else if TypeStr = '鐢啫鐨甸崐? then
+    Result := ptBoolean
+  else if TypeStr = '鐎电钖? then
+    Result := ptObject
+  else if TypeStr = '閺佹壆绮? then
+    Result := ptArray
+  else
+    Result := ptString; // 姒涙顓绘稉鍝勭摟缁楋缚瑕?
+end;
+
+procedure TFrameObjectEditor.btnAddClick(Sender: TObject);
+var
+  PropertyName, PropertyValue: string;
+  PropertyType: TObjectPropertyType;
+  NewRow: Integer;
+begin
+  // 濞ｈ濮為弬鏉跨潣閹?
+  if InputQuery('濞ｈ濮炵仦鐐粹偓?, '鐠囩柉绶崗銉ョ潣閹冩倳:', PropertyName) then
+  begin
+    // 濡偓閺屻儱鐫橀幀褍鎮曢弰顖氭儊瀹告彃鐡ㄩ崷?
+    for NewRow := 1 to sgProperties.RowCount - 1 do
+    begin
+      if SameText(sgProperties.Cells[0, NewRow], PropertyName) then
+      begin
+        MessageDlg('鐏炵偞鈧冩倳 "' + PropertyName + '" 瀹告彃鐡ㄩ崷?', mtWarning, [mbOK], 0);
+        Exit;
+      end;
+    end;
+    
+    // 閼惧嘲褰囩仦鐐粹偓褏琚崹?
+    PropertyType := TObjectPropertyType(cmbPropertyType.ItemIndex);
+    
+    // 閺嶈宓佺猾璇茬€烽懢宄板絿鐏炵偞鈧冣偓?
+    case PropertyType of
+      ptString:
+        begin
+          if not InputQuery('濞ｈ濮炵€涙顑佹稉鎻掔潣閹?, '鐠囩柉绶崗銉ョ摟缁楋缚瑕嗛崐?', PropertyValue) then
+            Exit;
+        end;
+      ptNumber:
+        begin
+          if not InputQuery('濞ｈ濮為弫鏉跨摟鐏炵偞鈧?, '鐠囩柉绶崗銉︽殶鐎涙鈧?', PropertyValue) then
+            Exit;
+          // 妤犲矁鐦夐弫鏉跨摟
+          try
+            StrToFloat(PropertyValue);
+          except
+            MessageDlg('閺冪姵鏅ラ惃鍕殶鐎涙鈧?, mtError, [mbOK], 0);
+            Exit;
+          end;
+        end;
+      ptBoolean:
+        begin
+          if MessageDlg('闁瀚ㄧ敮鍐ㄧ毜閸?, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+            PropertyValue := 'true'
+          else
+            PropertyValue := 'false';
+        end;
+      ptObject: PropertyValue := '{}';
+      ptArray: PropertyValue := '[]';
+    end;
+    
+    // 濞ｈ濮為崚鎵秹閺?
+    NewRow := sgProperties.RowCount;
+    sgProperties.RowCount := NewRow + 1;
+    sgProperties.Cells[0, NewRow] := PropertyName;
+    sgProperties.Cells[1, NewRow] := GetPropertyTypeAsString(PropertyType);
+    sgProperties.Cells[2, NewRow] := PropertyValue;
+    
+    // 鐠佸墽鐤嗘穱顔芥暭閺嶅洩顔?
+    Modified := True;
+    
+    // 闁鑵戦弬鎷岊攽
+    sgProperties.Row := NewRow;
+  end;
+end;
+
+procedure TFrameObjectEditor.btnEditClick(Sender: TObject);
+var
+  SelectedRow: Integer;
+  PropertyName, PropertyValue: string;
+  PropertyType: TObjectPropertyType;
+begin
+  // 缂傛牞绶柅澶夎厬閻ㄥ嫬鐫橀幀?
+  SelectedRow := sgProperties.Row;
+  if SelectedRow <= 0 then
+    Exit;
+    
+  // 閼惧嘲褰囪ぐ鎾冲閸?
+  PropertyName := sgProperties.Cells[0, SelectedRow];
+  PropertyType := GetPropertyTypeFromString(sgProperties.Cells[1, SelectedRow]);
+  PropertyValue := sgProperties.Cells[2, SelectedRow];
+  
+  // 缂傛牞绶仦鐐粹偓褍鎮?
+  if InputQuery('缂傛牞绶仦鐐粹偓?, '鐠囬绱潏鎴濈潣閹冩倳:', PropertyName) then
+  begin
+    // 濡偓閺屻儱鐫橀幀褍鎮曢弰顖氭儊瀹告彃鐡ㄩ崷顭掔礄閹烘帡娅庤ぐ鎾冲鐞涘矉绱?
+    for var i := 1 to sgProperties.RowCount - 1 do
+    begin
+      if (i <> SelectedRow) and SameText(sgProperties.Cells[0, i], PropertyName) then
+      begin
+        MessageDlg('鐏炵偞鈧冩倳 "' + PropertyName + '" 瀹告彃鐡ㄩ崷?', mtWarning, [mbOK], 0);
+        Exit;
+      end;
+    end;
+    
+    // 閺囧瓨鏌婄仦鐐粹偓褍鎮?
+    sgProperties.Cells[0, SelectedRow] := PropertyName;
+    
+    // 閺嶈宓佺猾璇茬€风紓鏍帆鐏炵偞鈧冣偓?
+    case PropertyType of
+      ptString:
+        begin
+          if InputQuery('缂傛牞绶€涙顑佹稉鎻掔潣閹?, '鐠囬绱潏鎴濈摟缁楋缚瑕嗛崐?', PropertyValue) then
+            sgProperties.Cells[2, SelectedRow] := PropertyValue;
+        end;
+      ptNumber:
+        begin
+          if InputQuery('缂傛牞绶弫鏉跨摟鐏炵偞鈧?, '鐠囬绱潏鎴炴殶鐎涙鈧?', PropertyValue) then
+          begin
+            // 妤犲矁鐦夐弫鏉跨摟
+            try
+              StrToFloat(PropertyValue);
+              sgProperties.Cells[2, SelectedRow] := PropertyValue;
+            except
+              MessageDlg('閺冪姵鏅ラ惃鍕殶鐎涙鈧?, mtError, [mbOK], 0);
+            end;
+          end;
+        end;
+      ptBoolean:
+        begin
+          if MessageDlg('闁瀚ㄧ敮鍐ㄧ毜閸?, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+            sgProperties.Cells[2, SelectedRow] := 'true'
+          else
+            sgProperties.Cells[2, SelectedRow] := 'false';
+        end;
+      ptObject, ptArray:
+        begin
+          MessageDlg('婢跺秵娼呯猾璇茬€烽弮鐘崇《閻╁瓨甯寸紓鏍帆閵嗗倽顕担璺ㄦ暏娑撴挾鏁ょ紓鏍帆閸ｃ劊鈧?, mtInformation, [mbOK], 0);
+        end;
+    end;
+    
+    // 鐠佸墽鐤嗘穱顔芥暭閺嶅洩顔?
+    Modified := True;
+  end;
+end;
+
+procedure TFrameObjectEditor.btnDeleteClick(Sender: TObject);
+var
+  SelectedRow: Integer;
+begin
+  // 閸掔娀娅庨柅澶夎厬閻ㄥ嫬鐫橀幀?
+  SelectedRow := sgProperties.Row;
+  if (SelectedRow <= 0) or (SelectedRow >= sgProperties.RowCount) then
+    Exit;
+    
+  if MessageDlg('绾喖鐣剧憰浣稿灩闂勩倕鐫橀幀?' + sgProperties.Cells[0, SelectedRow] + '"閸?',
+                mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    // 閸掔娀娅庣悰?
+    for var i := SelectedRow to sgProperties.RowCount - 2 do
+    begin
+      sgProperties.Cells[0, i] := sgProperties.Cells[0, i + 1];
+      sgProperties.Cells[1, i] := sgProperties.Cells[1, i + 1];
+      sgProperties.Cells[2, i] := sgProperties.Cells[2, i + 1];
+    end;
+    
+    // 閸戝繐鐨悰灞炬殶
+    sgProperties.RowCount := sgProperties.RowCount - 1;
+    
+    // 婵″倹鐏夊▽鈩冩箒閺佺増宓佺悰宀嬬礉缁備胶鏁ょ紓鏍帆閸滃苯鍨归梽銈嗗瘻闁?
+    if sgProperties.RowCount <= 1 then
+    begin
+      btnEdit.Enabled := False;
+      btnDelete.Enabled := False;
+    end;
+    
+    // 鐠佸墽鐤嗘穱顔芥暭閺嶅洩顔?
+    Modified := True;
+  end;
+end;
+
+procedure TFrameObjectEditor.LoadFromJSON;
+var
+  Value: TJSONValue;
+  ObjectValue: TJSONObject;
+  PropertyPair: TJSONPair;
+  PropertyType: TObjectPropertyType;
+  PropertyValue: string;
+  RowIndex: Integer;
+begin
+  if not Assigned(JSONObject) then
+    Exit;
+
+  // 濞撳懐鈹栫純鎴炵壐閿涘苯褰ф穱婵堟殌閺嶅洭顣界悰?
+  sgProperties.RowCount := 1;
+  
+  // 閸旂姾娴囩€电钖勭仦鐐粹偓?
+  Value := JSONObject.GetValue('value');
+  if Assigned(Value) and (Value is TJSONObject) then
+  begin
+    ObjectValue := TJSONObject(Value);
+    
+    // 闁秴宸婚幍鈧張澶婄潣閹?
+    for var i := 0 to ObjectValue.Count - 1 do
+    begin
+      PropertyPair := ObjectValue.Pairs[i];
+      if not Assigned(PropertyPair) then
+        Continue;
+        
+      // 绾喖鐣剧仦鐐粹偓褏琚崹瀣嫲閸?
+      if PropertyPair.JsonValue is TJSONString then
+      begin
+        PropertyType := ptString;
+        PropertyValue := TJSONString(PropertyPair.JsonValue).Value;
+      end
+      else if PropertyPair.JsonValue is TJSONNumber then
+      begin
+        PropertyType := ptNumber;
+        PropertyValue := TJSONNumber(PropertyPair.JsonValue).ToString;
+      end
+      else if PropertyPair.JsonValue is TJSONBool then
+      begin
+        PropertyType := ptBoolean;
+        PropertyValue := LowerCase(BoolToStr(TJSONBool(PropertyPair.JsonValue).AsBoolean, True));
+      end
+      else if PropertyPair.JsonValue is TJSONObject then
+      begin
+        PropertyType := ptObject;
+        PropertyValue := '{}';
+      end
+      else if PropertyPair.JsonValue is TJSONArray then
+      begin
+        PropertyType := ptArray;
+        PropertyValue := '[]';
+      end
+      else
+      begin
+        PropertyType := ptString;
+        PropertyValue := '';
+      end;
+      
+      // 濞ｈ濮炵悰?
+      RowIndex := sgProperties.RowCount;
+      sgProperties.RowCount := RowIndex + 1;
+      sgProperties.Cells[0, RowIndex] := PropertyPair.JsonString.Value;
+      sgProperties.Cells[1, RowIndex] := GetPropertyTypeAsString(PropertyType);
+      sgProperties.Cells[2, RowIndex] := PropertyValue;
+    end;
+    
+    // 婵″倹鐏夊▽鈩冩箒鐏炵偞鈧嶇礉绾喕绻氱粋浣烘暏閹稿鎸?
+    btnEdit.Enabled := sgProperties.RowCount > 1;
+    btnDelete.Enabled := sgProperties.RowCount > 1;
+  end;
+end;
+
+procedure TFrameObjectEditor.SaveToJSON;
+var
+  ObjectValue: TJSONObject;
+  PropertyName, PropertyValue: string;
+  PropertyType: TObjectPropertyType;
+begin
+  if not Assigned(JSONObject) then
+    Exit;
+    
+  // 娣囨繂鐡ㄧ猾璇茬€锋穱鈩冧紖
+  if JSONObject.GetValue('_type') = nil then
+    JSONObject.AddPair('_type', 'etObject');
+    
+  // 閸掓稑缂撻幋鏍ㄧ缁屽搫顕挒?
+  if JSONObject.GetValue('value') <> nil then
+  begin
+    if JSONObject.GetValue('value') is TJSONObject then
+      ObjectValue := TJSONObject(JSONObject.GetValue('value'))
+    else
+    begin
+      JSONObject.RemovePair('value');
+      ObjectValue := TJSONObject.Create;
+      JSONObject.AddPair('value', ObjectValue);
+    end;
+  end
+  else
+  begin
+    ObjectValue := TJSONObject.Create;
+    JSONObject.AddPair('value', ObjectValue);
+  end;
+  
+  // 濞撳懐鈹栭悳鐗堟箒鐏炵偞鈧?
+  while ObjectValue.Count > 0 do
+    ObjectValue.RemovePair(ObjectValue.Pairs[0].JsonString.Value);
+  
+  // 濞ｈ濮為幍鈧張澶婄潣閹?
+  for var i := 1 to sgProperties.RowCount - 1 do
+  begin
+    PropertyName := sgProperties.Cells[0, i];
+    PropertyType := GetPropertyTypeFromString(sgProperties.Cells[1, i]);
+    PropertyValue := sgProperties.Cells[2, i];
+    
+    case PropertyType of
+      ptString:
+        ObjectValue.AddPair(PropertyName, PropertyValue);
+      
+      ptNumber:
+        begin
+          try
+            ObjectValue.AddPair(PropertyName, TJSONNumber.Create(StrToFloat(PropertyValue)));
+          except
+            ObjectValue.AddPair(PropertyName, TJSONNumber.Create(0));
+          end;
+        end;
+      
+      ptBoolean:
+        ObjectValue.AddPair(PropertyName, TJSONBool.Create(LowerCase(PropertyValue) = 'true'));
+      
+      ptObject:
+        ObjectValue.AddPair(PropertyName, TJSONObject.Create);
+      
+      ptArray:
+        ObjectValue.AddPair(PropertyName, TJSONArray.Create);
+    end;
+  end;
+end;
+
+end. 
+

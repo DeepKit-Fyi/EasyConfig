@@ -1,4 +1,4 @@
-program ConfigBuild;
+﻿program ConfigBuild;
 
 uses
   Vcl.Forms,
@@ -7,6 +7,7 @@ uses
   ViewBuildConfig in 'ViewBuildConfig.pas' {FrmBuildConfig},
   ConfigIntf in 'ConfigIntf.pas',
   UtilsTypes in 'UtilsTypes.pas',
+  JSONHelpers in 'JSONHelpers.pas',
   FrameFontEditor in 'FrameFontEditor.pas',
   FrameAIAPIEditor in 'FrameAIAPIEditor.pas',
   FrameDBEditor in 'FrameDBEditor.pas',
@@ -15,7 +16,13 @@ uses
   FramesComplexEditor in 'FramesComplexEditor.pas',
   ConfigFrameBase in 'ConfigFrameBase.pas',
   FrameConfigEditor in 'FrameConfigEditor.pas' {frameConfigEditor: TframeConfigEditor},
-  FrameArrayEditor in 'FrameArrayEditor.pas';
+  FrameArrayEditor in 'FrameArrayEditor.pas',
+  FrameKeyValueDictEditor in 'FrameKeyValueDictEditor.pas' {FrameKeyValueDictEditor},
+  // FrameNetConfigEditor in 'FrameNetConfigEditor.pas',
+  FrameGeoLocationEditor in 'FrameGeoLocationEditor.pas',
+  // FrameEncryptEditor in 'FrameEncryptEditor.pas',
+  // FrameDateTimeRangeEditor in 'FrameDateTimeRangeEditor.pas',
+  ConfigValidator in 'ConfigValidator.pas';
 
 {$R *.res}
 

@@ -1,284 +1,352 @@
 object FrameVideoClipEditor: TFrameVideoClipEditor
   Left = 0
   Top = 0
-  Width = 800
-  Height = 600
+  Width = 640
+  Height = 480
   TabOrder = 0
-  object pnlToolbar: TPanel
+  object pnlBackground: TPanel
     Left = 0
     Top = 0
-    Width = 800
-    Height = 41
+    Width = 640
+    Height = 50
     Align = alTop
+    BevelOuter = bvNone
     TabOrder = 0
-    object btnSave: TButton
-      Left = 693
-      Top = 8
-      Width = 90
+    object lblBackground: TLabel
+      Left = 16
+      Top = 16
+      Width = 60
+      Height = 13
+      Caption = '背景路径:'
+    end
+    object edtBackground: TEdit
+      Left = 82
+      Top = 13
+      Width = 471
+      Height = 21
+      TabOrder = 0
+      OnChange = EditModified
+    end
+    object btnBrowseBackground: TButton
+      Left = 559
+      Top = 11
+      Width = 75
       Height = 25
-      Anchors = [akTop, akRight]
-      Caption = #20445#23384
-      TabOrder = 0
-      OnClick = btnSaveClick
-    end
-  end
-  object pnlMain: TPanel
-    Left = 0
-    Top = 41
-    Width = 800
-    Height = 559
-    Align = alClient
-    TabOrder = 1
-    object pnlBackground: TPanel
-      Left = 1
-      Top = 1
-      Width = 798
-      Height = 48
-      Align = alTop
-      TabOrder = 0
-      object lblBackground: TLabel
-        Left = 16
-        Top = 16
-        Width = 52
-        Height = 15
-        Caption = #32972#26223#22270#29255
-      end
-      object edtBackground: TEdit
-        Left = 88
-        Top = 13
-        Width = 577
-        Height = 23
-        TabOrder = 0
-      end
-      object btnBrowseBackground: TButton
-        Left = 683
-        Top = 12
-        Width = 98
-        Height = 25
-        Caption = #27983#35272'...'
-        TabOrder = 1
-        OnClick = btnBrowseBackgroundClick
-      end
-    end
-    object pnlDuration: TPanel
-      Left = 1
-      Top = 49
-      Width = 798
-      Height = 48
-      Align = alTop
+      Caption = '浏览...'
       TabOrder = 1
-      object lblDuration: TLabel
-        Left = 16
-        Top = 16
-        Width = 52
-        Height = 15
-        Caption = #29255#27573#26102#38271
-      end
-      object lblFps: TLabel
-        Left = 320
-        Top = 16
-        Width = 39
-        Height = 15
-        Caption = #24103#29575'FPS'
-      end
-      object edtDuration: TEdit
-        Left = 88
-        Top = 13
-        Width = 121
-        Height = 23
-        TabOrder = 0
-        Text = '10.0'
-      end
-      object edtFps: TEdit
-        Left = 376
-        Top = 13
-        Width = 121
-        Height = 23
-        TabOrder = 1
-        Text = '30'
-      end
-    end
-    object pnlAudio: TPanel
-      Left = 1
-      Top = 97
-      Width = 798
-      Height = 48
-      Align = alTop
-      TabOrder = 2
-      object lblAudio: TLabel
-        Left = 16
-        Top = 16
-        Width = 52
-        Height = 15
-        Caption = #38899#39057#25991#20214
-      end
-      object edtAudio: TEdit
-        Left = 88
-        Top = 13
-        Width = 577
-        Height = 23
-        TabOrder = 0
-      end
-      object btnBrowseAudio: TButton
-        Left = 683
-        Top = 12
-        Width = 98
-        Height = 25
-        Caption = #27983#35272'...'
-        TabOrder = 1
-        OnClick = btnBrowseAudioClick
-      end
-    end
-    object pnlCaptions: TPanel
-      Left = 1
-      Top = 145
-      Width = 798
-      Height = 361
-      Align = alClient
-      TabOrder = 3
-      object lblCaptions: TLabel
-        Left = 16
-        Top = 16
-        Width = 39
-        Height = 15
-        Caption = #23383#24149#34920
-      end
-      object lvCaptions: TListView
-        Left = 16
-        Top = 48
-        Width = 765
-        Height = 257
-        Columns = <>
-        GridLines = True
-        ReadOnly = True
-        RowSelect = True
-        TabOrder = 0
-        ViewStyle = vsReport
-      end
-      object btnAddCaption: TButton
-        Left = 272
-        Top = 317
-        Width = 106
-        Height = 25
-        Caption = #28155#21152#23383#24149
-        TabOrder = 1
-        OnClick = btnAddCaptionClick
-      end
-      object btnEditCaption: TButton
-        Left = 392
-        Top = 317
-        Width = 106
-        Height = 25
-        Caption = #32534#36753#23383#24149
-        TabOrder = 2
-        OnClick = btnEditCaptionClick
-      end
-      object btnDeleteCaption: TButton
-        Left = 512
-        Top = 317
-        Width = 106
-        Height = 25
-        Caption = #21024#38500#23383#24149
-        TabOrder = 3
-        OnClick = btnDeleteCaptionClick
-      end
-    end
-    object pnlCaptionEdit: TPanel
-      Left = 1
-      Top = 145
-      Width = 798
-      Height = 361
-      Align = alClient
-      TabOrder = 4
-      Visible = False
-      object lblCaptionText: TLabel
-        Left = 16
-        Top = 32
-        Width = 52
-        Height = 15
-        Caption = #23383#24149#25991#23383
-      end
-      object lblStartTime: TLabel
-        Left = 16
-        Top = 80
-        Width = 52
-        Height = 15
-        Caption = #24320#22987#26102#38388
-      end
-      object lblCaptionDuration: TLabel
-        Left = 16
-        Top = 128
-        Width = 52
-        Height = 15
-        Caption = #26174#31034#26102#38388
-      end
-      object edtCaptionText: TEdit
-        Left = 88
-        Top = 29
-        Width = 425
-        Height = 23
-        TabOrder = 0
-      end
-      object edtStartTime: TEdit
-        Left = 88
-        Top = 77
-        Width = 121
-        Height = 23
-        TabOrder = 1
-        Text = '0.0'
-      end
-      object edtCaptionDuration: TEdit
-        Left = 88
-        Top = 125
-        Width = 121
-        Height = 23
-        TabOrder = 2
-        Text = '5.0'
-      end
-      object btnFont: TButton
-        Left = 88
-        Top = 176
-        Width = 121
-        Height = 25
-        Caption = #36873#25321#23383#20307
-        TabOrder = 3
-        OnClick = btnFontClick
-      end
-      object btnSaveCaption: TButton
-        Left = 144
-        Top = 232
-        Width = 121
-        Height = 25
-        Caption = #20445#23384#23383#24149
-        TabOrder = 4
-        OnClick = btnSaveCaptionClick
-      end
-      object btnCancelCaption: TButton
-        Left = 296
-        Top = 232
-        Width = 121
-        Height = 25
-        Caption = #21462#28040
-        TabOrder = 5
-        OnClick = btnCancelCaptionClick
-      end
+      OnClick = btnBrowseBackgroundClick
     end
   end
-  object dlgOpenImage: TOpenPictureDialog
-    Left = 408
-    Top = 8
+  object pnlAudio: TPanel
+    Left = 0
+    Top = 50
+    Width = 640
+    Height = 50
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 1
+    object lblAudio: TLabel
+      Left = 16
+      Top = 16
+      Width = 60
+      Height = 13
+      Caption = '音频路径:'
+    end
+    object edtAudio: TEdit
+      Left = 82
+      Top = 13
+      Width = 471
+      Height = 21
+      TabOrder = 0
+      OnChange = EditModified
+    end
+    object btnBrowseAudio: TButton
+      Left = 559
+      Top = 11
+      Width = 75
+      Height = 25
+      Caption = '浏览...'
+      TabOrder = 1
+      OnClick = btnBrowseAudioClick
+    end
+  end
+  object pnlClipSettings: TPanel
+    Left = 0
+    Top = 100
+    Width = 640
+    Height = 50
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 2
+    object lblDuration: TLabel
+      Left = 16
+      Top = 18
+      Width = 60
+      Height = 13
+      Caption = '时长(秒):'
+    end
+    object lblFPS: TLabel
+      Left = 213
+      Top = 18
+      Width = 32
+      Height = 13
+      Caption = '帧率:'
+    end
+    object edtDuration: TEdit
+      Left = 82
+      Top = 15
+      Width = 85
+      Height = 21
+      TabOrder = 0
+      Text = '10.00'
+      OnChange = EditModified
+    end
+    object edtFPS: TEdit
+      Left = 251
+      Top = 15
+      Width = 85
+      Height = 21
+      TabOrder = 1
+      Text = '30.00'
+      OnChange = EditModified
+    end
+  end
+  object lblCaptions: TLabel
+    Left = 16
+    Top = 160
+    Width = 48
+    Height = 13
+    Caption = '字幕列表:'
+  end
+  object lstCaptions: TListBox
+    Left = 16
+    Top = 180
+    Width = 217
+    Height = 290
+    ItemHeight = 13
+    TabOrder = 3
+    OnClick = lstCaptionsClick
+  end
+  object pnlCaptionButtons: TPanel
+    Left = 239
+    Top = 180
+    Width = 98
+    Height = 290
+    BevelOuter = bvNone
+    TabOrder = 4
+    object btnAddCaption: TButton
+      Left = 0
+      Top = 0
+      Width = 98
+      Height = 25
+      Caption = '添加字幕'
+      TabOrder = 0
+      OnClick = btnAddCaptionClick
+    end
+    object btnEditCaption: TButton
+      Left = 0
+      Top = 31
+      Width = 98
+      Height = 25
+      Caption = '编辑字幕'
+      Enabled = False
+      TabOrder = 1
+      OnClick = btnEditCaptionClick
+    end
+    object btnDeleteCaption: TButton
+      Left = 0
+      Top = 62
+      Width = 98
+      Height = 25
+      Caption = '删除字幕'
+      Enabled = False
+      TabOrder = 2
+      OnClick = btnDeleteCaptionClick
+    end
+  end
+  object pnlCaptionDetails: TPanel
+    Left = 343
+    Top = 180
+    Width = 281
+    Height = 290
+    BevelOuter = bvNone
+    TabOrder = 5
+    Visible = False
+    object lblCaptionText: TLabel
+      Left = 8
+      Top = 8
+      Width = 60
+      Height = 13
+      Caption = '字幕文本:'
+    end
+    object lblStartTime: TLabel
+      Left = 8
+      Top = 48
+      Width = 60
+      Height = 13
+      Caption = '开始时间:'
+    end
+    object lblCaptionDuration: TLabel
+      Left = 143
+      Top = 48
+      Width = 60
+      Height = 13
+      Caption = '显示时长:'
+    end
+    object lblFontSettings: TLabel
+      Left = 8
+      Top = 88
+      Width = 60
+      Height = 13
+      Caption = '字体设置:'
+    end
+    object lblFontSize: TLabel
+      Left = 143
+      Top = 88
+      Width = 60
+      Height = 13
+      Caption = '字体大小:'
+    end
+    object lblFontColor: TLabel
+      Left = 8
+      Top = 128
+      Width = 60
+      Height = 13
+      Caption = '字体颜色:'
+    end
+    object lblPosition: TLabel
+      Left = 8
+      Top = 168
+      Width = 60
+      Height = 13
+      Caption = '位置设置:'
+    end
+    object lblCaptionX: TLabel
+      Left = 39
+      Top = 190
+      Width = 12
+      Height = 13
+      Caption = 'X:'
+    end
+    object lblCaptionY: TLabel
+      Left = 143
+      Top = 190
+      Width = 12
+      Height = 13
+      Caption = 'Y:'
+    end
+    object edtCaptionText: TEdit
+      Left = 74
+      Top = 5
+      Width = 199
+      Height = 21
+      TabOrder = 0
+    end
+    object edtStartTime: TEdit
+      Left = 74
+      Top = 45
+      Width = 60
+      Height = 21
+      TabOrder = 1
+      Text = '0.00'
+    end
+    object edtCaptionDuration: TEdit
+      Left = 209
+      Top = 45
+      Width = 60
+      Height = 21
+      TabOrder = 2
+      Text = '3.00'
+    end
+    object edtFontName: TEdit
+      Left = 74
+      Top = 85
+      Width = 60
+      Height = 21
+      TabOrder = 3
+      Text = 'Arial'
+    end
+    object btnSelectFont: TButton
+      Left = 66
+      Top = 125
+      Width = 75
+      Height = 25
+      Caption = '选择字体'
+      TabOrder = 5
+      OnClick = btnSelectFontClick
+    end
+    object edtFontSize: TEdit
+      Left = 209
+      Top = 85
+      Width = 60
+      Height = 21
+      TabOrder = 4
+      Text = '24'
+    end
+    object pnlFontColor: TPanel
+      Left = 16
+      Top = 146
+      Width = 24
+      Height = 16
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 6
+      OnClick = pnlFontColorClick
+    end
+    object edtCaptionX: TEdit
+      Left = 57
+      Top = 187
+      Width = 60
+      Height = 21
+      TabOrder = 7
+      Text = '10'
+    end
+    object edtCaptionY: TEdit
+      Left = 161
+      Top = 187
+      Width = 60
+      Height = 21
+      TabOrder = 8
+      Text = '10'
+    end
+    object btnSaveCaption: TButton
+      Left = 102
+      Top = 254
+      Width = 75
+      Height = 25
+      Caption = '保存'
+      TabOrder = 9
+      OnClick = btnSaveCaptionClick
+    end
+    object btnCancelCaption: TButton
+      Left = 183
+      Top = 254
+      Width = 75
+      Height = 25
+      Caption = '取消'
+      TabOrder = 10
+      OnClick = btnCancelCaptionClick
+    end
+  end
+  object dlgOpenBackground: TOpenDialog
+    Left = 472
+    Top = 64
   end
   object dlgOpenAudio: TOpenDialog
-    Left = 472
-    Top = 8
+    Left = 392
+    Top = 64
   end
   object dlgFont: TFontDialog
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
+    Font.Height = -11
+    Font.Name = 'Tahoma'
     Font.Style = []
-    Left = 536
-    Top = 8
+    Left = 552
+    Top = 64
+  end
+  object dlgColor: TColorDialog
+    Left = 312
+    Top = 64
   end
 end 

@@ -3,7 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, Vcl.Graphics, Vcl.Forms,
+  System.SysUtils, System.Classes, System.JSON, JSONHelpers, Vcl.Graphics, Vcl.Forms,
   Vcl.Controls, UtilsTypes;
 
 type

@@ -3,9 +3,9 @@ unit FrameAIAPIEditor;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.JSON, Vcl.Controls, Vcl.Forms, 
-  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Graphics, Vcl.Dialogs,
-  ConfigFrameBase, UtilsTypes;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  ConfigFrameBase, System.JSON, JSONHelpers, UtilsTypes;
 
 type
   TAIAPIEditorFrame = class(TBaseConfigFrame)
@@ -44,19 +44,17 @@ end;
 
 procedure TAIAPIEditorFrame.CreateControls;
 begin
-  // 主面板
-  pnlMain := TPanel.Create(Self);
+  // 主面�?  pnlMain := TPanel.Create(Self);
   pnlMain.Parent := Self;
   pnlMain.Align := alClient;
   pnlMain.BevelOuter := bvNone;
   pnlMain.Padding.SetBounds(10, 10, 10, 10);
 
-  // API提供商
-  lblProvider := TLabel.Create(Self);
+  // API提供�?  lblProvider := TLabel.Create(Self);
   lblProvider.Parent := pnlMain;
   lblProvider.Top := 15;
   lblProvider.Left := 10;
-  lblProvider.Caption := 'API提供商:';
+  lblProvider.Caption := 'API提供�?';
 
   cboProvider := TComboBox.Create(Self);
   cboProvider.Parent := pnlMain;
@@ -123,7 +121,7 @@ begin
   lblTimeout.Parent := pnlMain;
   lblTimeout.Top := lblBaseURL.Top + 30;
   lblTimeout.Left := 10;
-  lblTimeout.Caption := '超时(秒):';
+  lblTimeout.Caption := '超时(�?:';
 
   edtTimeout := TEdit.Create(Self);
   edtTimeout.Parent := pnlMain;
@@ -133,8 +131,7 @@ begin
   edtTimeout.Text := '30';
   edtTimeout.OnChange := edtChange;
 
-  // 初始化界面
-  UpdateProviderFields;
+  // 初始化界�?  UpdateProviderFields;
 end;
 
 procedure TAIAPIEditorFrame.LoadFromJSON;
@@ -145,8 +142,7 @@ begin
   if not Assigned(JSONObject) then
     Exit;
 
-  // 加载API提供商
-  Value := JSONObject.GetValue('provider');
+  // 加载API提供�?  Value := JSONObject.GetValue('provider');
   if Assigned(Value) and (Value is TJSONString) then
   begin
     ProviderStr := TJSONString(Value).Value;
@@ -216,8 +212,7 @@ begin
     else ProviderStr := 'openai';
   end;
 
-  // 保存API提供商
-  if JSONObject.GetValue('provider') <> nil then
+  // 保存API提供�?  if JSONObject.GetValue('provider') <> nil then
     JSONObject.RemovePair('provider');
   JSONObject.AddPair('provider', ProviderStr);
 
@@ -255,8 +250,7 @@ end;
 
 procedure TAIAPIEditorFrame.UpdateProviderFields;
 begin
-  // 确保界面控件已创建
-  if not Assigned(cboProvider) then
+  // 确保界面控件已创�?  if not Assigned(cboProvider) then
     Exit;
     
   // 根据不同的API提供商显示不同的界面元素
